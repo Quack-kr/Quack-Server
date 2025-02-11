@@ -4,14 +4,12 @@ import static jakarta.persistence.FetchType.LAZY;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 
 @Entity
 @Table(name = "review_keyword")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// 생성자 선언 후, @Builder 붙이기
 public class ReviewKeyword {
 
     @Id
@@ -19,12 +17,21 @@ public class ReviewKeyword {
     private Long reviewKeywordId;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "review_id")
+    @JoinColumn(name = "review_id", nullable = false)
     private Review review;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "keyword_id")
+    @JoinColumn(name = "keyword_id", nullable = false)
     private Keyword keyword;
 
-    private LocalDateTime createdDate;
+    private ReviewKeyword(Review review, Keyword keyword) {
+        this.review = review;
+        this.keyword = keyword;
+    }
+
+    public static ReviewKeyword create(Review review, Keyword keyword) {
+        return new ReviewKeyword(review, keyword);
+    }
+
+    //TODO: 연관관계 편의메서드 작성하기
 }

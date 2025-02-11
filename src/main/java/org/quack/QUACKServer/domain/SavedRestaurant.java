@@ -4,14 +4,12 @@ import static jakarta.persistence.FetchType.*;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 
 @Entity
 @Table(name = "saved_restaurant")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// 생성자 선언 후, @Builder 붙이기
 public class SavedRestaurant {
 
     @Id
@@ -19,12 +17,22 @@ public class SavedRestaurant {
     private Long savedId;
 
     @ManyToOne (fetch = LAZY)
-    @JoinColumn(name = "user_id")
-    private User user; // 저장한 유저
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "restaurant_id")
-    private Restaurant restaurant; // 저장한 가게
+    @JoinColumn(name = "restaurant_id", nullable = false)
+    private Restaurant restaurant;
 
-    private LocalDateTime createdDate;
+
+    private SavedRestaurant(User user, Restaurant restaurant){
+        this.user = user;
+        this.restaurant =restaurant;
+    }
+
+    public static SavedRestaurant create(User user, Restaurant restaurant) {
+        return new SavedRestaurant(user, restaurant);
+    }
+
+    //TODO: @JoinColumn 안하고, 단순히 user_id, restaurant_id로 저장하는 방식 생각해보기
 }

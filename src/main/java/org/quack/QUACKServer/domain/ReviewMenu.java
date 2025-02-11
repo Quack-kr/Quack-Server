@@ -4,14 +4,12 @@ import static jakarta.persistence.FetchType.LAZY;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 
 @Entity
 @Table(name = "review_menu")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// 생성자 선언 후, @Builder 붙이기
 public class ReviewMenu {
 
     @Id
@@ -19,11 +17,21 @@ public class ReviewMenu {
     private Long reviewMenuId;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "review_id")
+    @JoinColumn(name = "review_id", nullable = false)
     private Review review;
 
-    // 간단히 텍스트만 저장 or enum 타입으로 변경
+    @Column(nullable = false)
     private String menuName;
 
-    private LocalDateTime createdDate;
+
+    private ReviewMenu(Review review, String menuName) {
+        this.review = review;
+        this.menuName = menuName;
+    }
+
+    public static ReviewMenu create(Review review, String menuName) {
+        return new ReviewMenu(review, menuName);
+    }
+
+    // TODO: 연관관계 편의메서드 작성하기
 }

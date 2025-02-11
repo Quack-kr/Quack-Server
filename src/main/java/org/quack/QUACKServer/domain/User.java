@@ -2,48 +2,67 @@ package org.quack.QUACKServer.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.annotations.ColumnDefault;
 import org.quack.QUACKServer.domain.common.BaseEntity;
+import org.quack.QUACKServer.domain.common.Role;
+import org.quack.QUACKServer.domain.common.SocialType;
 import org.quack.QUACKServer.dto.user.UpdateUserInfoRequest;
 
-/**
- * providerType: (카카오, 네이버, 애플 등) 소셜 로그인 타입
- * roleType: (일반유저, 사장님) 권한/역할
- */
+
 @Entity
-@Table(name = "user")
+@Table(name = "user",
+        uniqueConstraints = {
+        @UniqueConstraint(name = "UNIQUE_SOCIAL_ID_CONSTRAINT",
+        columnNames = "social_id"),
+        @UniqueConstraint(name = "UNIQUE_NICKNAME_CONSTRAINT",
+        columnNames = "nickname")
+        })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// 생성자 선언 후, @Builder 붙이기
-// 아래 애노테이션은 임시로 작성
-@AllArgsConstructor
-@Builder
 public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;  // PK
+    @Column(nullable = false)
+    private Long userId;
 
-    private String providerType; // Enum type으로 변경
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SocialType socialType;
+
+    @Column(nullable = false)
+    private String socialId;
+
+    @Column(nullable = false)
     private String email;
+
+    @Column(nullable = false, length = 20)
     private String nickname;
-    private String roleType; // Enum type으로 변경
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'USER'")
+    private Role roleType;
+
+    @Column(nullable = false)
     private String profileImage;
 
+    private User(SocialType socialType, String socialId, String email, String nickname, String profileImage){
+        this.socialType = socialType;
+        this.socialId = socialId;
+        this.email = email;
+        this.nickname = nickname;
+        this.roleType = Role.USER;
+        this.profileImage = profileImage;
+    }
 
-    // == 연관관계 매핑 예시 == //
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<Inquiry> inquiries = new ArrayList<>();
+    @Builder
+    public static User createBySocial(SocialType socialType,
+                               String socialId, String email,
+                               String nickname, String profileImage) {
+        return new User(socialType, socialId, email, nickname, profileImage);
+    }
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<Restaurant> restaurants = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<SavedRestaurant> savedRestaurants = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<Review> reviews = new ArrayList<>();
 
     public void updateUserProfile (UpdateUserInfoRequest updateUserInfoRequest) {
         if (updateUserInfoRequest.getNickname() != null) {

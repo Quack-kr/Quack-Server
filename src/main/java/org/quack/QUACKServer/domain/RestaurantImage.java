@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @Table(name = "restaurant_image")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// 생성자 선언 후, @Builder 붙이기
 public class RestaurantImage {
 
     @Id
@@ -18,9 +17,12 @@ public class RestaurantImage {
     private Long restaurantImageId;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    private String imagePath;        // 실제 파일 경로나 URL
+    private String imagePath;
+
     private LocalDateTime createdDate;
+
+    // TODO: 생성자 및 연관관계 편의 메서드 구현
 }

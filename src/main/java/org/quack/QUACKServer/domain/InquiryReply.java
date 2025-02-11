@@ -17,8 +17,7 @@ public class InquiryReply {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long replyId;
 
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "inquiry_id")
+    @OneToOne(mappedBy = "inquiryReply", fetch = LAZY)
     private Inquiry inquiry;  // 어떤 문의에 대한 답변인지
 
     private String content;

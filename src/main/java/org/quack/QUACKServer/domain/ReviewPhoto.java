@@ -5,13 +5,11 @@ import static jakarta.persistence.FetchType.*;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "review_photo")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// 생성자 선언 후, @Builder 붙이기
 public class ReviewPhoto {
 
     @Id
@@ -19,9 +17,21 @@ public class ReviewPhoto {
     private Long reviewPhotoId;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "review_id")
-    private Review review;  // 어떤 리뷰에 달린 사진인지
+    @JoinColumn(name = "review_id", nullable = false)
+    private Review review;
 
+    @Column(nullable = false)
     private String photoUrl;
-    private LocalDateTime createdDate;
+
+
+    private ReviewPhoto(Review review, String photoUrl){
+        this.review = review;
+        this.photoUrl = photoUrl;
+    }
+
+    public static ReviewPhoto create(Review review, String photoUrl){
+        return new ReviewPhoto(review, photoUrl);
+    }
+
+    // TODO: 연관관계 편의메서드 작성하기
 }
