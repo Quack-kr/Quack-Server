@@ -12,7 +12,6 @@ import java.util.List;
 @Table(name = "restaurant")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// 생성자 선언 후, @Builder 붙이기
 public class Restaurant {
 
     @Id
@@ -21,14 +20,34 @@ public class Restaurant {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
-    private User user;   // 가게 등록자(사장님 계정 등)
+    private User user;
 
-    private String name;
-    private String phone;
-    private String address;
-    private String registrationImage;
+    @Column(nullable = false)
+    private String restaurantName;
+
+    @Column(nullable = false)
+    private String address; // 주소
+
+    private String category; // 식당 카테고리 -> 다중 값 가능 ex) 일식, 초
+
+    private String simpleDescription; // 식당 한줄 소개
+
+    private String detailDescription; // 식당 상세 소개
+
+    private String latitude; // 위도
+
+    private String longitude; // 경도
+
+    private String registrationNumber; // 사업자 등록번호
+
+    private String ownerName; // 대표자
+
+    private String representativePhone; // 대표자 번호
+
+    private String registrationImage; // 사업자 등록증 초본
+
     private LocalDateTime registrationDate;
-    // 필요시 사업자정보 필드 등 추가
+
 
     // == 연관관계 == //
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
@@ -48,4 +67,8 @@ public class Restaurant {
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Review> reviews = new ArrayList<>();
+
+
+    //TODO : 컬럼 정리 (사업자 관련 정보를 분리할 지, 각 컬럼 별로 제약조건을 뭘 달지), 생성자 및 연관관계 편의 메서드 구현
+    // 여기서도 단순히 USER를 참조하는 것이 아니라 user_id만 넣어주는 방식 고려해볼것.
 }

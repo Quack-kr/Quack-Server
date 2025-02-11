@@ -9,7 +9,6 @@ import lombok.*;
 @Table(name = "menu")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// 생성자 선언 후, @Builder 붙이기
 public class Menu {
 
     @Id
@@ -20,7 +19,17 @@ public class Menu {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
+    @Column(nullable = false)
     private String menuName;
+
+    private String menuDescription;
+
+    @Column(nullable = false)
     private int price;
-    // 추가 정보(설명, 이미지) 필요 시 필드 추가
+
+
+    private String menuImage;
+
+    // TODO: 컬럼 별 제약 조건 고려, 생성자 및 연관관계 편의 메서드 구현
+
 }

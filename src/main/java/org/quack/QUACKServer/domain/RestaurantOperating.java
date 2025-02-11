@@ -4,24 +4,32 @@ import static jakarta.persistence.FetchType.LAZY;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.quack.QUACKServer.domain.common.DayOfWeek;
 
 @Entity
 @Table(name = "restaurant_operating")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-// 생성자 선언 후, @Builder 붙이기
 public class RestaurantOperating {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long restaurantOperatingId;
+    private Long operatingId;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    private String dayOfWeek;   //  "MON", "TUE"
-    private String startTime;   // "09:00"
-    private String endTime;     // "22:00"
-    private Boolean isHoliday;  // 휴무 여부
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek dayOfWeek;
+
+
+    private String startTime;
+    private String endTime;
+    private String breakStartTime;
+    private String breakEndTime;
+    private String lastOrderTime;
+    private Boolean isHoliday;
+
+    // TODO: 생성자 및 연관관계 편의메서드 작성하기
 }
