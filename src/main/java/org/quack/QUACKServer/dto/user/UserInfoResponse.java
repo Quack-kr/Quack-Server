@@ -1,13 +1,12 @@
 package org.quack.QUACKServer.dto.user;
 
 
-import lombok.Builder;
-import lombok.Getter;
 
-@Getter
-@Builder
-public class UserInfoResponse {
-    private String nickname;
-    private int reviewCount;
-    private int savedRestaurantCount;
+public record UserInfoResponse(String nickname,
+                              int reviewCount,
+                              int savedRestaurantCount)
+{
+    public static UserInfoResponse of(String nickname, int reviewCount, int savedRestaurantCount) {
+        return new UserInfoResponse(nickname, reviewCount, savedRestaurantCount);
+    }
 }

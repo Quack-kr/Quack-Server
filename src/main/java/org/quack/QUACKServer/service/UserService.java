@@ -1,13 +1,18 @@
 package org.quack.QUACKServer.service;
 
-import java.util.Optional;
+import static org.quack.QUACKServer.exception.errorCode.CustomUserError.CURRENT_USE_NICKNAME;
+import static org.quack.QUACKServer.exception.errorCode.CustomUserError.USER_NOT_FOUND;
+
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.config.jwt.JwtProvider;
 import org.quack.QUACKServer.domain.User;
-import org.quack.QUACKServer.dto.user.LoginResponse;
+import org.quack.QUACKServer.dto.user.InitRegisterResponse;
+import org.quack.QUACKServer.dto.user.NicknameValidation;
+import org.quack.QUACKServer.dto.user.RegisterResponse;
+import org.quack.QUACKServer.dto.user.RegisterUserRequest;
 import org.quack.QUACKServer.dto.user.UpdateUserInfoRequest;
-import org.quack.QUACKServer.dto.user.UserInfoResponse;
-import org.quack.QUACKServer.oauth.dto.KakaoUserInfo;
+import org.quack.QUACKServer.exception.exception.CustomUserException;
 import org.quack.QUACKServer.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,75 +28,77 @@ public class UserService {
     private final JwtProvider jwtProvider;
     private final KakaoService kakaoService;
 
-    public LoginResponse loginOrRegisterKakao(String kakaoAccessToken) {
+    private static final String[] COLORS = {
+            "붉은", "주황", "노란", "푸른", "보라", "핑크"
+    };
 
-        KakaoUserInfo kakaoUserInfo = kakaoService.getKakaoUserInfo(kakaoAccessToken);
+    private static final String[] MENUS = {
+            "탕수육", "김밥", "자장면", "라면", "짬뽕", "수육", "족발", "돈까스", "떡볶이", "족발", "순대", "닭발"
+    };
 
-        Optional<User> optionalUser = userRepository.findByEmailAndProviderType(
-                kakaoUserInfo.getEmail(),
-                "KAKAO"
-        );
 
-        User user;
-        if (optionalUser.isEmpty()) {
-            user = registerKakaoUser(kakaoUserInfo);
-        } else {
-            user = optionalUser.get();
+    public String generateDefaultNickname(){
+        String nickname;
+        while(true){
+            nickname = generateRandomNickname();
+            if (!userRepository.existsByNickname(nickname)) {
+                break;
+            }
         }
+        return nickname;
+    }
 
-        return generateTokens(user);
+    private String generateRandomNickname(){
+        Random random = new Random();
+        String color = COLORS[random.nextInt(COLORS.length)];
+        String menu = MENUS[random.nextInt(MENUS.length)];
+        int num = random.nextInt(9999) + 1;
+
+        return String.format("%s %s %04d", color, menu, num);
     }
 
 
-    private User registerKakaoUser(KakaoUserInfo kakaoUserInfo) {
-
-        if (userRepository.existsByNickname(kakaoUserInfo.getNickname())) {
-            throw new RuntimeException("이미 존재하는 닉네임입니다.");
-        }
-
-        User newUser = User.builder()
-                .providerType("KAKAO")
-                .email(kakaoUserInfo.getEmail())
-                .nickname(kakaoUserInfo.getNickname())
-                .roleType("USER")
-                .profileImage(kakaoUserInfo.getProfileImage())
-                .build();
-
-        return userRepository.save(newUser);
+    public User getUserOrException(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new CustomUserException(USER_NOT_FOUND, "user with that id could not be found"));
     }
 
-
-    private LoginResponse generateTokens(User user) {
-        String accessToken = jwtProvider.createAccessToken(user.getUserId(), user.getRoleType());
-        String refreshToken = jwtProvider.createRefreshToken(user.getUserId(), user.getRoleType());
-
-        return LoginResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-    }
-
-
-    public UserInfoResponse getMyPageInfo(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
-
-        int reviewCount = user.getReviews().size();
-        int savedCount = user.getSavedRestaurants().size();
-
-        return UserInfoResponse.builder()
-                .nickname(user.getNickname())
-                .reviewCount(reviewCount)
-                .savedRestaurantCount(savedCount)
-                .build();
+    public InitRegisterResponse initRegister(Long userid) {
+        User user = getUserOrException(userid);
+        String defaultNickname = generateDefaultNickname();
+        return InitRegisterResponse.of(user.getSocialType(), user.getEmail(), defaultNickname);
     }
 
 
     public void updateProfile(Long userId, UpdateUserInfoRequest updateUserInfoRequest) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
-
+        User user = getUserOrException(userId);
         user.updateUserProfile(updateUserInfoRequest);
+    }
+
+    public RegisterResponse registerUser(Long userId, RegisterUserRequest registerUserRequest) {
+        User user = getUserOrException(userId);
+        if (duplicatedNickname(registerUserRequest.nickname())) {
+            return RegisterResponse.from("닉네임이 중복입니다.",false);
+        }
+        user.registerUser(registerUserRequest);
+        return RegisterResponse.from("회원가입이 완료되었습니다.",true);
+    }
+
+
+    public NicknameValidation isAvaliableNickname(Long userId, String nickname) {
+        User user = getUserOrException(userId);
+
+        if (user.getNickname().equals(nickname)) {
+            throw new CustomUserException(CURRENT_USE_NICKNAME, "user already used current nickname");
+        }
+        if (duplicatedNickname(nickname)) {
+            return NicknameValidation.from(false);
+        }
+
+        return NicknameValidation.from(true);
+    }
+
+    public boolean duplicatedNickname(String nickname) {
+        return userRepository.existsByNickname(nickname);
     }
 }
