@@ -73,13 +73,9 @@ public class KakaoService {
             ));
         }
 
-        UserAuthentication userAuthentication = new UserAuthentication(
-                user.getUserId(), null, null);
 
-        // access token 생성
-        String accessToken = "";
-        // refresh token 생성
-        String refreshToken = "";
+        String accessToken = jwtProvider.createAccessToken(user.getUserId());
+        String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
 
         // refresh token - Redis 저장
 
