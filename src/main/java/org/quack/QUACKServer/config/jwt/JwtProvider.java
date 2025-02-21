@@ -1,55 +1,68 @@
 package org.quack.QUACKServer.config.jwt;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-/**
- * 서비스에서 사용할 JWT 토큰을 생성하고, 검증하는 클래스
- */
+
 @Component
 @RequiredArgsConstructor
 public class JwtProvider {
 
-    @Value("${jwt.secretKey}")
+    @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.accessToken.expiration}")
+    @Value("${jwt.access.expiration-time}")
     private long accessTokenExpiration;
 
-    @Value("${jwt.refreshToken.expiration}")
+    @Value("${jwt.refresh.expiration-time}")
     private long refreshTokenExpiration;
 
-    /**
-     * Access Token 생성
-     */
-    public String createAccessToken(Long userId, String roleType) {
-        return createToken(userId, roleType, accessTokenExpiration);
+    @PostConstruct
+    protected void init() {
+        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    /**
-     * Refresh Token 생성
-     */
-    public String createRefreshToken(Long userId, String roleType) {
-        return createToken(userId, roleType, refreshTokenExpiration);
+    public String createAccessToken(Long userId) {
+        return createToken(userId, accessTokenExpiration, "access");
     }
 
-    private String createToken(Long userId, String roleType, long tokenValidity) {
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + tokenValidity);
+    public String createRefreshToken(Long userId) {
+        return createToken(userId, refreshTokenExpiration, "refresh");
+    }
+
+    private String createToken(Long userId, Long expiration, String tokenType) {
 
         return Jwts.builder()
-                .setSubject(String.valueOf(userId))
-                .claim("role", roleType)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes())
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setClaims(generateClaims(userId, expiration, tokenType))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    //TODO: 토큰 검증/파싱 메서드 추가
+    private Claims generateClaims(Long userId, Long expiration, String tokenType) {
+        long now = System.currentTimeMillis();
+        final Claims claims = Jwts.claims()
+                .setSubject(tokenType)
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(now + expiration));
+        claims.put("userId", userId);
+        return claims;
+    }
+
+    protected SecretKey getSignKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
+    }
+
 }

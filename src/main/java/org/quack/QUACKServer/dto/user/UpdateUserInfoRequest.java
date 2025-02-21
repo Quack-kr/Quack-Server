@@ -1,11 +1,9 @@
 package org.quack.QUACKServer.dto.user;
 
-import lombok.Builder;
-import lombok.Getter;
 
-@Getter
-@Builder
-public class UpdateUserInfoRequest {
-    private String nickname;
-    private String profileImage;
+public record UpdateUserInfoRequest(String nickname, String profileImage)
+{
+    public static UpdateUserInfoRequest of(String nickname, String profileImage) {
+        return new UpdateUserInfoRequest(nickname, profileImage);
+    }
 }
