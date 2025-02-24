@@ -8,11 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.config.jwt.JwtProvider;
 import org.quack.QUACKServer.domain.User;
 import org.quack.QUACKServer.dto.user.InitRegisterResponse;
+import org.quack.QUACKServer.dto.user.MyPageInfoResponse;
 import org.quack.QUACKServer.dto.user.NicknameValidation;
 import org.quack.QUACKServer.dto.user.RegisterResponse;
 import org.quack.QUACKServer.dto.user.RegisterUserRequest;
 import org.quack.QUACKServer.dto.user.UpdateUserInfoRequest;
 import org.quack.QUACKServer.exception.exception.CustomUserException;
+import org.quack.QUACKServer.repository.ReviewRepository;
 import org.quack.QUACKServer.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,8 @@ import org.quack.QUACKServer.oauth.service.KakaoService;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ReviewService reviewService;
+    private final SavedRestaurantService savedRestaurantService;
     private final JwtProvider jwtProvider;
     private final KakaoService kakaoService;
 
@@ -100,5 +104,21 @@ public class UserService {
 
     public boolean duplicatedNickname(String nickname) {
         return userRepository.existsByNickname(nickname);
+    }
+
+    public MyPageInfoResponse getMyPage(Long userId) {
+        User user = getUserOrException(userId);
+
+        int reviewCount = reviewService.getReviewCountByUserId(userId);
+        int savedRestaurantCount = savedRestaurantService.getSavedRestaurantCountByUserId(userId);
+        int empathyDecibel = reviewService.getEmpathyDecibelByUserId(userId);
+
+        return MyPageInfoResponse.of(
+                user.getNickname(),
+                user.getProfileImage(),
+                reviewCount,
+                savedRestaurantCount,
+                empathyDecibel
+                );
     }
 }
