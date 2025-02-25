@@ -109,9 +109,10 @@ public class UserService {
     public MyPageInfoResponse getMyPage(Long userId) {
         User user = getUserOrException(userId);
 
+        // 추후 DTO 프로젝션, 직접 쿼리 작성으로 성능 개선
         int reviewCount = reviewService.getReviewCountByUserId(userId);
         int savedRestaurantCount = savedRestaurantService.getSavedRestaurantCountByUserId(userId);
-        int empathyDecibel = reviewService.getEmpathyDecibelByUserId(userId);
+        double empathyDecibel = reviewService.getEmpathyDecibelByUserId(userId);
 
         return MyPageInfoResponse.of(
                 user.getNickname(),

@@ -1,5 +1,8 @@
 package org.quack.QUACKServer.service;
 
+import static org.quack.QUACKServer.domain.common.LikeType.노공감;
+import static org.quack.QUACKServer.domain.common.LikeType.핵공감;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.Review;
@@ -20,10 +23,12 @@ public class ReviewService {
         return reviewRepository.countByUserId(userId);
     }
 
-    public int getEmpathyDecibelByUserId(Long userId) {
-        // userId로 사용자가 작성한 Review를 모두 불러오기
-        // 해당 리뷰마다 핵공감, 노공감 횟수를 보고 숫자로 계산
-        return 0;
+    public double getEmpathyDecibelByUserId(Long userId) {
+        Double empathyDecibel = reviewLikeRepository.aggregateEmpathyDecibelByUserId(userId);
+        if (empathyDecibel == null || empathyDecibel < 0.0) {
+            empathyDecibel = 0.0;
+        }
+        return empathyDecibel;
     }
 
     public List<Review> getReviewsByUserId(Long userId) {
