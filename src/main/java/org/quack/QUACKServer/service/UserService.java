@@ -13,6 +13,7 @@ import org.quack.QUACKServer.dto.user.NicknameValidation;
 import org.quack.QUACKServer.dto.user.RegisterResponse;
 import org.quack.QUACKServer.dto.user.RegisterUserRequest;
 import org.quack.QUACKServer.dto.user.UpdateUserInfoRequest;
+import org.quack.QUACKServer.dto.user.UpdateUserResponse;
 import org.quack.QUACKServer.exception.exception.CustomUserException;
 import org.quack.QUACKServer.repository.ReviewRepository;
 import org.quack.QUACKServer.repository.UserRepository;
@@ -74,9 +75,14 @@ public class UserService {
     }
 
 
-    public void updateProfile(Long userId, UpdateUserInfoRequest updateUserInfoRequest) {
+    public UpdateUserResponse updateProfile(Long userId, UpdateUserInfoRequest updateUserInfoRequest) {
         User user = getUserOrException(userId);
-        user.updateUserProfile(updateUserInfoRequest);
+        if (duplicatedNickname(updateUserInfoRequest.nickname())) {
+            return UpdateUserResponse.of("닉네임이 중복입니다.", false);
+        } else {
+            user.updateUserProfile(updateUserInfoRequest);
+            return UpdateUserResponse.of("프로필 변경이 완료되었습니다.", true);
+        }
     }
 
     public RegisterResponse registerUser(Long userId, RegisterUserRequest registerUserRequest) {

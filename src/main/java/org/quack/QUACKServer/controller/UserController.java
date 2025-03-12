@@ -14,6 +14,7 @@ import org.quack.QUACKServer.dto.user.RegisterResponse;
 import org.quack.QUACKServer.dto.user.RegisterUserRequest;
 import org.quack.QUACKServer.dto.user.UpdateUserInfoRequest;
 import org.quack.QUACKServer.dto.user.InitRegisterResponse;
+import org.quack.QUACKServer.dto.user.UpdateUserResponse;
 import org.quack.QUACKServer.service.ReviewService;
 import org.quack.QUACKServer.service.SavedRestaurantService;
 import org.quack.QUACKServer.service.UserService;
@@ -73,13 +74,16 @@ public class UserController {
 
 
     @PatchMapping("/my-profile")
-    public ResponseEntity<Void> updateProfile(
+    public ResponseEntity<UpdateUserResponse> updateProfile(
             Principal principal,
             @RequestBody UpdateUserInfoRequest request
     ) {
         User user = userService.getUserOrException(Long.valueOf(principal.getName()));
-        userService.updateProfile(user.getUserId(), request);
-        return ResponseEntity.ok().build();
+        UpdateUserResponse response = userService.updateProfile(user.getUserId(), request);
+        if (!response.isUpdate()) {
+            return ResponseEntity.status(CONFLICT).body(response);
+        }
+        else return ResponseEntity.status(OK).body(response);
     }
 
     @GetMapping("/my-profile")
