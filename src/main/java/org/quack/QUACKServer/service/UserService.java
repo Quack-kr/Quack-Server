@@ -8,11 +8,14 @@ import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.config.jwt.JwtProvider;
 import org.quack.QUACKServer.domain.User;
 import org.quack.QUACKServer.dto.user.InitRegisterResponse;
+import org.quack.QUACKServer.dto.user.MyPageInfoResponse;
 import org.quack.QUACKServer.dto.user.NicknameValidation;
 import org.quack.QUACKServer.dto.user.RegisterResponse;
 import org.quack.QUACKServer.dto.user.RegisterUserRequest;
 import org.quack.QUACKServer.dto.user.UpdateUserInfoRequest;
+import org.quack.QUACKServer.dto.user.UpdateUserResponse;
 import org.quack.QUACKServer.exception.exception.CustomUserException;
+import org.quack.QUACKServer.repository.ReviewRepository;
 import org.quack.QUACKServer.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +28,8 @@ import org.quack.QUACKServer.oauth.service.KakaoService;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ReviewService reviewService;
+    private final SavedRestaurantService savedRestaurantService;
     private final JwtProvider jwtProvider;
     private final KakaoService kakaoService;
 
@@ -70,9 +75,14 @@ public class UserService {
     }
 
 
-    public void updateProfile(Long userId, UpdateUserInfoRequest updateUserInfoRequest) {
+    public UpdateUserResponse updateProfile(Long userId, UpdateUserInfoRequest updateUserInfoRequest) {
         User user = getUserOrException(userId);
-        user.updateUserProfile(updateUserInfoRequest);
+        if (duplicatedNickname(updateUserInfoRequest.nickname())) {
+            return UpdateUserResponse.of("닉네임이 중복입니다.", false);
+        } else {
+            user.updateUserProfile(updateUserInfoRequest);
+            return UpdateUserResponse.of("프로필 변경이 완료되었습니다.", true);
+        }
     }
 
     public RegisterResponse registerUser(Long userId, RegisterUserRequest registerUserRequest) {
@@ -100,5 +110,22 @@ public class UserService {
 
     public boolean duplicatedNickname(String nickname) {
         return userRepository.existsByNickname(nickname);
+    }
+
+    public MyPageInfoResponse getMyPage(Long userId) {
+        User user = getUserOrException(userId);
+
+        // 추후 DTO 프로젝션, 직접 쿼리 작성으로 성능 개선
+        int reviewCount = reviewService.getReviewCountByUserId(userId);
+        int savedRestaurantCount = savedRestaurantService.getSavedRestaurantCountByUserId(userId);
+        double empathyDecibel = reviewService.getEmpathyDecibelByUserId(userId);
+
+        return MyPageInfoResponse.of(
+                user.getNickname(),
+                user.getProfileImage(),
+                reviewCount,
+                savedRestaurantCount,
+                empathyDecibel
+                );
     }
 }
