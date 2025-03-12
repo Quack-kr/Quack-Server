@@ -1,5 +1,6 @@
 package org.quack.QUACKServer.controller;
 
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -59,9 +60,15 @@ public class UserController {
                                                          @RequestBody
                                                          RegisterUserRequest registerUserRequest) {
         User user = userService.getUserOrException(Long.valueOf(principal.getName()));
-        return ResponseEntity
+        RegisterResponse response = userService.registerUser(user.getUserId(), registerUserRequest);
+        if(!response.isRegister()){
+            return ResponseEntity
+                    .status(CONFLICT)
+                    .body(response);
+        }
+        else return ResponseEntity
                 .status(CREATED)
-                .body(userService.registerUser(user.getUserId(), registerUserRequest));
+                .body(response);
     }
 
 
