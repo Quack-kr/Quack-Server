@@ -2,12 +2,14 @@ package org.quack.QUACKServer.controller;
 
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 import jakarta.validation.Valid;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.User;
+import org.quack.QUACKServer.domain.common.SocialType;
 import org.quack.QUACKServer.dto.user.MyPageInfoResponse;
 import org.quack.QUACKServer.dto.user.NicknameValidation;
 import org.quack.QUACKServer.dto.user.RegisterResponse;
@@ -15,6 +17,7 @@ import org.quack.QUACKServer.dto.user.RegisterUserRequest;
 import org.quack.QUACKServer.dto.user.UpdateUserInfoRequest;
 import org.quack.QUACKServer.dto.user.InitRegisterResponse;
 import org.quack.QUACKServer.dto.user.UpdateUserResponse;
+import org.quack.QUACKServer.oauth.service.KakaoService;
 import org.quack.QUACKServer.service.ReviewService;
 import org.quack.QUACKServer.service.SavedRestaurantService;
 import org.quack.QUACKServer.service.UserService;
@@ -34,6 +37,7 @@ public class UserController {
     private final UserService userService;
     private final ReviewService reviewService;
     private final SavedRestaurantService savedRestaurantService;
+    private final KakaoService kakaoService;
 
 
     @GetMapping("/registration")
@@ -70,6 +74,37 @@ public class UserController {
         else return ResponseEntity
                 .status(CREATED)
                 .body(response);
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Void> logout(Principal principal) {
+        User user = userService.getUserOrException(Long.valueOf(principal.getName()));
+
+        // refresh token - Redis 삭제 -> redisService.removeRefreshToken(userId);
+
+        if (user.getSocialType() == SocialType.KAKAO) {
+            kakaoService.kakaoLogout(user);
+        }
+
+        // 애플, 네이버 구현 후 추가
+
+        return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    // TODO: 해지 사유 요청으로 넘어오면, 바인딩하고 DB에 저장하는 거 추가하기.
+    @GetMapping("/withdraw")
+    public ResponseEntity<Void> withdraw(Principal principal) {
+        User user = userService.getUserOrException(Long.valueOf(principal.getName()));
+        // refresh token - Redis 삭제
+        // DB에 데이터를 삭제할 것인지 정하기. 작성한 리뷰, 핵공감, 노공감 등등
+
+        if (user.getSocialType() == SocialType.KAKAO) {
+            kakaoService.kakaoWithdraw(user);
+        }
+
+        // 애플, 네이버 구현 후 추가
+
+        return ResponseEntity.status(NO_CONTENT).build();
     }
 
 

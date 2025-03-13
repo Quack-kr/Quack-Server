@@ -18,6 +18,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 
 
@@ -84,10 +86,37 @@ public class KakaoService {
 
         return AuthResponse.of(accessToken, refreshToken, isNewUser);
     }
+
+    public void kakaoLogout(User user) {
+        kakaoRequest(user.getSocialId(), kakaoLogoutUrl);
+    }
+
+    public void kakaoWithdraw(User user) {
+        kakaoRequest(user.getSocialId(), kakaoUnlinkUrl);
+    }
+
+    private void kakaoRequest(Long socialId, String requestUrl) {
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("target_id_type", "user_id");
+        params.add("target_id", String.valueOf(socialId));
+
+        RestClient restClient = RestClient.create();
+
+        restClient.post()
+                .uri(requestUrl)
+                .header(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded")
+                .header(HttpHeaders.AUTHORIZATION, "KakaoAK " + kakaoAdminKey)
+                .body(params)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+                    throw new CustomKakaoLoginException(KAKAO_SERVER_ERROR, "kakao server didn't work for request");
+                })
+                .toBodilessEntity();
+    }
 }
 
 /*
  TODO:
- 1. 카카오 로그아웃
- 2. 카카오 회원탈퇴
+ 1. 카카오 회원탈퇴
  */
