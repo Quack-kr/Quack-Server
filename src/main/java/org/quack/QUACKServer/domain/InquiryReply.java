@@ -18,8 +18,20 @@ public class InquiryReply {
     private Long replyId;
 
     @OneToOne(mappedBy = "inquiryReply", fetch = LAZY)
-    private Inquiry inquiry;  // 어떤 문의에 대한 답변인지
+    private Inquiry inquiry;
 
+    @Column
     private String content;
+
     private LocalDateTime createdDate;
+
+    private InquiryReply(Inquiry inquiry, String content, LocalDateTime createdDate) {
+        this.inquiry = inquiry;
+        this.content = content;
+        this.createdDate = createdDate;
+    }
+
+    public static InquiryReply createInquiryReply(Inquiry inquiry, String content, LocalDateTime createdDate) {
+        return new InquiryReply(inquiry, content, createdDate);
+    }
 }

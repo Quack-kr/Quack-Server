@@ -30,13 +30,12 @@ public class Inquiry {
 
     @Enumerated(EnumType.STRING)
     @ColumnDefault(value = "'READY'")
-    private Enum replyStatus;
+    private ReplyStatus replyStatus;
 
 
     private LocalDateTime createdDate;
 
-    // 1:1 관계 (문의 -> 답변)
-    @OneToOne(fetch = LAZY)
+    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "inquiry_id")
     private InquiryReply inquiryReply;
 
@@ -48,7 +47,14 @@ public class Inquiry {
         this.createdDate = LocalDateTime.now();
     }
 
-    public static Inquiry create(User user, String title, String content){
-        return new Inquiry(user, title, content);
+    public static Inquiry createInquiry(User user, String title, String content){
+        Inquiry inquiry = new Inquiry(user, title, content);
+        InquiryReply reply = InquiryReply.createInquiryReply(inquiry,null, null);
+        inquiry.setInquiryReply(reply);
+        return inquiry;
+    }
+
+    private void setInquiryReply(InquiryReply reply){
+        this.inquiryReply = reply;
     }
 }
