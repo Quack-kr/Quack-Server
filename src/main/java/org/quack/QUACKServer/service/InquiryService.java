@@ -33,7 +33,7 @@ public class InquiryService {
 
     public void deleteInquiry(Long userId, Long inquiryId) {
         User user = userService.getUserOrException(userId);
-        inquiryRepository.deleteByUserIdAndInquiryId(user.getUserId(), inquiryId);
+        inquiryRepository.deleteByUser_UserIdAndInquiryId(user.getUserId(), inquiryId);
     }
 
 

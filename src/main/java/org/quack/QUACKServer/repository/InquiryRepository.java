@@ -21,6 +21,6 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
             "ORDER BY i.createdDate DESC")
     Page<InquiriesResponse> findInquiriesByUserId(Long userId, Pageable pageable);
 
-    void deleteByUserIdAndInquiryId(Long userId, Long inquiryId);
+    void deleteByUser_UserIdAndInquiryId(Long userId, Long inquiryId);
 
 }

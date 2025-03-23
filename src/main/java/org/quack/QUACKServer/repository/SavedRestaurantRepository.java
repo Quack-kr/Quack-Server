@@ -10,9 +10,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SavedRestaurantRepository extends JpaRepository<SavedRestaurant, Long> {
 
-    int getCountByUserId(Long userId);
+    int getCountByUser_UserId(Long userId);
 
-    List<Restaurant> findAllByUserId(Long userId);
+    boolean existsByUser_UserIdAndRestaurant_RestaurantId(Long userId, Long restaurantId);
 
-    boolean existsByUserIdAndRestaurantId(Long userId, Long restaurantId);
+    List<Restaurant> findAllByUser_UserId(Long userId);
 }

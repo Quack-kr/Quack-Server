@@ -25,7 +25,7 @@ public class ReviewService {
     private final ReviewLikeRepository reviewLikeRepository;
 
     public int getReviewCountByUserId(Long userId) {
-        return reviewRepository.countByUserId(userId);
+        return reviewRepository.countByUser_UserId(userId);
     }
 
     public double getEmpathyDecibelByUserId(Long userId) {
@@ -38,7 +38,7 @@ public class ReviewService {
 
     public List<Review> getReviewsByUserId(Long userId) {
         // iOS에서 요청이 어떻게 넘어오는지 확인하고 paging 해야함
-        return reviewRepository.findAllByUserId(userId);
+        return reviewRepository.findAllByUser_UserId(userId);
     }
 
     public List<RecentReviewDto> getRecentReviewByRestaurantId(Long restaurantId) {

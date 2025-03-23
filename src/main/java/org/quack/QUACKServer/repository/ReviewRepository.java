@@ -10,9 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    int countByUserId(Long userId);
-
-    List<Review> findAllByUserId(Long userId);
+    int countByUser_UserId(Long userId);
 
     @Query("SELECT r " +
             "FROM Review r " +
@@ -20,4 +18,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "  AND LENGTH(r.content) >= :minLength " +
             "ORDER BY r.createdDate DESC")
     List<Review> findRecentReviewsByRestaurantId(Long restaurantId, int minLength, Pageable pageable);
+
+    List<Review> findAllByUser_UserId(Long userId);
 }

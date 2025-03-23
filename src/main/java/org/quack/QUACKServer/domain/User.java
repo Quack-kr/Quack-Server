@@ -11,7 +11,7 @@ import org.quack.QUACKServer.dto.user.UpdateUserInfoRequest;
 
 
 @Entity
-@Table(name = "user",
+@Table(name = "users",
         uniqueConstraints = {
         @UniqueConstraint(name = "UNIQUE_SOCIAL_ID_CONSTRAINT",
         columnNames = "social_id"),

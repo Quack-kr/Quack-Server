@@ -5,7 +5,6 @@ import static org.quack.QUACKServer.exception.errorCode.CustomKakaoLoginError.KA
 
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.config.jwt.JwtProvider;
-import org.quack.QUACKServer.config.jwt.UserAuthentication;
 import org.quack.QUACKServer.domain.User;
 import org.quack.QUACKServer.domain.common.SocialType;
 import org.quack.QUACKServer.dto.auth.AuthResponse;
@@ -13,7 +12,6 @@ import org.quack.QUACKServer.exception.exception.CustomKakaoLoginException;
 import org.quack.QUACKServer.oauth.dto.KakaoUserInfo;
 import org.quack.QUACKServer.repository.UserRepository;
 import org.quack.QUACKServer.service.RedisService;
-import org.quack.QUACKServer.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -30,7 +28,6 @@ import org.springframework.web.client.RestClient;
 public class KakaoService {
 
     private final UserRepository userRepository;
-    private final UserService userService;
     private final JwtProvider jwtProvider;
     private final RedisService redisService;
 

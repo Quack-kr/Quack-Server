@@ -15,17 +15,17 @@ public class SavedRestaurantService {
     private final SavedRestaurantRepository savedRestaurantRepository;
 
     public int getSavedRestaurantCountByUserId(Long userId) {
-        return savedRestaurantRepository.getCountByUserId(userId);
+        return savedRestaurantRepository.getCountByUser_UserId(userId);
     }
 
     public List<Restaurant> getSavedRestaurantsByUserId(Long userId) {
         // 요청 확인하고, paging 하기
-        return savedRestaurantRepository.findAllByUserId(userId);
+        return savedRestaurantRepository.findAllByUser_UserId(userId);
     }
 
     public boolean isRestaurantSaved(Long userId, Long restaurantId) {
         if (userId != null) {
-            return savedRestaurantRepository.existsByUserIdAndRestaurantId(userId, restaurantId);
+            return savedRestaurantRepository.existsByUser_UserIdAndRestaurant_RestaurantId(userId, restaurantId);
         }
         return false;
     }

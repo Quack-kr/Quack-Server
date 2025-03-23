@@ -5,7 +5,6 @@ import static org.quack.QUACKServer.exception.errorCode.CustomUserError.USER_NOT
 
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
-import org.quack.QUACKServer.config.jwt.JwtProvider;
 import org.quack.QUACKServer.domain.User;
 import org.quack.QUACKServer.dto.user.InitRegisterResponse;
 import org.quack.QUACKServer.dto.user.MyPageInfoResponse;
@@ -15,12 +14,9 @@ import org.quack.QUACKServer.dto.user.RegisterUserRequest;
 import org.quack.QUACKServer.dto.user.UpdateUserInfoRequest;
 import org.quack.QUACKServer.dto.user.UpdateUserResponse;
 import org.quack.QUACKServer.exception.exception.CustomUserException;
-import org.quack.QUACKServer.repository.ReviewRepository;
 import org.quack.QUACKServer.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import org.quack.QUACKServer.oauth.service.KakaoService;
 
 @Service
 @Transactional
@@ -30,8 +26,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final ReviewService reviewService;
     private final SavedRestaurantService savedRestaurantService;
-    private final JwtProvider jwtProvider;
-    private final KakaoService kakaoService;
 
     private static final String[] COLORS = {
             "붉은", "주황", "노란", "푸른", "보라", "핑크"
