@@ -12,14 +12,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SavedRestaurantService {
 
-    private final SavedRestaurantRepository restaurantRepository;
+    private final SavedRestaurantRepository savedRestaurantRepository;
 
     public int getSavedRestaurantCountByUserId(Long userId) {
-        return restaurantRepository.getCountByUserId(userId);
+        return savedRestaurantRepository.getCountByUserId(userId);
     }
 
     public List<Restaurant> getSavedRestaurantsByUserId(Long userId) {
         // 요청 확인하고, paging 하기
-        return restaurantRepository.findAllByUserId(userId);
+        return savedRestaurantRepository.findAllByUserId(userId);
+    }
+
+    public boolean isRestaurantSaved(Long userId, Long restaurantId) {
+        if (userId != null) {
+            return savedRestaurantRepository.existsByUserIdAndRestaurantId(userId, restaurantId);
+        }
+        return false;
     }
 }

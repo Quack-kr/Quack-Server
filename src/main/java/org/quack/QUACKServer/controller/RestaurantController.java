@@ -1,5 +1,6 @@
 package org.quack.QUACKServer.controller;
 
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.dto.restaurant.RestaurantInfoResponse;
 import org.quack.QUACKServer.service.RestaurantService;
@@ -15,7 +16,9 @@ public class RestaurantController {
     private final RestaurantService restaurantService;
 
     @GetMapping("/restaurant/{restaurantId}")
-    public ResponseEntity<RestaurantInfoResponse> getRestaurantInfo(@PathVariable Long restaurantId) {
-        return ResponseEntity.ok(restaurantService.getRestaurantInfo(restaurantId));
+    public ResponseEntity<RestaurantInfoResponse> getRestaurantInfo(@PathVariable Long restaurantId,
+                                                                    Principal principal) {
+        Long userId = principal != null ? Long.valueOf(principal.getName()) : null;
+        return ResponseEntity.ok(restaurantService.getRestaurantInfo(restaurantId, userId));
     }
 }

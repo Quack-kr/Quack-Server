@@ -13,4 +13,6 @@ public interface SavedRestaurantRepository extends JpaRepository<SavedRestaurant
     int getCountByUserId(Long userId);
 
     List<Restaurant> findAllByUserId(Long userId);
+
+    boolean existsByUserIdAndRestaurantId(Long userId, Long restaurantId);
 }
