@@ -25,6 +25,8 @@ public class Restaurant {
     @Column(nullable = false)
     private String restaurantName;
 
+    private String representativeImage; // 대표이미지
+
     @Column(nullable = false)
     private String address; // 주소
 
@@ -62,13 +64,10 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Menu> menus = new ArrayList<>();
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<SavedRestaurant> savedList = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Review> reviews = new ArrayList<>();
 
 
     //TODO : 컬럼 정리 (사업자 관련 정보를 분리할 지, 각 컬럼 별로 제약조건을 뭘 달지), 생성자 및 연관관계 편의 메서드 구현
-    // 여기서도 단순히 USER를 참조하는 것이 아니라 user_id만 넣어주는 방식 고려해볼것.
 }

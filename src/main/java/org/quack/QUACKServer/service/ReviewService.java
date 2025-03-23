@@ -4,10 +4,15 @@ import static org.quack.QUACKServer.domain.common.LikeType.노공감;
 import static org.quack.QUACKServer.domain.common.LikeType.핵공감;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.Review;
+import org.quack.QUACKServer.domain.ReviewPhoto;
+import org.quack.QUACKServer.dto.restaurant.RecentReviewDto;
+import org.quack.QUACKServer.dto.restaurant.ReviewMenuDto;
 import org.quack.QUACKServer.repository.ReviewLikeRepository;
 import org.quack.QUACKServer.repository.ReviewRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,5 +39,36 @@ public class ReviewService {
     public List<Review> getReviewsByUserId(Long userId) {
         // iOS에서 요청이 어떻게 넘어오는지 확인하고 paging 해야함
         return reviewRepository.findAllByUserId(userId);
+    }
+
+    public List<RecentReviewDto> getRecentReviewByRestaurantId(Long restaurantId) {
+        List<Review> reviews = reviewRepository.findRecentReviewsByRestaurantId(restaurantId, 50,
+                PageRequest.of(0, 3));
+
+        List<RecentReviewDto> recentReviews = reviews.stream()
+                .map(r -> new RecentReviewDto(
+                        r.getReviewId(),
+                        r.getUser().getNickname(),
+                        r.getUser().getProfileImage(),
+                        r.getCreatedDate(),
+                        getReviewPhoto(r),
+                        getReviewMenuDto(r)
+                ))
+                .collect(Collectors.toList());
+
+    }
+
+    private List<String> getReviewPhoto(Review review) {
+        return review.getReviewPhotos()
+                .stream()
+                .map(ReviewPhoto::getPhotoUrl)
+                .collect(Collectors.toList());
+    }
+
+    private List<ReviewMenuDto> getReviewMenuDto(Review review){
+        return review.getReviewMenus().stream()
+                .map(rm -> new ReviewMenuDto(rm.getMenu().getMenuName(), rm.getEvaluation()))
+                .collect(Collectors.toList());
+
     }
 }
