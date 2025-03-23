@@ -12,6 +12,7 @@ import org.quack.QUACKServer.dto.auth.AuthResponse;
 import org.quack.QUACKServer.exception.exception.CustomKakaoLoginException;
 import org.quack.QUACKServer.oauth.dto.KakaoUserInfo;
 import org.quack.QUACKServer.repository.UserRepository;
+import org.quack.QUACKServer.service.RedisService;
 import org.quack.QUACKServer.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -31,6 +32,7 @@ public class KakaoService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final JwtProvider jwtProvider;
+    private final RedisService redisService;
 
     @Value("${kakao.user-info-url}")
     private String kakaoUserInfoUrl;
@@ -79,7 +81,7 @@ public class KakaoService {
         String accessToken = jwtProvider.createAccessToken(user.getUserId());
         String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
 
-        // refresh token - Redis 저장
+        redisService.saveRefreshToken(user.getUserId(), refreshToken);
 
 
         boolean isNewUser = user.getNickname().equals("k*");

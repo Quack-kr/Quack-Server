@@ -4,7 +4,9 @@ import static org.springframework.http.HttpStatus.OK;
 
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.dto.auth.AuthResponse;
+import org.quack.QUACKServer.dto.auth.ReissueResponse;
 import org.quack.QUACKServer.oauth.service.KakaoService;
+import org.quack.QUACKServer.service.AuthService;
 import org.quack.QUACKServer.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,7 @@ public class AuthController {
 
     private final KakaoService kakaoService;
     private final UserService userService;
+    private final AuthService authService;
 
     @PostMapping("/auth/login/kakao")
     public ResponseEntity<AuthResponse> kakaoLogin(@RequestHeader("Kakao-Access-token") String kakaoAccessToken) {
@@ -26,4 +29,10 @@ public class AuthController {
                 .body(kakaoService.getKakaoUserInfo(kakaoAccessToken));
     }
 
+    @GetMapping("/auth/reissue")
+    public ResponseEntity<ReissueResponse> reissueToken(@RequestHeader("Refresh-Token") String refreshToken) {
+        return ResponseEntity
+                .status(OK)
+                .body(authService.reissueToken(refreshToken));
+    }
 }

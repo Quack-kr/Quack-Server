@@ -18,6 +18,7 @@ import org.quack.QUACKServer.dto.user.UpdateUserInfoRequest;
 import org.quack.QUACKServer.dto.user.InitRegisterResponse;
 import org.quack.QUACKServer.dto.user.UpdateUserResponse;
 import org.quack.QUACKServer.oauth.service.KakaoService;
+import org.quack.QUACKServer.service.RedisService;
 import org.quack.QUACKServer.service.ReviewService;
 import org.quack.QUACKServer.service.SavedRestaurantService;
 import org.quack.QUACKServer.service.UserService;
@@ -38,6 +39,7 @@ public class UserController {
     private final ReviewService reviewService;
     private final SavedRestaurantService savedRestaurantService;
     private final KakaoService kakaoService;
+    private final RedisService redisService;
 
 
     @GetMapping("/registration")
@@ -80,8 +82,6 @@ public class UserController {
     public ResponseEntity<Void> logout(Principal principal) {
         User user = userService.getUserOrException(Long.valueOf(principal.getName()));
 
-        // refresh token - Redis 삭제 -> redisService.removeRefreshToken(userId);
-
         if (user.getSocialType() == SocialType.KAKAO) {
             kakaoService.kakaoLogout(user);
         }
@@ -103,6 +103,8 @@ public class UserController {
         }
 
         // 애플, 네이버 구현 후 추가
+
+        redisService.deleteRefreshToken(user.getUserId());
 
         return ResponseEntity.status(NO_CONTENT).build();
     }
