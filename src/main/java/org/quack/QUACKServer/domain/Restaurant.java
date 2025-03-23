@@ -25,6 +25,8 @@ public class Restaurant {
     @Column(nullable = false)
     private String restaurantName;
 
+    private String representativeImage; // 대표이미지
+
     @Column(nullable = false)
     private String address; // 주소
 
