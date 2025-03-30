@@ -1,15 +1,21 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.4.1'
-	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.springframework.boot' version "${springBootVersion}"
+	id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
 }
 
-group = 'org.quack'
-version = '0.0.1-SNAPSHOT'
+group = "${projectGroup}"
+version = "${applicationVersion}"
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -36,6 +42,10 @@ dependencies {
 	// Spring start-web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
+	// utility
+	implementation 'org.apache.commons:commons-lang3:3.17.0'
+	implementation 'org.apache.commons:commons-collections4:4.4'
+
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -52,8 +62,14 @@ dependencies {
 	runtimeOnly "io.jsonwebtoken:jjwt-impl:0.11.5"
 	runtimeOnly "io.jsonwebtoken:jjwt-jackson:0.11.5"
 
+	// encoding
+	implementation 'com.google.guava:guava:33.4.0-jre'
+
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// OAuth
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
