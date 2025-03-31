@@ -10,5 +10,5 @@ public record RecentReviewDto(
         LocalDateTime createdDate,
         List<String> reviewPhotos,
         List<String> keywords,
-        List<String> menus
+        List<ReviewMenuDto> menus
 ) { }

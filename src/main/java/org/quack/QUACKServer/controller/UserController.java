@@ -6,10 +6,13 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 import jakarta.validation.Valid;
+
 import java.security.Principal;
+
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.User;
 import org.quack.QUACKServer.domain.common.SocialType;
+import org.quack.QUACKServer.dto.reviews.response.UserReviewsResponse;
 import org.quack.QUACKServer.dto.user.MyPageInfoResponse;
 import org.quack.QUACKServer.dto.user.NicknameValidation;
 import org.quack.QUACKServer.dto.user.RegisterResponse;
@@ -26,7 +29,6 @@ import org.quack.QUACKServer.validation.NicknameConstraint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -68,12 +70,11 @@ public class UserController {
                                                          RegisterUserRequest registerUserRequest) {
         User user = userService.getUserOrException(Long.valueOf(principal.getName()));
         RegisterResponse response = userService.registerUser(user.getUserId(), registerUserRequest);
-        if(!response.isRegister()){
+        if (!response.isRegister()) {
             return ResponseEntity
                     .status(CONFLICT)
                     .body(response);
-        }
-        else return ResponseEntity
+        } else return ResponseEntity
                 .status(CREATED)
                 .body(response);
     }
@@ -119,8 +120,7 @@ public class UserController {
         UpdateUserResponse response = userService.updateProfile(user.getUserId(), request);
         if (!response.isUpdate()) {
             return ResponseEntity.status(CONFLICT).body(response);
-        }
-        else return ResponseEntity.status(OK).body(response);
+        } else return ResponseEntity.status(OK).body(response);
     }
 
     @GetMapping("/my-profile")
@@ -134,7 +134,7 @@ public class UserController {
                 .body(userService.getMyPage(user.getUserId()));
     }
 
-    @GetMapping("/my-reviews")
+    @GetMapping("/review/my-reviews")
     public ResponseEntity<UserReviewsResponse> getMyReviews(Principal principal) {
         // 로그인이 되어 있지 않는 상태 예외 처리하기
 
@@ -143,17 +143,17 @@ public class UserController {
         User user = userService.getUserOrException(Long.valueOf(principal.getName()));
         return ResponseEntity
                 .status(OK)
-                .body(reviewService.getReviewsByUserId(user.getUserId()));
+                .body(UserReviewsResponse.from(reviewService.getReviewsByUserId(user.getUserId())));
     }
 
-    @GetMapping("/save/restaurant")
-    public ResponseEntity<UserSavedRestaurantResponse> getMySavedRestaurant(Principal principal) {
-
-        // RestaurantController 에 넣을지, UserController 에 넣을지 고민해보기
-
-        User user = userService.getUserOrException(Long.valueOf(principal.getName()));
-        return ResponseEntity
-                .status(OK)
-                .body(savedRestaurantService.getSavedRestaurantsByUserId(user.getUserId()));
-    }
+//    @GetMapping("/save/restaurants")
+//    public ResponseEntity<UserSavedRestaurantResponse> getMySavedRestaurant(Principal principal) {
+//
+//        // RestaurantController 에 넣을지, UserController 에 넣을지 고민해보기
+//
+//        User user = userService.getUserOrException(Long.valueOf(principal.getName()));
+//        return ResponseEntity
+//                .status(OK)
+//                .body(UserSavedRestaurantResponse.from(savedRestaurantService.getSavedRestaurantsByUserId(user.getUserId())));
+//    }
 }

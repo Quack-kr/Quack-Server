@@ -2,5 +2,5 @@ package org.quack.QUACKServer.domain.common;
 
 
 public enum LikeType {
-    핵공감, 노공감
+    HACK_GONG_GAM, NO_GANG_GAM
 }

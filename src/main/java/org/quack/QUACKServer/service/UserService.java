@@ -119,7 +119,6 @@ public class UserService {
                 user.getProfileImage(),
                 reviewCount,
                 savedRestaurantCount,
-                empathyDecibel
-                );
+                empathyDecibel);
     }
 }

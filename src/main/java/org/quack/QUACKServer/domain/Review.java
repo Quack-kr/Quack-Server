@@ -1,7 +1,6 @@
 package org.quack.QUACKServer.domain;
 
 import static jakarta.persistence.FetchType.LAZY;
-
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class Review extends BaseEntity {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
-    private Restaurant restaurant;  // 어떤 가게에 대한 리뷰인지
+    private Restaurant restaurant;
 
     @Column(nullable = true, length = 150)
     private String content;
@@ -37,6 +36,9 @@ public class Review extends BaseEntity {
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<ReviewMenu> reviewMenus = new ArrayList<>();
+
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<ReviewLike> reviewLike = new ArrayList<>();
 
     private Review(User user, Restaurant restaurant, String content) {
         this.user = user;

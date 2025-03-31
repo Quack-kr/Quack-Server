@@ -20,17 +20,20 @@ public class ReviewMenu {
     @JoinColumn(name = "review_id", nullable = false)
     private Review review;
 
-    @Column(nullable = false)
-    private String menuName;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name="menu_id", nullable = false)
+    private Menu menu;
 
+    @Column
+    private String evaluation;
 
-    private ReviewMenu(Review review, String menuName) {
+    private ReviewMenu(Review review, Menu menu) {
         this.review = review;
-        this.menuName = menuName;
+        this.menu = menu;
     }
 
-    public static ReviewMenu create(Review review, String menuName) {
-        return new ReviewMenu(review, menuName);
+    public static ReviewMenu create(Review review, Menu menu) {
+        return new ReviewMenu(review, menu);
     }
 
     // TODO: 연관관계 편의메서드 작성하기

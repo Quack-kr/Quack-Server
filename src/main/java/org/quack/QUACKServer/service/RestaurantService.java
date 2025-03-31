@@ -63,7 +63,7 @@ public class RestaurantService {
         boolean isOpen = restaurantOperatingService.isRestaurantOpen(restaurantId);
 
 
-        RestaurantInfoResponse restaurantInfoResponse = RestaurantInfoResponse.builder()
+        return RestaurantInfoResponse.builder()
                 .restaurantBasicInfoDto(basicInfo)
                 .operatingInfo(operatingInfo)
                 .features(featureInfo)
@@ -74,8 +74,6 @@ public class RestaurantService {
                 .isSaved(isSaved)
                 .isOpen(isOpen)
                 .build();
-
-        return restaurantInfoResponse;
     }
 
     private void checkExistingRestaurant(Long restaurantId) {
@@ -86,8 +84,7 @@ public class RestaurantService {
 
 
     private RestaurantBasicInfoDto getRestaurantBasicInfoDto(Long restaurantId) {
-        RestaurantBasicInfoDto basicInfo = restaurantRepository.findBasicInfoByRestaurantId(restaurantId);
-        return basicInfo;
+        return restaurantRepository.findBasicInfoByRestaurantId(restaurantId);
     }
 
 }

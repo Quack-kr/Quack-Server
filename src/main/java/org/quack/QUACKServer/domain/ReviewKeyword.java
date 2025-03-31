@@ -10,6 +10,8 @@ import lombok.*;
 @Table(name = "review_keyword")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class ReviewKeyword {
 
     @Id
@@ -32,6 +34,7 @@ public class ReviewKeyword {
     public static ReviewKeyword create(Review review, Keyword keyword) {
         return new ReviewKeyword(review, keyword);
     }
+
 
     //TODO: 연관관계 편의메서드 작성하기
 }
