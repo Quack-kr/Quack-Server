@@ -1,12 +1,9 @@
 package org.quack.QUACKServer.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.quack.QUACKServer.dto.restaurant.SavedRestaurantDto;
+import org.quack.QUACKServer.domain.Restaurant;
 import org.quack.QUACKServer.repository.SavedRestaurantRepository;
-import org.quack.QUACKServer.util.DistanceCalculator;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
