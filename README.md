@@ -17,7 +17,7 @@
 <br />
 
 ## 🗂 Folder Architecture
-
+<pre>
 org.quack.QUACKServer
 ├── domain
 │   ├── user                    # 사용자 관련 도메인
@@ -74,3 +74,6 @@ org.quack.QUACKServer
 │   └── jwt                     # JWT 관련 처리
 │
 └── QuackServerApplication      # 스프링 부트 메인 클래스
+</pre>
+
+
