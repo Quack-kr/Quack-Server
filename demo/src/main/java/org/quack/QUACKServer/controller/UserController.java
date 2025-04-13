@@ -10,6 +10,7 @@ import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.User;
 import org.quack.QUACKServer.domain.common.SocialType;
+import org.quack.QUACKServer.dto.restaurant.SavedRestaurantDto;
 import org.quack.QUACKServer.dto.user.MyPageInfoResponse;
 import org.quack.QUACKServer.dto.user.NicknameValidation;
 import org.quack.QUACKServer.dto.user.RegisterResponse;
@@ -23,6 +24,7 @@ import org.quack.QUACKServer.service.ReviewService;
 import org.quack.QUACKServer.service.SavedRestaurantService;
 import org.quack.QUACKServer.service.UserService;
 import org.quack.QUACKServer.validation.NicknameConstraint;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -147,13 +149,23 @@ public class UserController {
     }
 
     @GetMapping("/save/restaurant")
-    public ResponseEntity<UserSavedRestaurantResponse> getMySavedRestaurant(Principal principal) {
+    public ResponseEntity<Page<SavedRestaurantDto>> getMySavedRestaurant(
+            Principal principal,
+            @RequestParam(defaultValue = "0") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam("latitude") double userLatitude,
+            @RequestParam("longitude") double userLongitude) {
 
-        // RestaurantController 에 넣을지, UserController 에 넣을지 고민해보기
 
         User user = userService.getUserOrException(Long.valueOf(principal.getName()));
+
         return ResponseEntity
                 .status(OK)
-                .body(savedRestaurantService.getSavedRestaurantsByUserId(user.getUserId()));
+                .body(savedRestaurantService.getSavedRestaurantsByUserId(
+                        user.getUserId(),
+                        pageNum,
+                        pageSize,
+                        userLatitude,
+                        userLongitude));
     }
 }

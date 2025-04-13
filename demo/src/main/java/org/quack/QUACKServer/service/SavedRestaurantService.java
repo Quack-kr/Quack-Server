@@ -13,14 +13,41 @@ import org.springframework.transaction.annotation.Transactional;
 public class SavedRestaurantService {
 
     private final SavedRestaurantRepository savedRestaurantRepository;
+    private final RestaurantOperatingService operatingService;
 
     public int getSavedRestaurantCountByUserId(Long userId) {
         return savedRestaurantRepository.getCountByUser_UserId(userId);
     }
 
-    public List<Restaurant> getSavedRestaurantsByUserId(Long userId) {
-        // 요청 확인하고, paging 하기
-        return savedRestaurantRepository.findAllByUser_UserId(userId);
+    public Page<SavedRestaurantDto> getSavedRestaurantsByUserId(Long userId,
+                                                                int pageNum, int pageSize,
+                                                                double userLatitude, double userLongitude) {
+
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        Page<SavedRestaurantDto> savedRestaurants = savedRestaurantRepository.findSavedRestaurantsByUserId(userId, pageable);
+
+        return savedRestaurants.map(dto -> {
+            double restaurantLatitude = Double.parseDouble(dto.latitude());
+            double restaurantLongitude = Double.parseDouble(dto.longitude());
+            double kmDistance = DistanceCalculator.haversineCalculateDistance(userLatitude, userLongitude, restaurantLatitude,
+                    restaurantLongitude);
+            long distance = (long) (kmDistance * 1000);
+
+            boolean isOpen = operatingService.isRestaurantOpen(dto.restaurantId());
+
+            return new SavedRestaurantDto(
+                    dto.restaurantId(),
+                    dto.representativeImage(),
+                    dto.restaurantName(),
+                    dto.category(),
+                    dto.simpleDescription(),
+                    distance,
+                    dto.averagePrice(),
+                    isOpen,
+                    dto.latitude(),
+                    dto.longitude()
+            );
+        });
     }
 
     public boolean isRestaurantSaved(Long userId, Long restaurantId) {
