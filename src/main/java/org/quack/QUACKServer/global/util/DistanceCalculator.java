@@ -1,4 +1,4 @@
-package org.quack.QUACKServer.util;
+package org.quack.QUACKServer.global.util;
 
 public class DistanceCalculator {
 
