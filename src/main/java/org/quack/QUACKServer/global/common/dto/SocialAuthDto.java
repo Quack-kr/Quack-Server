@@ -3,6 +3,7 @@ package org.quack.QUACKServer.global.common.dto;
 import io.jsonwebtoken.Claims;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author : jung-kwanhee
@@ -14,8 +15,10 @@ import lombok.Getter;
 @Getter
 @Builder
 public class SocialAuthDto {
+
     private String providerId;
     private String email;
+
     public static SocialAuthDto from(Claims claims) {
         return SocialAuthDto.builder()
                 .providerId(claims.getSubject())

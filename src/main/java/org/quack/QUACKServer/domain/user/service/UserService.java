@@ -41,11 +41,12 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void createBeforeSignUp (ClientType clientType, SocialAuthDto socialAuthDto) {
+    public User createBeforeSignUp (ClientType clientType, SocialAuthDto socialAuthDto) {
         User user = User.createBySocial(
-                clientType, socialAuthDto.getProviderId(), socialAuthDto.getEmail(), "", "" );
+                clientType, socialAuthDto.getProviderId(), socialAuthDto.getEmail(), "", "", false );
 
-        userRepository.save(user);
+        return userRepository.save(user);
+
     }
 
 }

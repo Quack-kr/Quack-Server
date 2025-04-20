@@ -1,27 +1,23 @@
 package org.quack.QUACKServer.global.security.provider;
 
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpServletResponseWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
+import org.quack.QUACKServer.domain.user.domain.User;
 import org.quack.QUACKServer.domain.user.service.UserService;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.global.infra.social.apple.AppleHttpInterface;
-import org.quack.QUACKServer.global.infra.social.apple.dto.OidcPublicKeys;
+import org.quack.QUACKServer.global.infra.social.apple.dto.ApplePublicKeys;
 import org.quack.QUACKServer.global.security.enums.ClientType;
 import org.quack.QUACKServer.global.security.exception.BeforeSignUpException;
 import org.quack.QUACKServer.global.security.jwt.JwtProvider;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.security.PublicKey;
-import java.util.Map;
 
 /**
  * @author : jung-kwanhee
@@ -52,8 +48,11 @@ public class AppleLoginAuthenticationProvider implements LoginAuthenticationProv
         QuackUser quackUser = (QuackUser) userService.loadUserByUsername(socialAuthDto.getProviderId());
 
         if (quackUser.isBeforeSignUp()) {
-            userService.createBeforeSignUp(socialType, socialAuthDto);
-            throw new BeforeSignUpException("회원가입을 해야합니다", socialAuthDto);
+            if(quackUser.getUserId() == null) {
+                User user = userService.createBeforeSignUp(socialType, socialAuthDto);
+                quackUser = QuackUser.from(user);
+            }
+            throw new BeforeSignUpException("회원가입을 해야합니다", quackUser);
         } else {
             return quackAuthenticationToken;
         }
@@ -68,8 +67,8 @@ public class AppleLoginAuthenticationProvider implements LoginAuthenticationProv
 
     @Override
     public SocialAuthDto getSocialAuth(final String idToken) {
-        OidcPublicKeys oidcPublicKeys = appleHttpInterface.getApplePublicKeys();
-        PublicKey publicKey = publicKeyProvider.generatePublicKey(parseHeaders(idToken), oidcPublicKeys);
+        ApplePublicKeys applePublicKeys = appleHttpInterface.getApplePublicKeys();
+        PublicKey publicKey = publicKeyProvider.generatePublicKey(parseHeaders(idToken), applePublicKeys);
         Claims claims = jwtProvider.parseClaims(idToken, publicKey);
 
         return SocialAuthDto.from(claims);

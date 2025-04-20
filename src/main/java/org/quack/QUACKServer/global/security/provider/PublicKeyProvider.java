@@ -1,8 +1,8 @@
 package org.quack.QUACKServer.global.security.provider;
 
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.global.infra.social.apple.dto.OidcPublicKey;
-import org.quack.QUACKServer.global.infra.social.apple.dto.OidcPublicKeys;
+import org.quack.QUACKServer.global.infra.social.apple.dto.ApplePublicKey;
+import org.quack.QUACKServer.global.infra.social.apple.dto.ApplePublicKeys;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -25,17 +25,23 @@ import java.util.Map;
 @Slf4j
 public class PublicKeyProvider {
 
-    public PublicKey generatePublicKey(Map<String, String> idTokenHeaders, OidcPublicKeys oidcPublicKeys) {
-        return getPublicKey(oidcPublicKeys.getKey(idTokenHeaders.get("kid"), idTokenHeaders.get("alg")));
+    public PublicKey generatePublicKey(Map<String, String> idTokenHeaders, ApplePublicKeys applePublicKeys) {
+        return getPublicKey(applePublicKeys.getKey(idTokenHeaders.get("kid"), idTokenHeaders.get("alg")));
     }
 
-    private PublicKey getPublicKey(OidcPublicKey oidcPublicKey) {
-        byte[] nBytes = Base64.getDecoder().decode(oidcPublicKey.n());
-        byte[] eBytes = Base64.getDecoder().decode(oidcPublicKey.e());
-
-        RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec( new BigInteger(1, nBytes), new BigInteger(1, eBytes));
+    private PublicKey getPublicKey(ApplePublicKey oidcPublicKey) {
 
         try {
+
+            byte[] nBytes = Base64.getUrlDecoder().decode(oidcPublicKey.n());
+            byte[] eBytes = Base64.getUrlDecoder().decode(oidcPublicKey.e());
+
+
+            RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(
+                    new BigInteger(1, nBytes),
+                    new BigInteger(1, eBytes)
+            );
+
             return KeyFactory.getInstance(oidcPublicKey.kty()).generatePublic(rsaPublicKeySpec);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);

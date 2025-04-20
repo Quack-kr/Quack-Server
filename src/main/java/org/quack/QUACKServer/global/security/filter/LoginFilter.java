@@ -5,11 +5,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.domain.auth.dto.LoginResponse;
+import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
+import org.quack.QUACKServer.global.common.dto.BaseResponse;
 import org.quack.QUACKServer.global.security.enums.ClientType;
 import org.quack.QUACKServer.global.security.exception.BeforeSignUpException;
 import org.quack.QUACKServer.global.security.provider.LoginAuthenticationProvider;
 import org.quack.QUACKServer.global.security.provider.LoginAuthenticationProviderFactory;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthenticationToken;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -33,10 +37,11 @@ import java.util.Map;
 public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 
     private final LoginAuthenticationProviderFactory providerFactory;
-
-    public LoginFilter(AuthenticationManager authenticationManager, LoginAuthenticationProviderFactory providerFactory) {
+    private final ObjectMapper objectMapper;
+    public LoginFilter(AuthenticationManager authenticationManager, LoginAuthenticationProviderFactory providerFactory, ObjectMapper objectMapper) {
         super(new AntPathRequestMatcher("/api/v1/auth/login", "POST"));
         this.providerFactory = providerFactory;
+        this.objectMapper = objectMapper;
         setAuthenticationManager(authenticationManager);
     }
 
@@ -68,19 +73,42 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
             throws IOException, ServletException {
+        String path = String.valueOf(request.getServletPath());
 
         if (failed instanceof BeforeSignUpException beforeSignUpException) {
+
+            LoginResponse loginResponse = LoginResponse.builder()
+                    .userId(beforeSignUpException.getQuackUser().getUserId())
+                    .signUpStatus(SignUpStatus.BEFORE)
+                    .email(beforeSignUpException.getQuackUser().getEmail())
+                    .build();
+
             response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType("application/json");
-            response.getWriter().write(new ObjectMapper().writeValueAsString(
-                    Map.of("message", beforeSignUpException.getMessage(),
-                            "email", beforeSignUpException.getSocialAuthDto().getEmail(),
-                            "status", "BEFORE_SIGNUP" )
+            response.setContentType("application/json; charset=UTF-8");
+            response.getWriter()
+                    .write(objectMapper.writeValueAsString(build(path, loginResponse, beforeSignUpException.getMessage(), "200")
             ));
+
             return;
         }
 
         // 기본 실패 처리
         super.unsuccessfulAuthentication(request, response, failed);
     }
+
+
+
+    // TODO : 공통 부 처리에서 나갈 예정.
+
+    private BaseResponse<Object> build(String path, Object data, String message, String code) {
+        return BaseResponse.builder()
+                .path(path)
+                .data(data)
+                .message(message)
+                .code(code)
+                .build();
+    }
 }
+
+
+

@@ -8,7 +8,7 @@ package org.quack.QUACKServer.global.infra.social.apple.dto;
  * @fileName : OidcPublicKey
  * @date : 25. 4. 15.
  */
-public record OidcPublicKey(
+public record ApplePublicKey(
         String kty,
         String kid,
         String use,

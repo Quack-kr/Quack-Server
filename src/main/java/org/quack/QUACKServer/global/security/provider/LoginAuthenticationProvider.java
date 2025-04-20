@@ -1,14 +1,10 @@
 package org.quack.QUACKServer.global.security.provider;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jwt.SignedJWT;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.core.Authentication;
 
-import java.io.IOException;
 import java.text.ParseException;
-import java.util.Base64;
 import java.util.Map;
 
 /**
@@ -18,8 +14,8 @@ import java.util.Map;
  * @fileName : LoginAuthenticationProvider
  * @date : 25. 4. 15.
  */
+
 public interface LoginAuthenticationProvider extends AuthenticationProvider {
-//    Authentication authenticate(String idToken);
 
     SocialAuthDto getSocialAuth(String idToken);
 

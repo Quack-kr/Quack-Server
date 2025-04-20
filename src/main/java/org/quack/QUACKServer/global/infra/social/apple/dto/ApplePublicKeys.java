@@ -6,13 +6,13 @@ import java.util.List;
  * @author : jung-kwanhee
  * @description :
  * @packageName : org.quack.QUACKServer.global.config.security.dto
- * @fileName : OidcPublicKeys
+ * @fileName : ApplePublicKeys
  * @date : 25. 4. 15.
  */
-public record OidcPublicKeys(
-        List<OidcPublicKey> keys
+public record ApplePublicKeys(
+        List<ApplePublicKey> keys
 ) {
-    public OidcPublicKey getKey(final String kid, final String alg) {
+    public ApplePublicKey getKey(final String kid, final String alg) {
         return keys.stream()
                 .filter(key -> key.kid().equals(kid) && key.alg().equals(alg))
                 .findAny()

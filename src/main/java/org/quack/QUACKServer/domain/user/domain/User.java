@@ -36,7 +36,7 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ClientType clientType;
+    private ClientType socialType;
 
     @Column(nullable = false)
     private String socialId;
@@ -65,19 +65,31 @@ public class User extends BaseEntity {
     @ColumnDefault("0")
     private boolean isSignUp;
 
-    private User(ClientType socialType, String socialId, String email, String nickname, String profileImage){
-        this.clientType = socialType;
+    @Builder(access = AccessLevel.PRIVATE, builderMethodName = "createBuilder")
+    private User(ClientType socialType, String socialId, String email, String nickname, String profileImage, boolean isSignUp){
+        this.socialType = socialType;
         this.socialId = socialId;
         this.email = email;
         this.nickname = nickname;
         this.roleType = Role.USER;
         this.profileImage = profileImage;
+        this.isDeleted = false;
+        this.deletedAt = null;
+        this.isSignUp = isSignUp;
+
     }
 
     public static User createBySocial(ClientType socialType,
                                String socialId, String email,
-                               String nickname, String profileImage) {
-        return new User(socialType, socialId, email, nickname, profileImage);
+                               String nickname, String profileImage, boolean isSignUp) {
+        return User.createBuilder()
+                .socialType(socialType)
+                .socialId(socialId)
+                .email(email)
+                .nickname(nickname)
+                .profileImage(profileImage)
+                .isSignUp(isSignUp)
+                .build();
     }
 
 

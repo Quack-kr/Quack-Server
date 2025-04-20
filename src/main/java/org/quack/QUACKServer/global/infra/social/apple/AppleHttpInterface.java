@@ -1,6 +1,6 @@
 package org.quack.QUACKServer.global.infra.social.apple;
 
-import org.quack.QUACKServer.global.infra.social.apple.dto.OidcPublicKeys;
+import org.quack.QUACKServer.global.infra.social.apple.dto.ApplePublicKeys;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 
@@ -15,5 +15,8 @@ import org.springframework.web.service.annotation.HttpExchange;
 public interface AppleHttpInterface {
 
     @GetExchange("/auth/keys")
-    OidcPublicKeys getApplePublicKeys();
+    ApplePublicKeys getApplePublicKeys();
+
+    // @PostExchange("/auth/oauth2/v2/token")
+
 }

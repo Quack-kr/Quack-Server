@@ -27,6 +27,7 @@ import java.util.List;
 @AllArgsConstructor
 public class QuackUser implements UserDetails {
 
+    @Setter
     private Long userId;
     private String provideId;
     @Setter
@@ -57,12 +58,16 @@ public class QuackUser implements UserDetails {
         return QuackUser.builder()
                 .userId(user.getUserId())
                 .provideId(user.getSocialId())
+                .email(user.getEmail())
                 .isSignUp(user.isSignUp())
                 .build();
     }
 
     public static QuackUser empty(String provideId) {
-        return QuackUser.builder().provideId(provideId).isSignUp(false).build();
+        return QuackUser.builder()
+                .provideId(provideId)
+                .isSignUp(false)
+                .build();
     }
 
     public boolean isBeforeSignUp() {

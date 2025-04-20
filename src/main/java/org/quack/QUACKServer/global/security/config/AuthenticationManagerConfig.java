@@ -1,6 +1,7 @@
 package org.quack.QUACKServer.global.security.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.global.security.enums.ClientType;
 import org.quack.QUACKServer.global.security.provider.AppleLoginAuthenticationProvider;
 import org.quack.QUACKServer.global.security.provider.LoginAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Qualifier;

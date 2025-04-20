@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authenticationManager(quackAuthenticationManager)
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/api/v1/public/*","/auth/*","common/health-check").permitAll()
+                        request.requestMatchers("/api/v1/public/*","/auth/apple/callback","common/health-check").permitAll()
                                 .anyRequest().authenticated())
                 .sessionManagement(configurer ->
                         configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

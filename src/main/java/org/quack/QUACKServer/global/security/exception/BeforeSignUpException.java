@@ -1,6 +1,7 @@
 package org.quack.QUACKServer.global.security.exception;
 
 import lombok.Getter;
+import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
 import org.springframework.security.core.AuthenticationException;
 
@@ -14,15 +15,15 @@ import org.springframework.security.core.AuthenticationException;
 @Getter
 public class BeforeSignUpException extends AuthenticationException {
 
-    private final SocialAuthDto socialAuthDto;
+    private final QuackUser quackUser;
 
-    public BeforeSignUpException(String msg, Throwable cause, SocialAuthDto socialAuthDto) {
+    public BeforeSignUpException(String msg, Throwable cause, QuackUser quackUser) {
         super(msg, cause);
-        this.socialAuthDto = socialAuthDto;
+        this.quackUser = quackUser;
     }
 
-    public BeforeSignUpException(String msg, SocialAuthDto socialAuthDto) {
+    public BeforeSignUpException(String msg, QuackUser quackUser) {
         super(msg);
-        this.socialAuthDto = socialAuthDto;
+        this.quackUser = quackUser;
     }
 }
