@@ -3,7 +3,7 @@ package org.quack.QUACKServer.global.config.http;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.global.infra.social.AppleHttpInterface;
+import org.quack.QUACKServer.global.infra.social.apple.AppleHttpInterface;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -38,7 +38,7 @@ public class HttpInterfaceConfig {
 
     public HttpInterfaceConfig(
             DefaultListableBeanFactory beanFactory,
-            @Value("${quack.http.apple.url}") String appleApiBaseUrl
+            @Value("${oauth.apple.auth.url}") String appleApiBaseUrl
     ) {
         this.appleApiBaseUrl = appleApiBaseUrl;
         this.beanFactory = beanFactory;

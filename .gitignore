@@ -49,3 +49,4 @@ out/
 
 ## Apple Pem Key ##
 *.p12
+*.p8
