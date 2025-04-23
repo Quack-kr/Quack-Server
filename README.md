@@ -20,6 +20,11 @@
 <pre>
 org.quack.QUACKServer
 ├── domain
+│   ├── auth
+│   │   ├── service
+│   │   ├── domain
+│   │   └── validation
+│   │  
 │   ├── user                    # 사용자 관련 도메인
 │   │   ├── controller
 │   │   ├── service
