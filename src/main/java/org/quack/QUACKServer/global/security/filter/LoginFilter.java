@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.domain.auth.dto.LoginResponse;
+import org.quack.QUACKServer.domain.auth.dto.response.LoginResponse;
 import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
 import org.quack.QUACKServer.global.common.dto.BaseResponse;
 import org.quack.QUACKServer.global.security.enums.ClientType;
@@ -13,7 +13,6 @@ import org.quack.QUACKServer.global.security.exception.BeforeSignUpException;
 import org.quack.QUACKServer.global.security.provider.LoginAuthenticationProvider;
 import org.quack.QUACKServer.global.security.provider.LoginAuthenticationProviderFactory;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthenticationToken;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -22,7 +21,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author : jung-kwanhee
@@ -38,6 +36,7 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 
     private final LoginAuthenticationProviderFactory providerFactory;
     private final ObjectMapper objectMapper;
+
     public LoginFilter(AuthenticationManager authenticationManager, LoginAuthenticationProviderFactory providerFactory, ObjectMapper objectMapper) {
         super(new AntPathRequestMatcher("/api/v1/auth/login", "POST"));
         this.providerFactory = providerFactory;
@@ -78,7 +77,6 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
         if (failed instanceof BeforeSignUpException beforeSignUpException) {
 
             LoginResponse loginResponse = LoginResponse.builder()
-                    .userId(beforeSignUpException.getQuackUser().getUserId())
                     .signUpStatus(SignUpStatus.BEFORE)
                     .email(beforeSignUpException.getQuackUser().getEmail())
                     .build();

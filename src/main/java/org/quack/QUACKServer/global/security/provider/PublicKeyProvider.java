@@ -36,7 +36,6 @@ public class PublicKeyProvider {
             byte[] nBytes = Base64.getUrlDecoder().decode(oidcPublicKey.n());
             byte[] eBytes = Base64.getUrlDecoder().decode(oidcPublicKey.e());
 
-
             RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(
                     new BigInteger(1, nBytes),
                     new BigInteger(1, eBytes)

@@ -76,7 +76,6 @@ public class User extends BaseEntity {
         this.isDeleted = false;
         this.deletedAt = null;
         this.isSignUp = isSignUp;
-
     }
 
     public static User createBySocial(ClientType socialType,
@@ -92,6 +91,11 @@ public class User extends BaseEntity {
                 .build();
     }
 
+    public void registerUser(String nickname) {
+        this.isSignUp = true;
+        this.nickname = nickname;
+    }
+
 
 //    public void updateUserProfile (UpdateUserInfoRequest updateUserInfoRequest) {
 //        if (updateUserInfoRequest.nickname() != null) {
@@ -103,10 +107,5 @@ public class User extends BaseEntity {
 //        }
 //    }
 //
-//    public void registerUser(RegisterUserRequest registerUserRequest) {
-//        if (registerUserRequest.nickname() != null) {
-//            this.nickname = registerUserRequest.nickname();
-//        }
-//    }
 
 }

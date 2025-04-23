@@ -7,7 +7,7 @@ public class BaseCustomException extends RuntimeException{
 
     private final ErrorCode errorCode;
 
-    public BaseCustomException(ErrorCode errorCode, String message) {
+    public CustomException(ErrorCode errorCode, String message) {
         super(message);
         this.errorCode = errorCode;
     }

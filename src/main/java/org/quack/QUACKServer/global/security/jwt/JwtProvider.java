@@ -1,21 +1,18 @@
 package org.quack.QUACKServer.global.security.jwt;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
-import java.nio.charset.StandardCharsets;
+
 import java.security.Key;
 import java.security.PublicKey;
-import java.util.Arrays;
-import java.util.Base64;
-import javax.crypto.SecretKey;
+import java.util.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,10 +22,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
-import java.util.Collection;
-import java.util.Date;
 import java.util.function.Function;
 
 
@@ -45,6 +39,10 @@ public class JwtProvider {
     @Value("${jwt.refresh.expiration-time}")
     private long refreshTokenExpiration;
     private static final String AUTHORITIES_KEY = "auth";
+    private static final String USER_ID = "userId";
+    private static final String SOCIAL_TYPE = "socialType";
+    private static final String SOCIAL_ID = "socialId";
+
 //
 //    @PostConstruct
 //    protected void init() {
@@ -156,4 +154,29 @@ public class JwtProvider {
         return userNickname;
     }
 
+    public String generateToken(QuackUser quackUser) {
+        return generateToken(new HashMap<>(), quackUser);
+    }
+    public String generateRefreshToken(QuackUser quackUser) {
+        return buildToken(new HashMap<>(), quackUser, refreshTokenExpiration);
+    }
+
+    public String generateToken(Map<String, Object> extraClaims, QuackUser userDetails) {
+        return buildToken(extraClaims, userDetails, accessTokenExpiration);
+    }
+
+    public String buildToken(Map<String, Object> extraClaims, QuackUser userDetails, long expiration) {
+        return Jwts
+                .builder()
+                .setClaims(extraClaims)
+                .claim(AUTHORITIES_KEY, userDetails.getAuthorities())
+                .claim(USER_ID, userDetails.getUserId())
+                .claim(SOCIAL_TYPE, userDetails.getNickname())
+                .claim(SOCIAL_ID, userDetails.getSocialId())
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
 }

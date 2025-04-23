@@ -1,13 +1,11 @@
 package org.quack.QUACKServer.domain.auth.domain;
 
 import lombok.*;
-import org.apache.commons.lang3.StringUtils;
 import org.quack.QUACKServer.domain.user.domain.User;
-import org.springframework.security.core.CredentialsContainer;
+import org.quack.QUACKServer.global.security.enums.ClientType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,14 +27,11 @@ public class QuackUser implements UserDetails {
 
     @Setter
     private Long userId;
-    private String provideId;
-    @Setter
+    private String socialId;
+    private ClientType socialType;
     private Boolean isMarketingCheck;
-    @Setter
     private String nickname;
-    @Setter
     private String email;
-    @Setter
     private boolean isSignUp;
 
     @Override
@@ -46,7 +41,7 @@ public class QuackUser implements UserDetails {
 
     @Override
     public String getPassword() {
-        return provideId;
+        return socialId;
     }
 
     @Override
@@ -57,7 +52,8 @@ public class QuackUser implements UserDetails {
     public static QuackUser from (User user) {
         return QuackUser.builder()
                 .userId(user.getUserId())
-                .provideId(user.getSocialId())
+                .socialId(user.getSocialId())
+                .socialType(user.getSocialType())
                 .email(user.getEmail())
                 .isSignUp(user.isSignUp())
                 .build();
@@ -65,7 +61,7 @@ public class QuackUser implements UserDetails {
 
     public static QuackUser empty(String provideId) {
         return QuackUser.builder()
-                .provideId(provideId)
+                .socialId(provideId)
                 .isSignUp(false)
                 .build();
     }

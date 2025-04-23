@@ -21,7 +21,7 @@ public class SocialAuthDto {
 
     public static SocialAuthDto from(Claims claims) {
         return SocialAuthDto.builder()
-                .providerId(claims.getSubject())
+                .providerId(claims.getSubject()) // Social_id
                 .email(claims.get("email", String.class))
                 .build();
 

@@ -42,6 +42,7 @@ public class SecurityConfig {
                         configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterAfter(jw)
                 .build();
     }
 

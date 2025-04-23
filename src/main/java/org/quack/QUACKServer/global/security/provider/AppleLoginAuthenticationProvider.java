@@ -67,6 +67,7 @@ public class AppleLoginAuthenticationProvider implements LoginAuthenticationProv
 
     @Override
     public SocialAuthDto getSocialAuth(final String idToken) {
+        // 애플에서 공개키를 주면 (idToken -> ~
         ApplePublicKeys applePublicKeys = appleHttpInterface.getApplePublicKeys();
         PublicKey publicKey = publicKeyProvider.generatePublicKey(parseHeaders(idToken), applePublicKeys);
         Claims claims = jwtProvider.parseClaims(idToken, publicKey);

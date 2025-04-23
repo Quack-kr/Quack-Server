@@ -29,7 +29,6 @@ public class QuackAuthenticationToken extends AbstractAuthenticationToken {
         this.accessToken = accessToken;
         this.idToken = idToken;
         setAuthenticated(false);
-
     }
 
     public QuackAuthenticationToken(Collection<? extends GrantedAuthority> authorities, Object details, ClientType clientType, String accessToken, String idToken) {

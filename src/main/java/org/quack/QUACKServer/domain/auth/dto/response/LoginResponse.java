@@ -1,4 +1,4 @@
-package org.quack.QUACKServer.domain.auth.dto;
+package org.quack.QUACKServer.domain.auth.dto.response;
 
 import lombok.Builder;
 import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
@@ -12,10 +12,8 @@ import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
  */
 @Builder
 public record LoginResponse(
-        Long userId,
         SignUpStatus signUpStatus,
         String email
 ) {
-
 
 }
