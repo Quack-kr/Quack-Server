@@ -38,7 +38,7 @@ public class HttpInterfaceConfig {
 
     public HttpInterfaceConfig(
             DefaultListableBeanFactory beanFactory,
-            @Value("${oauth.apple.auth.url}") String appleApiBaseUrl
+            @Value("${social.apple.base-url}") String appleApiBaseUrl
     ) {
         this.appleApiBaseUrl = appleApiBaseUrl;
         this.beanFactory = beanFactory;
