@@ -10,7 +10,8 @@ import java.util.Collection;
 
 /**
  * @author : jung-kwanhee
- * @description :
+ * @description : 인증 전 필터를 타기 위한 객체
+ *
  * @packageName : org.quack.QUACKServer.global.security.token
  * @fileName : QuackAuthenticationToken
  * @date : 25. 4. 15.
@@ -31,12 +32,14 @@ public class QuackAuthenticationToken extends AbstractAuthenticationToken {
         setAuthenticated(false);
     }
 
-    public QuackAuthenticationToken(Collection<? extends GrantedAuthority> authorities, Object details, ClientType clientType, String accessToken, String idToken) {
-        super(authorities);
+    public QuackAuthenticationToken(QuackUser details,
+                                    ClientType clientType,
+                                    String accessToken,
+                                    String idToken) {
+        super(details.getAuthorities());
         this.clientType = clientType;
-        this.accessToken = accessToken;
-        // details 는 QuackUser
         super.setDetails(details);
+        this.accessToken = accessToken;
         this.idToken = idToken;
         setAuthenticated(true);
     }
@@ -47,7 +50,7 @@ public class QuackAuthenticationToken extends AbstractAuthenticationToken {
     }
 
     @Override
-    public Object getPrincipal() {
+    public QuackUser getPrincipal() {
         return null;
     }
 

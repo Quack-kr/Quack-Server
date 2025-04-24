@@ -6,15 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.auth.dto.request.SignupRequest;
-import org.quack.QUACKServer.domain.auth.dto.response.CreateUserResponse;
+import org.quack.QUACKServer.domain.auth.dto.response.AuthResponse;
 import org.quack.QUACKServer.domain.user.domain.User;
 import org.quack.QUACKServer.domain.user.repository.UserRepository;
-import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.global.security.jwt.JwtProvider;
 import org.quack.QUACKServer.global.security.provider.AppleLoginAuthenticationProvider;
-import org.quack.QUACKServer.global.security.provider.PublicKeyProvider;
-import org.quack.QUACKServer.global.util.validation.NicknameValidator;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,8 +31,7 @@ public class AuthService {
     private final AppleLoginAuthenticationProvider appleLoginAuthenticationProvider;
     private final JwtProvider jwtProvider;
 
-
-    public CreateUserResponse signup(SignupRequest request, String idToken) {
+    public AuthResponse signup(SignupRequest request, String idToken) {
 
         switch (request.clientType()) {
             case APPLE -> {
@@ -49,7 +45,7 @@ public class AuthService {
                 String accessToken = jwtProvider.generateToken(QuackUser.from(user));
                 String refreshToken = jwtProvider.generateRefreshToken(QuackUser.from(user));
 
-                return CreateUserResponse.of(accessToken, refreshToken);
+                return AuthResponse.of(accessToken, refreshToken);
             }
             default -> {
                 // TODO : 공통 예외처리 로직 적용
@@ -59,5 +55,6 @@ public class AuthService {
 
 
     }
+
 
 }

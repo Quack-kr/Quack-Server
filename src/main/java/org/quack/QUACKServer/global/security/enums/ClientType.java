@@ -28,6 +28,5 @@ public enum ClientType {
                 .filter(c -> c.getValue().equals(value))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
-
     }
 }

@@ -1,0 +1,70 @@
+package org.quack.QUACKServer.global.security.jwt;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.global.common.dto.BaseResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+/**
+ * @author : jung-kwanhee
+ * @description :
+ * @packageName : org.quack.QUACKServer.global.security.jwt
+ * @fileName : JwtExceptionFilter
+ * @date : 25. 4. 25.
+ */
+@RequiredArgsConstructor
+@Component
+@Slf4j
+public class JwtExceptionFilter extends OncePerRequestFilter {
+    private final ObjectMapper objectMapper;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        try {
+            filterChain.doFilter(request, response);
+        } catch (RuntimeException e) {
+            log.error("AuthenticationExceptionFilter error", e);
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.getWriter().write(createResponseBody(HttpStatus.CONFLICT, e.getMessage()));
+        } catch (Exception e) {
+            log.error("AuthenticationExceptionFilter error", e);
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.getWriter().write(createResponseBody(e));
+        }
+    }
+
+    private String createResponseBody(HttpStatusCode code, String message) throws JsonProcessingException {
+        BaseResponse<Object> baseResponse = BaseResponse.builder()
+                .code(code.toString())
+                .message(message)
+                .build();
+
+        return objectMapper.writeValueAsString(baseResponse);
+    }
+
+    private String createResponseBody(Exception e) throws JsonProcessingException {
+        BaseResponse<Object> baseResponse = BaseResponse.builder()
+                .code(String.valueOf(HttpStatus.CONFLICT.value()))
+                .message(e.getMessage() + " [" + "Exception 발생" + "]")
+                .build();
+
+        return objectMapper.writeValueAsString(baseResponse);
+    }
+}

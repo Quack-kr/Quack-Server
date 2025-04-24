@@ -1,15 +1,19 @@
 package org.quack.QUACKServer.global.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.domain.auth.domain.QuackUser;
+import org.quack.QUACKServer.domain.auth.dto.response.AuthResponse;
 import org.quack.QUACKServer.domain.auth.dto.response.LoginResponse;
 import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
 import org.quack.QUACKServer.global.common.dto.BaseResponse;
 import org.quack.QUACKServer.global.security.enums.ClientType;
 import org.quack.QUACKServer.global.security.exception.BeforeSignUpException;
+import org.quack.QUACKServer.global.security.jwt.JwtProvider;
 import org.quack.QUACKServer.global.security.provider.LoginAuthenticationProvider;
 import org.quack.QUACKServer.global.security.provider.LoginAuthenticationProviderFactory;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthenticationToken;
@@ -32,16 +36,18 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-public class LoginFilter extends AbstractAuthenticationProcessingFilter {
+public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     private final LoginAuthenticationProviderFactory providerFactory;
     private final ObjectMapper objectMapper;
+    private final JwtProvider jwtProvider;
 
-    public LoginFilter(AuthenticationManager authenticationManager, LoginAuthenticationProviderFactory providerFactory, ObjectMapper objectMapper) {
+    public SocialAuthLoginFilter(AuthenticationManager authenticationManager, LoginAuthenticationProviderFactory providerFactory, ObjectMapper objectMapper, JwtProvider jwtProvider) {
         super(new AntPathRequestMatcher("/api/v1/auth/login", "POST"));
         this.providerFactory = providerFactory;
         this.objectMapper = objectMapper;
         setAuthenticationManager(authenticationManager);
+        this.jwtProvider = jwtProvider;
     }
 
     @Override
@@ -62,7 +68,6 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 
             return provider.authenticate(quackAuthenticationToken);
 
-
         } catch (AuthenticationException e) {
             log.error("Authentication failed: ", e);
             throw e;  // 예외를 다시 던져서 스프링 시큐리티가 처리하도록 함
@@ -72,7 +77,7 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
             throws IOException, ServletException {
-        String path = String.valueOf(request.getServletPath());
+        String path = request.getServletPath() + "/auth/login";
 
         if (failed instanceof BeforeSignUpException beforeSignUpException) {
 
@@ -94,9 +99,23 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
         super.unsuccessfulAuthentication(request, response, failed);
     }
 
+    // 인증 성공
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+                                            Authentication authResult) throws IOException {
+        String path = request.getServletPath() + "/auth/login";
+        QuackUser quackUser = (QuackUser) authResult.getDetails();
+        AuthResponse authResponse = AuthResponse.builder()
+                .accessToken(jwtProvider.generateToken(quackUser))
+                .refreshToken(jwtProvider.generateRefreshToken(quackUser))
+                .build();
 
-
-    // TODO : 공통 부 처리에서 나갈 예정.
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json; charset=UTF-8");
+        response.getWriter()
+                .write(objectMapper.writeValueAsString(build(path, authResponse, "인증 성공", "200")
+                ));
+    }
 
     private BaseResponse<Object> build(String path, Object data, String message, String code) {
         return BaseResponse.builder()

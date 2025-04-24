@@ -1,6 +1,7 @@
 package org.quack.QUACKServer.domain.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.quack.QUACKServer.global.security.enums.ClientType;
 
 /**
@@ -12,6 +13,6 @@ import org.quack.QUACKServer.global.security.enums.ClientType;
  */
 public record SignupRequest(
         @NotBlank String nickname,
-        @NotBlank ClientType clientType
+        @NotNull ClientType clientType
 ) {
 }

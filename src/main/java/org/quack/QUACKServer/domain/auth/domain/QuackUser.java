@@ -53,6 +53,7 @@ public class QuackUser implements UserDetails {
         return QuackUser.builder()
                 .userId(user.getUserId())
                 .socialId(user.getSocialId())
+                .nickname(user.getNickname())
                 .socialType(user.getSocialType())
                 .email(user.getEmail())
                 .isSignUp(user.isSignUp())
