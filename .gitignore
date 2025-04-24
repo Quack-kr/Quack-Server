@@ -46,3 +46,7 @@ out/
 
 ## application.yml ##
 *.yml
+
+## Apple Pem Key ##
+*.p12
+*.p8
