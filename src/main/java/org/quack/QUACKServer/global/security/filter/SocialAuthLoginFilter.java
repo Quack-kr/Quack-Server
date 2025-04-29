@@ -106,6 +106,7 @@ public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilte
         String path = request.getServletPath() + "/auth/login";
         QuackUser quackUser = (QuackUser) authResult.getDetails();
         AuthResponse authResponse = AuthResponse.builder()
+                .signUpStatus(SignUpStatus.FINISH)
                 .accessToken(jwtProvider.generateToken(quackUser))
                 .refreshToken(jwtProvider.generateRefreshToken(quackUser))
                 .build();

@@ -30,6 +30,7 @@ public class AuthController {
 
     private final AuthService authService;
 
+    // TODO : 배포과정에서 삭제.
     @PostMapping(value = "/auth/apple/callback", consumes = "application/x-www-form-urlencoded")
     public String callback(HttpServletRequest request) {
 
@@ -42,7 +43,7 @@ public class AuthController {
 
     @PostMapping("/auth/signup")
     public AuthResponse signup(
-            @Valid @NotBlank @RequestHeader("id_token") String idToken,
+            @Valid @NotBlank @RequestHeader("id-token") String idToken,
             @Valid @RequestBody SignupRequest request) {
          return authService.signup(request, idToken);
     }
