@@ -13,6 +13,7 @@ import org.quack.QUACKServer.global.security.enums.ClientType;
  */
 public record SignupRequest(
         @NotBlank String nickname,
-        @NotNull ClientType clientType
+        @NotNull ClientType clientType,
+        Boolean agreeMarketingPolicy
 ) {
 }
