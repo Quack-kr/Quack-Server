@@ -18,7 +18,7 @@ import java.util.Arrays;
 public enum SignUpStatus {
 
     BEFORE("BEFORE"),
-    FINISHED("FINISHED");
+    FINISH("FINISH");
     private final String value;
 
 }
