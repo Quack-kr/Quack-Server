@@ -39,7 +39,7 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath profileImage = createString("profileImage");
 
-    public final EnumPath<org.quack.QUACKServer.domain.common.domain.Role> roleType = createEnum("roleType", org.quack.QUACKServer.domain.common.domain.Role.class);
+    public final EnumPath<org.quack.QUACKServer.domain.auth.enums.Role> roleType = createEnum("roleType", org.quack.QUACKServer.domain.auth.enums.Role.class);
 
     public final StringPath socialId = createString("socialId");
 

@@ -2,7 +2,6 @@ package org.quack.QUACKServer.domain.restaurant.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.quack.QUACKServer.domain.restaurant.domain.RestaurantCategory;
 
 /**
  * @author : jung-kwanhee
@@ -63,16 +62,17 @@ public interface RestaurantEnum {
 
     @Getter
     @AllArgsConstructor
-    enum RestaurantOrderByType {
-        LATEST("LATEST","최신순"),
-        LIKE("LIKE", "공감순")
+    enum RestaurantSortType {
+        LATEST("LATEST","저장순"),
+        LIKE("LIKE", "미친 맛 순"),
+        DISTANCE("DISTANCE", "거리순")
         ;
-
 
         private final String value;
         private final String description;
     }
 
+    // 필터
     @Getter
     @AllArgsConstructor
     enum RestaurantCategoryType {
@@ -96,4 +96,65 @@ public interface RestaurantEnum {
         private final String value;
         private final String description;
     }
+
+    @Getter
+    @AllArgsConstructor
+    enum FavorFilterType {
+        TASTE_PLAIN("TASTE_PLAIN","맛이 평범한 곳"),
+        SIDE_PLAIN("SIDE_PLAIN","사이드메뉴 평범한 곳"),
+        INGREDIENT_NOT_FRESH("INGREDIENT_NOT_FRESH","재료가 신선하지 않은 곳"),
+        MENU_LACKING("MENU_LACKING","메뉴구성이 아쉬운 곳")
+        ;
+        private final String value;
+        private final String description;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    enum AtmosphereFilterType{
+        NOISY("NOISY", "시끄러운 곳"),
+        ATMOSPHERE_LACKING("ATMOSPHERE_LACKING", "분위기 아쉬운 곳");
+
+        private final String value;
+        private final String description;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    enum ToiletFilterType {
+        DIRTY("DIRTY", "더러운 곳"),
+        UNISEX("UNISEX", "남녀공용인 곳")
+        ;
+
+        private final String value;
+        private final String description;
+    }
+
+
+    @Getter
+    @AllArgsConstructor
+    enum ServiceFilterType{
+        NO_PARKING("NO_PARKING","주차불가"),
+        PAID_PARKING("PAID_PARKING","유료주차"),
+        UNFRIENDLY("UNFRIENDLY","불친절한 곳")
+        ;
+
+        private final String value;
+        private final String description;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    enum AtcFilterType{
+        BAD_VALUE("BAD_VALUE","가성비가 안좋은 곳"),
+        SLOW_FOOD("SLOW_FOOD","음식이 오래걸리는 곳"),
+        UNCOMFORTABLE_SEAT("UNCOMFORTABLE_SEAT","좌석이 불편한 곳"),
+        UNHYGIENIC("UNHYGIENIC","비위생적인 곳"),
+        LONG_WAITING("LONG_WAITING","웨이팅이 긴 곳"),
+        NO_MEAT_GRILL_HELP("NO_MEAT_GRILL_HELP","고기 안구워주는 곳");
+
+        private final String value;
+        private final String description;
+    }
+
 }

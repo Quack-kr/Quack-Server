@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,25 +27,22 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long restaurantId;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "area_id")
-    private List<RestaurantArea> restaurantArea;
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<RestaurantArea> restaurantArea = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private List<RestaurantCategory> category;
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<RestaurantCategory> category = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_keyword_id")
-    private List<RestaurantKeyword> restaurantKeyword;
+    // 이걸 식당에 조인 거는게 맞나?
+    // 리뷰 등록시 해당 정보들을 다 가지고 있을 예정.
+    // JOIN 걸어서
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<RestaurantKeyword> restaurantKeyword = new ArrayList<>();
 
     private String detailAddress;
 
-    @Column(precision = 10, scale = 7)
-    private Double latitude;
-
-    @Column(precision = 10, scale = 7)
-    private Double longitude;
+    @Column(columnDefinition = "GEOMETRY")
+    private Point location;
 
     private String simpleDescription;
 

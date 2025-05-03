@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 /**
  * @author : jung-kwanhee
  * @description :
@@ -23,4 +25,8 @@ public class RestaurantArea {
     private Long restaurantAreaId;
 
     private String restaurantAreaName;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "restaurant_id", nullable = false)
+    private Restaurant restaurant;
 }

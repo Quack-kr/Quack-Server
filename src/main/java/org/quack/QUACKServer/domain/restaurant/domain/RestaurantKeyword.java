@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 /**
  * @author : jung-kwanhee
  * @description :
@@ -29,5 +31,9 @@ public class RestaurantKeyword {
 
     @Enumerated(EnumType.STRING)
     private RestaurantEnum.ReviewKeywordType restaurantKeywordType;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "restaurant_id", nullable = false)
+    private Restaurant restaurant;
 
 }

@@ -1,14 +1,13 @@
 package org.quack.QUACKServer.domain.user.domain;
 
 import jakarta.persistence.*;
-import jakarta.websocket.ClientEndpoint;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.quack.QUACKServer.domain.common.domain.BaseEntity;
-import org.quack.QUACKServer.domain.common.domain.Role;
+import org.quack.QUACKServer.domain.auth.enums.Role;
 import org.quack.QUACKServer.global.security.enums.ClientType;
 
 import java.time.LocalDateTime;

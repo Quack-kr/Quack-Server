@@ -2,6 +2,8 @@ package org.quack.QUACKServer.domain.restaurant.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum;
+import org.quack.QUACKServer.domain.user.dto.UserLocationItem;
+import org.quack.QUACKServer.global.common.dto.PageInfo;
 
 import java.util.List;
 
@@ -15,9 +17,8 @@ import java.util.List;
 
 
 public record SearchSubtractRestaurantsRequest(
-        @NotNull
-        List<RestaurantEnum.RestaurantKeyword> filterBy,
-        @NotNull
-        List<RestaurantOrderByItem> orderBy
+        @NotNull RestaurantSubtractFilterItem filter,
+        @NotNull RestaurantSortItem sort,
+        PageInfo pageInfo
 ) {
 }

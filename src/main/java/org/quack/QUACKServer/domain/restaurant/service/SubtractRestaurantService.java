@@ -24,9 +24,21 @@ public class SubtractRestaurantService {
     @Transactional(readOnly = true)
     public SearchSubtractRestaurantsResponse searchSubtractRestaurants(SearchSubtractRestaurantsRequest request) {
 
-        // QuackUser quackUser = QuackAuthContext.getQuackUserDetails();
+        // 1. 필터링 처리
+        // ServiceFilterType => 식당에서
+        // 나머지는 리뷰에서
 
+
+
+        // 2. 정렬조건 처리
+
+        // 3. 페이징 정보 처리
+
+        // 4. 조회
+
+        // 5. Vo to Dto
         return SearchSubtractRestaurantsResponse.from(new ArrayList<>());
 
     }
+
 }
