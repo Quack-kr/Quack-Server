@@ -33,9 +33,6 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<RestaurantCategory> category = new ArrayList<>();
 
-    // 이걸 식당에 조인 거는게 맞나?
-    // 리뷰 등록시 해당 정보들을 다 가지고 있을 예정.
-    // JOIN 걸어서
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<RestaurantKeyword> restaurantKeyword = new ArrayList<>();
 
@@ -59,11 +56,6 @@ public class Restaurant {
 
     // TODO : ENUM 정의
     private String service;
-
-
-
-
-
 
 
 }

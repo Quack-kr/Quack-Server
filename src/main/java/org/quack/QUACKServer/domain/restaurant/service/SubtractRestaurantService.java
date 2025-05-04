@@ -2,6 +2,8 @@ package org.quack.QUACKServer.domain.restaurant.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
+import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.restaurant.dto.request.SearchSubtractRestaurantsRequest;
 import org.quack.QUACKServer.domain.restaurant.dto.response.SearchSubtractRestaurantsResponse;
 import org.springframework.stereotype.Service;
@@ -25,10 +27,6 @@ public class SubtractRestaurantService {
     public SearchSubtractRestaurantsResponse searchSubtractRestaurants(SearchSubtractRestaurantsRequest request) {
 
         // 1. 필터링 처리
-        // ServiceFilterType => 식당에서
-        // 나머지는 리뷰에서
-
-
 
         // 2. 정렬조건 처리
 

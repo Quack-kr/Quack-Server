@@ -29,7 +29,7 @@ public interface RestaurantEnum {
         TASTE("TASTE", "맛"),
         SIDE_MENU("SIDE_MENU", "사이드메뉴"),
         INGREDIENT("INGREDIENT", "재료 신선도"),
-        NOISE("NOISE", "가게 소음도"), // 불편한점만
+        NOISE("NOISE", "가게 소음도"),
         MENU("MENU", "메뉴 구성도"),
         RESTROOM("RESTROOM", "화장실 청결"),
         ATMOSPHERE("ATMOSPHERE", "분위기"),
