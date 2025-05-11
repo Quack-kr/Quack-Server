@@ -21,6 +21,21 @@ public interface RestaurantEnum {
 
         private final String value;
         private final String description;
+
+        public static ParkingType fromSubtractFilter(ServiceFilterType filterType) {
+            switch (filterType) {
+                case ServiceFilterType.NO_PARKING -> {
+                    return ParkingType.IMPOSSIBLE;
+                }
+                case ServiceFilterType.PAID_PARKING -> {
+                    return ParkingType.PAID;
+                }
+                case null, default -> {
+                    return null;
+                }
+            }
+
+        }
     }
 
     @Getter
@@ -50,20 +65,8 @@ public interface RestaurantEnum {
 
     @Getter
     @AllArgsConstructor
-    enum ReviewKeywordType {
-
-        NEGATIVE("NEGATIVE", "안좋았던점"),
-        POSITIVE("POSITIVE", "좋았던점")
-        ;
-
-        private final String value;
-        private final String description;
-    }
-
-    @Getter
-    @AllArgsConstructor
     enum RestaurantSortType {
-        LATEST("LATEST","저장순"),
+        SAVED("SAVED","저장순"),
         LIKE("LIKE", "미친 맛 순"),
         DISTANCE("DISTANCE", "거리순")
         ;
@@ -156,5 +159,4 @@ public interface RestaurantEnum {
         private final String value;
         private final String description;
     }
-
 }

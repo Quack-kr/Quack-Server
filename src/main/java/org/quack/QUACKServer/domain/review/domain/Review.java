@@ -41,8 +41,8 @@ public class Review{
     @Column(name = "content")
     private String reviewContent;
 
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<ReviewImage> reviewImages = new ArrayList<>();
+//    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = false)
+//    private List<ReviewImage> reviewImages = new ArrayList<>();
 
 
 }

@@ -17,8 +17,9 @@ import java.util.List;
 
 
 public record SearchSubtractRestaurantsRequest(
-        @NotNull RestaurantSubtractFilterItem filter,
+        RestaurantSubtractFilterItem filter,
         @NotNull RestaurantSortItem sort,
         PageInfo pageInfo
 ) {
+
 }

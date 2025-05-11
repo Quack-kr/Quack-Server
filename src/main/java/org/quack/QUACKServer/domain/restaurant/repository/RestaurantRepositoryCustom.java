@@ -2,6 +2,7 @@ package org.quack.QUACKServer.domain.restaurant.repository;
 
 
 import org.quack.QUACKServer.domain.restaurant.domain.Restaurant;
+import org.quack.QUACKServer.domain.restaurant.dto.response.SubtractRestaurantItem;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSubtractFilter;
 
 import java.util.List;
@@ -16,5 +17,9 @@ import java.util.List;
 
 public interface RestaurantRepositoryCustom {
 
-    List<Restaurant> findAllBySubtractFilterAndSortFilter(RestaurantSubtractFilter filter);
+    List<SubtractRestaurantItem> findAllBySubtractFilterOrderByDistance(RestaurantSubtractFilter filter);
+
+    List<SubtractRestaurantItem> findAllBySubtractFilterOrderByLike(RestaurantSubtractFilter filter);
+
+    List<SubtractRestaurantItem> findAllBySubtractFilterOrderBySaved(RestaurantSubtractFilter filter);
 }

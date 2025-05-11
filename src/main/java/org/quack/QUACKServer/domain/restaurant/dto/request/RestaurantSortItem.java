@@ -14,7 +14,7 @@ import org.quack.QUACKServer.domain.user.dto.UserLocationItem;
 
 public record RestaurantSortItem(
         UserLocationItem userLocationItem,
-        @NotNull RestaurantEnum.RestaurantSortType orderByType,
+        @NotNull RestaurantEnum.RestaurantSortType sortType,
         @NotNull Boolean isOpen) {
 
 }

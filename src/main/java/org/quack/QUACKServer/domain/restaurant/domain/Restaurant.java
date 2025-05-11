@@ -33,26 +33,34 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<RestaurantCategory> category = new ArrayList<>();
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<RestaurantKeyword> restaurantKeyword = new ArrayList<>();
-
+    @Column(name = "detail_address")
     private String detailAddress;
 
-    @Column(columnDefinition = "GEOMETRY")
-    private Point location;
+    @Column(name = "restaurant_name", nullable = false)
+    private String restaurantName;
 
+    @Column(columnDefinition = "GEOMETRY" , name = "restaurant_location")
+    private Point restaurantLocation;
+
+    @Column(name = "simple_description")
     private String simpleDescription;
 
+    @Column(name = "detail_description")
     private String detailDescription;
 
+    @Column(name = "effort_message")
     private String effortMessage;
 
+    @Column(name = "average_price")
     private Long averagePrice;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "parking")
     private RestaurantEnum.ParkingType parking;
 
-    private Boolean toilet;
+    // 남녀 공용 여부
+    @Column(name = "unisex_toilet_flag")
+    private Boolean isUnisexToilet;
 
     // TODO : ENUM 정의
     private String service;

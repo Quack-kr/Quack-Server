@@ -30,7 +30,7 @@ public class QRestaurant extends EntityPathBase<Restaurant> {
 
     public final StringPath effortMessage = createString("effortMessage");
 
-    public final SimplePath<java.awt.Point> location = createSimple("location", java.awt.Point.class);
+    public final BooleanPath isUnisexToilet = createBoolean("isUnisexToilet");
 
     public final EnumPath<org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum.ParkingType> parking = createEnum("parking", org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum.ParkingType.class);
 
@@ -38,13 +38,13 @@ public class QRestaurant extends EntityPathBase<Restaurant> {
 
     public final NumberPath<Long> restaurantId = createNumber("restaurantId", Long.class);
 
-    public final ListPath<RestaurantKeyword, QRestaurantKeyword> restaurantKeyword = this.<RestaurantKeyword, QRestaurantKeyword>createList("restaurantKeyword", RestaurantKeyword.class, QRestaurantKeyword.class, PathInits.DIRECT2);
+    public final SimplePath<java.awt.Point> restaurantLocation = createSimple("restaurantLocation", java.awt.Point.class);
+
+    public final StringPath restaurantName = createString("restaurantName");
 
     public final StringPath service = createString("service");
 
     public final StringPath simpleDescription = createString("simpleDescription");
-
-    public final BooleanPath toilet = createBoolean("toilet");
 
     public QRestaurant(String variable) {
         super(Restaurant.class, forVariable(variable));
