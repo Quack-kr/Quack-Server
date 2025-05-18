@@ -19,6 +19,12 @@ public class QMenu extends EntityPathBase<Menu> {
 
     public static final QMenu menu = new QMenu("menu");
 
+    public final DateTimePath<java.time.LocalDateTime> createAt = createDateTime("createAt", java.time.LocalDateTime.class);
+
+    public final DateTimePath<java.time.LocalDateTime> deletedAt = createDateTime("deletedAt", java.time.LocalDateTime.class);
+
+    public final NumberPath<Long> menuCategoryId = createNumber("menuCategoryId", Long.class);
+
     public final StringPath menuDescription = createString("menuDescription");
 
     public final NumberPath<Long> menuId = createNumber("menuId", Long.class);
@@ -27,7 +33,11 @@ public class QMenu extends EntityPathBase<Menu> {
 
     public final NumberPath<Long> menuPrice = createNumber("menuPrice", Long.class);
 
+    public final NumberPath<Integer> menuSortOrder = createNumber("menuSortOrder", Integer.class);
+
     public final NumberPath<Long> restaurantId = createNumber("restaurantId", Long.class);
+
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
 
     public QMenu(String variable) {
         super(Menu.class, forVariable(variable));

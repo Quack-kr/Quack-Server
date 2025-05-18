@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -20,31 +19,13 @@ public class QRestaurant extends EntityPathBase<Restaurant> {
 
     public static final QRestaurant restaurant = new QRestaurant("restaurant");
 
-    public final NumberPath<Long> averagePrice = createNumber("averagePrice", Long.class);
-
-    public final ListPath<RestaurantCategory, QRestaurantCategory> category = this.<RestaurantCategory, QRestaurantCategory>createList("category", RestaurantCategory.class, QRestaurantCategory.class, PathInits.DIRECT2);
-
     public final StringPath detailAddress = createString("detailAddress");
 
-    public final StringPath detailDescription = createString("detailDescription");
-
-    public final StringPath effortMessage = createString("effortMessage");
-
-    public final BooleanPath isUnisexToilet = createBoolean("isUnisexToilet");
-
-    public final EnumPath<org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum.ParkingType> parking = createEnum("parking", org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum.ParkingType.class);
-
-    public final ListPath<RestaurantArea, QRestaurantArea> restaurantArea = this.<RestaurantArea, QRestaurantArea>createList("restaurantArea", RestaurantArea.class, QRestaurantArea.class, PathInits.DIRECT2);
+    public final SimplePath<org.springframework.data.geo.Point> location = createSimple("location", org.springframework.data.geo.Point.class);
 
     public final NumberPath<Long> restaurantId = createNumber("restaurantId", Long.class);
 
-    public final SimplePath<java.awt.Point> restaurantLocation = createSimple("restaurantLocation", java.awt.Point.class);
-
     public final StringPath restaurantName = createString("restaurantName");
-
-    public final StringPath service = createString("service");
-
-    public final StringPath simpleDescription = createString("simpleDescription");
 
     public QRestaurant(String variable) {
         super(Restaurant.class, forVariable(variable));

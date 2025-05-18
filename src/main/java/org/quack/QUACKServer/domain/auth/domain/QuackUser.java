@@ -1,8 +1,8 @@
 package org.quack.QUACKServer.domain.auth.domain;
 
 import lombok.*;
-import org.quack.QUACKServer.domain.user.domain.User;
-import org.quack.QUACKServer.global.security.enums.ClientType;
+import org.quack.QUACKServer.domain.user.domain.CustomerUser;
+import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,13 +26,11 @@ import java.util.List;
 public class QuackUser implements UserDetails {
 
     @Setter
-    private Long userId;
-    private String socialId;
-    private ClientType socialType;
+    private Long customerUserId;
+    private ProviderType provider;
     private Boolean isMarketingCheck;
     private String nickname;
     private String email;
-    private boolean isSignUp;
 
     @Override
     public String getUsername() {
@@ -41,7 +39,7 @@ public class QuackUser implements UserDetails {
 
     @Override
     public String getPassword() {
-        return socialId;
+        return null;
     }
 
     @Override
@@ -49,27 +47,20 @@ public class QuackUser implements UserDetails {
         return List.of(new SimpleGrantedAuthority("USER"));
     }
 
-    public static QuackUser from (User user) {
+    public static QuackUser from (CustomerUser user) {
         return QuackUser.builder()
-                .userId(user.getUserId())
-                .socialId(user.getSocialId())
+                .customerUserId(user.getCustomerUserId())
                 .nickname(user.getNickname())
-                .socialType(user.getSocialType())
+                .provider(user.getProvider())
                 .email(user.getEmail())
-                .isSignUp(user.isSignUp())
                 .build();
     }
 
-    public static QuackUser empty(String provideId) {
+    public static QuackUser empty() {
         return QuackUser.builder()
-                .socialId(provideId)
-                .isSignUp(false)
                 .build();
     }
 
-    public boolean isBeforeSignUp() {
-        return !isSignUp;
-    }
     @Override public boolean isAccountNonExpired() { return true; }
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }

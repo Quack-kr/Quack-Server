@@ -3,12 +3,11 @@ package org.quack.QUACKServer.domain.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
-import org.quack.QUACKServer.domain.user.domain.User;
-import org.quack.QUACKServer.domain.user.repository.UserRepository;
+import org.quack.QUACKServer.domain.user.domain.CustomerUser;
+import org.quack.QUACKServer.domain.user.repository.CustomerUserRepository;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
-import org.quack.QUACKServer.global.security.enums.ClientType;
-import org.quack.QUACKServer.global.security.jwt.JwtProvider;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.quack.QUACKServer.global.security.enums.ProviderType;
+import org.quack.QUACKServer.global.security.exception.BeforeSignUpException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -27,26 +26,26 @@ import java.util.Optional;
 @Slf4j
 public class UserService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final CustomerUserRepository customerUserRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String socialId) throws UsernameNotFoundException {
+    public QuackUser loadUserByUsername(String providerId) throws UsernameNotFoundException {
 
-        Optional<User> user = userRepository.findBySocialId(socialId);
+        Optional<CustomerUser> user = customerUserRepository.findByProviderId(providerId);
 
         if(user.isPresent()) {
             return QuackUser.from(user.get());
         } else {
-            return QuackUser.empty(socialId);
+            throw new BeforeSignUpException("회원가입을 해야합니다", QuackUser.empty());
         }
     }
 
-    public User createBeforeSignUp (ClientType clientType, SocialAuthDto socialAuthDto) {
-        User user = User.createBySocial(
-                clientType, socialAuthDto.getProviderId(), socialAuthDto.getEmail(), "", "", false );
-
-        return userRepository.save(user);
-
-    }
+//    public CustomerUser createBeforeSignUp (ProviderType clientType, SocialAuthDto socialAuthDto) {
+//        CustomerUser user = CustomerUser.createBySocial(
+//                clientType, socialAuthDto.getProviderId(), socialAuthDto.getEmail(), "");
+//
+//        return customerUserRepository.save(user);
+//
+//    }
 
 }

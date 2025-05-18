@@ -11,7 +11,7 @@ import org.quack.QUACKServer.domain.auth.dto.response.AuthResponse;
 import org.quack.QUACKServer.domain.auth.dto.response.LoginResponse;
 import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
 import org.quack.QUACKServer.global.common.dto.BaseResponse;
-import org.quack.QUACKServer.global.security.enums.ClientType;
+import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.quack.QUACKServer.global.security.exception.BeforeSignUpException;
 import org.quack.QUACKServer.global.security.jwt.JwtProvider;
 import org.quack.QUACKServer.global.security.provider.LoginAuthenticationProvider;
@@ -52,9 +52,9 @@ public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilte
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-            throws AuthenticationException, IOException, ServletException {
+            throws AuthenticationException {
         try {
-            ClientType clientType = ClientType.from(request.getParameter("client_type"));
+            ProviderType clientType = ProviderType.from(request.getParameter("client_type"));
             String idToken = request.getHeader("id_token");
 
             if (clientType == null || idToken == null) {

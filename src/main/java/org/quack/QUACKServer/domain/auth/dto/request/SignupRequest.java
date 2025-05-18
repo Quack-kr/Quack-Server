@@ -2,7 +2,7 @@ package org.quack.QUACKServer.domain.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.quack.QUACKServer.global.security.enums.ClientType;
+import org.quack.QUACKServer.global.security.enums.ProviderType;
 
 /**
  * @author : jung-kwanhee
@@ -13,7 +13,7 @@ import org.quack.QUACKServer.global.security.enums.ClientType;
  */
 public record SignupRequest(
         @NotBlank String nickname,
-        @NotNull ClientType clientType,
+        @NotNull ProviderType clientType,
         Boolean agreeMarketingPolicy
 ) {
 }
