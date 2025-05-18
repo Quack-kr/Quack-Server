@@ -1,12 +1,10 @@
 package org.quack.QUACKServer.domain.auth.domain;
 
 import lombok.Getter;
-import org.quack.QUACKServer.global.security.enums.ClientType;
+import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 
 import javax.security.auth.Subject;
-import java.util.Collection;
 
 /**
  * @author : jung-kwanhee
@@ -20,24 +18,24 @@ import java.util.Collection;
 @Getter
 public class QuackAuthenticationToken extends AbstractAuthenticationToken {
 
-    private final ClientType clientType;
+    private final ProviderType provider;
     private final String accessToken;
     private final String idToken;
 
-    public QuackAuthenticationToken(ClientType clientType, String accessToken, String idToken) {
+    public QuackAuthenticationToken(ProviderType provider, String accessToken, String idToken) {
         super(null);
-        this.clientType = clientType;
+        this.provider = provider;
         this.accessToken = accessToken;
         this.idToken = idToken;
         setAuthenticated(false);
     }
 
     public QuackAuthenticationToken(QuackUser details,
-                                    ClientType clientType,
+                                    ProviderType provider,
                                     String accessToken,
                                     String idToken) {
         super(details.getAuthorities());
-        this.clientType = clientType;
+        this.provider = provider;
         super.setDetails(details);
         this.accessToken = accessToken;
         this.idToken = idToken;

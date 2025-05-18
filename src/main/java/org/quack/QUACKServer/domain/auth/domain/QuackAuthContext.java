@@ -19,7 +19,7 @@ import java.util.Objects;
 @Slf4j
 public class QuackAuthContext {
 
-    public String getSocialId() { return Objects.requireNonNull(getQuackUserDetails()).getSocialId(); }
+    public Long getCustomerUserId() { return Objects.requireNonNull(getQuackUserDetails()).getCustomerUserId(); }
 
     public static QuackUser getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

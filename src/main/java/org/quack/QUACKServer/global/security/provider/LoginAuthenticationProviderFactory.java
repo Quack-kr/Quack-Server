@@ -1,12 +1,13 @@
 package org.quack.QUACKServer.global.security.provider;
 
-import org.quack.QUACKServer.global.security.enums.ClientType;
+import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author : jung-kwanhee
@@ -18,17 +19,17 @@ import java.util.Map;
 @Component
 public class LoginAuthenticationProviderFactory {
 
-    private final Map<ClientType, LoginAuthenticationProvider> providerMap = new HashMap<>();
+    private final Map<ProviderType, LoginAuthenticationProvider> providerMap = new HashMap<>();
 
     @Autowired
     public LoginAuthenticationProviderFactory(List<LoginAuthenticationProvider> providers) {
         providers.forEach(provider -> {
-            ClientType clientType = resolve(provider);
+            ProviderType clientType = resolve(provider);
             providerMap.put(clientType, provider);
         });
     }
 
-    public LoginAuthenticationProvider get(ClientType clientType) {
+    public LoginAuthenticationProvider get(ProviderType clientType) {
         if (!providerMap.containsKey(clientType)) {
             throw new IllegalArgumentException("알 수 없는 로그인 방식 : " +  clientType.getValue());
         }
@@ -36,13 +37,13 @@ public class LoginAuthenticationProviderFactory {
         return providerMap.get(clientType);
     }
 
-    private ClientType resolve(LoginAuthenticationProvider provider) {
+    private ProviderType resolve(LoginAuthenticationProvider provider) {
         switch (provider) {
             case AppleLoginAuthenticationProvider appleLoginAuthenticationProvider-> {
-                return ClientType.APPLE;
+                return ProviderType.APPLE;
             }
             case null, default -> {
-                throw new IllegalArgumentException("알 수 없는 로그인 방식 : " +  provider.getClass());
+                throw new IllegalArgumentException("알 수 없는 로그인 방식 : " +  Objects.requireNonNull(provider).getClass());
             }
         }
     }

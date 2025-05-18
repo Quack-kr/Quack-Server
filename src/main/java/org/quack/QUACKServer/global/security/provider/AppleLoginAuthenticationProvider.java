@@ -4,18 +4,13 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
-import org.quack.QUACKServer.domain.auth.service.AuthService;
-import org.quack.QUACKServer.domain.user.domain.User;
 import org.quack.QUACKServer.domain.user.service.UserService;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.global.infra.social.apple.AppleHttpInterface;
 import org.quack.QUACKServer.global.infra.social.apple.dto.ApplePublicKeys;
-import org.quack.QUACKServer.global.security.enums.ClientType;
-import org.quack.QUACKServer.global.security.exception.BeforeSignUpException;
+import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.quack.QUACKServer.global.security.jwt.JwtProvider;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthenticationToken;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
@@ -45,20 +40,12 @@ public class AppleLoginAuthenticationProvider implements LoginAuthenticationProv
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
         QuackAuthenticationToken quackAuthenticationToken = (QuackAuthenticationToken) authentication;
-        ClientType socialType = quackAuthenticationToken.getClientType();
+        ProviderType provider = quackAuthenticationToken.getProvider();
 
         SocialAuthDto socialAuthDto = getSocialAuth(quackAuthenticationToken.getIdToken());
-        QuackUser quackUser = (QuackUser) userService.loadUserByUsername(socialAuthDto.getProviderId());
+        QuackUser quackUser = userService.loadUserByUsername(socialAuthDto.getProviderId());
+        return new QuackAuthenticationToken(quackUser, provider, quackAuthenticationToken.getAccessToken(),quackAuthenticationToken.getIdToken());
 
-        if (quackUser.isBeforeSignUp()) {
-            if(quackUser.getUserId() == null) {
-                User user = userService.createBeforeSignUp(socialType, socialAuthDto);
-                quackUser = QuackUser.from(user);
-            }
-            throw new BeforeSignUpException("회원가입을 해야합니다", quackUser);
-        } else {
-            return new QuackAuthenticationToken(quackUser, socialType, quackAuthenticationToken.getAccessToken(),quackAuthenticationToken.getIdToken());
-        }
 
     }
 

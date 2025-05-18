@@ -2,12 +2,12 @@ package org.quack.QUACKServer.domain.restaurant.domain;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum;
-
-import java.awt.*;
+import org.springframework.data.geo.Point;
 
 /**
  * @author : jung-kwanhee
@@ -24,34 +24,17 @@ public class Restaurant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "restaurant_id")
     private Long restaurantId;
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<RestaurantArea> restaurantArea = new ArrayList<>();
-
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<RestaurantCategory> category = new ArrayList<>();
+    @Column(nullable = false, name = "restaurant_name")
+    private String restaurantName;
 
     private String detailAddress;
 
     @Column(columnDefinition = "GEOMETRY")
     private Point location;
 
-    private String simpleDescription;
-
-    private String detailDescription;
-
-    private String effortMessage;
-
-    private Long averagePrice;
-
-    @Enumerated(EnumType.STRING)
-    private RestaurantEnum.ParkingType parking;
-
-    private Boolean toilet;
-
-    // TODO : ENUM 정의
-    private String service;
 
 }
 
