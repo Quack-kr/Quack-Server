@@ -13,7 +13,7 @@ import java.util.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
-import org.quack.QUACKServer.global.security.enums.ClientType;
+import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,8 +42,8 @@ public class JwtProvider {
     private long refreshTokenExpiration;
     private static final String AUTHORITIES_KEY = "auth";
     private static final String USER_ID = "userId";
-    private static final String SOCIAL_TYPE = "socialType";
-    private static final String SOCIAL_ID = "socialId";
+    private static final String PROVIDER = "provider";
+    private static final String PROVIDER_ID = "providerId";
     private static final String IS_SIGN_UP = "isSignUp";
     private static final String HAS_AGREED = "hasAgreed";
     private static final String NICKNAME = "nickname";
@@ -92,7 +92,7 @@ public class JwtProvider {
     }
 
     public String extractSocialId(String accessToken) {
-        return extractClaim(accessToken, claims -> claims.get(SOCIAL_ID, String.class));
+        return extractClaim(accessToken, claims -> claims.get(PROVIDER_ID, String.class));
     }
 
     public String resolveToken(HttpServletRequest request) {
@@ -156,13 +156,11 @@ public class JwtProvider {
 
     public UserDetails extractUserDetails(String token) {
         return extractClaim(token,claims -> QuackUser.builder()
-                .userId(claims.get(USER_ID, Long.class))
-                .isSignUp(claims.get(IS_SIGN_UP, Boolean.class))
+                .customerUserId(claims.get(USER_ID, Long.class))
                 .nickname(claims.get(NICKNAME, String.class))
                 .email(claims.get(EMAIL, String.class))
-                .socialType(ClientType.from(claims.get(SOCIAL_TYPE, String.class)))
+                .provider(ProviderType.from(claims.get(PROVIDER, String.class)))
                 .isMarketingCheck(claims.get(HAS_AGREED, Boolean.class))
-                .socialId(claims.get(SOCIAL_ID, String.class))
                 .build());
     }
 
@@ -182,14 +180,12 @@ public class JwtProvider {
                 .builder()
                 .setClaims(extraClaims)
                 .claim(AUTHORITIES_KEY, userDetails.getAuthorities())
-                .claim(USER_ID, userDetails.getUserId())
-                .claim(SOCIAL_TYPE, userDetails.getSocialType())
-                .claim(SOCIAL_ID, userDetails.getSocialId())
-                .claim(IS_SIGN_UP, userDetails.isSignUp())
+                .claim(USER_ID, userDetails.getCustomerUserId())
+                .claim(PROVIDER, userDetails.getProvider())
                 .claim(HAS_AGREED, userDetails.getIsMarketingCheck())
                 .claim(NICKNAME, userDetails.getNickname())
                 .claim(EMAIL, userDetails.getEmail())
-                .setSubject(userDetails.getSocialId())
+                .setSubject(String.valueOf(userDetails.getCustomerUserId()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(key(), SignatureAlgorithm.HS256)

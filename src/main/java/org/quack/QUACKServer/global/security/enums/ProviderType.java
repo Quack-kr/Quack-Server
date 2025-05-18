@@ -9,13 +9,13 @@ import java.util.Arrays;
  * @author : jung-kwanhee
  * @description :
  * @packageName : org.quack.QUACKServer.global.config.security.enums
- * @fileName : ClientType
+ * @fileName : ProviderType
  * @date : 25. 4. 15.
  */
 
 @Getter
 @AllArgsConstructor
-public enum ClientType {
+public enum ProviderType {
 
     APPLE("APPLE"),
     KAKAO("KAKAO"),
@@ -23,8 +23,8 @@ public enum ClientType {
 
     private final String value;
 
-    public static ClientType from(String value) {
-        return Arrays.stream(ClientType.values())
+    public static ProviderType from(String value) {
+        return Arrays.stream(ProviderType.values())
                 .filter(c -> c.getValue().equals(value))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);

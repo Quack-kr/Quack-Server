@@ -7,8 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.auth.dto.request.SignupRequest;
 import org.quack.QUACKServer.domain.auth.dto.response.AuthResponse;
-import org.quack.QUACKServer.domain.user.domain.User;
-import org.quack.QUACKServer.domain.user.repository.UserRepository;
+import org.quack.QUACKServer.domain.user.domain.CustomerUser;
+import org.quack.QUACKServer.domain.user.repository.CustomerUserRepository;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.global.security.jwt.JwtProvider;
 import org.quack.QUACKServer.global.security.provider.AppleLoginAuthenticationProvider;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final CustomerUserRepository customerUserRepository;
     private final AppleLoginAuthenticationProvider appleLoginAuthenticationProvider;
     private final JwtProvider jwtProvider;
 
@@ -37,7 +37,7 @@ public class AuthService {
             case APPLE -> {
                 SocialAuthDto socialAuthDto = appleLoginAuthenticationProvider.getSocialAuth(idToken);
 
-                User user = userRepository.findBySocialId(socialAuthDto.getProviderId())
+                CustomerUser user = customerUserRepository.findByProviderId(socialAuthDto.getProviderId())
                         .orElseThrow(() -> new ValidationException("Invalid social ID"));
 
                 user.registerUser(request.nickname());
