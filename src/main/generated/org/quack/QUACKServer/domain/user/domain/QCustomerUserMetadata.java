@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -31,8 +30,6 @@ public class QCustomerUserMetadata extends EntityPathBase<CustomerUserMetadata> 
     public final BooleanPath privacyAgreed = createBoolean("privacyAgreed");
 
     public final NumberPath<Long> profileImageId = createNumber("profileImageId", Long.class);
-
-    public final SetPath<org.quack.QUACKServer.domain.restaurant.domain.Restaurant, org.quack.QUACKServer.domain.restaurant.domain.QRestaurant> savedRestaurants = this.<org.quack.QUACKServer.domain.restaurant.domain.Restaurant, org.quack.QUACKServer.domain.restaurant.domain.QRestaurant>createSet("savedRestaurants", org.quack.QUACKServer.domain.restaurant.domain.Restaurant.class, org.quack.QUACKServer.domain.restaurant.domain.QRestaurant.class, PathInits.DIRECT2);
 
     public final BooleanPath termsAgreed = createBoolean("termsAgreed");
 

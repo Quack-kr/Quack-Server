@@ -52,7 +52,7 @@ public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilte
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-            throws AuthenticationException, IOException, ServletException {
+            throws AuthenticationException {
         try {
             ProviderType clientType = ProviderType.from(request.getParameter("client_type"));
             String idToken = request.getHeader("id_token");

@@ -1,6 +1,5 @@
 package org.quack.QUACKServer.domain.menu.domain;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

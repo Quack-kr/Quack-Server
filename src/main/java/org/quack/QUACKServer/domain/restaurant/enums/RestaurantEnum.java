@@ -21,13 +21,52 @@ public interface RestaurantEnum {
 
         private final String value;
         private final String description;
+
+        public static ParkingType fromSubtractFilter(ServiceFilterType filterType) {
+            switch (filterType) {
+                case ServiceFilterType.NO_PARKING -> {
+                    return ParkingType.IMPOSSIBLE;
+                }
+                case ServiceFilterType.PAID_PARKING -> {
+                    return ParkingType.PAID;
+                }
+                case null, default -> {
+                    return null;
+                }
+            }
+
+        }
     }
 
+    @Getter
+    @AllArgsConstructor
+    enum RestaurantKeyword {
+        TASTE("TASTE", "맛"),
+        SIDE_MENU("SIDE_MENU", "사이드메뉴"),
+        INGREDIENT("INGREDIENT", "재료 신선도"),
+        NOISE("NOISE", "가게 소음도"),
+        MENU("MENU", "메뉴 구성도"),
+        RESTROOM("RESTROOM", "화장실 청결"),
+        ATMOSPHERE("ATMOSPHERE", "분위기"),
+        SERVICE("SERVICE", "서비스 만족도"),
+        PARKING("PARKING", "주차 편의성"),
+        COST("COST", "가격 가성비"),
+        TIME("TIME", "음식 나오는 속도"),
+        SEAT("SEAT", "좌석 편의도"),
+        HYGIENE("HYGIENE", "위생도"),
+        WAITING_TIME("WAITING_TIME", "웨이팅 시간"),
+        MEAT_SERVICE("MEAT_SERVICE", "고기 구어주는 서비스"),
+        MEAT_STATUS("MEAT_STATUS", "고기 상태")
+        ;
+
+        private final String value;
+        private final String description;
+    }
 
     @Getter
     @AllArgsConstructor
     enum RestaurantSortType {
-        LATEST("LATEST","저장순"),
+        SAVED("SAVED","저장순"),
         LIKE("LIKE", "미친 맛 순"),
         DISTANCE("DISTANCE", "거리순")
         ;
@@ -120,5 +159,4 @@ public interface RestaurantEnum {
         private final String value;
         private final String description;
     }
-
 }

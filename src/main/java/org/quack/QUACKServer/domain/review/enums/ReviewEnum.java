@@ -2,6 +2,9 @@ package org.quack.QUACKServer.domain.review.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.quack.QUACKServer.domain.restaurant.dto.request.RestaurantSubtractFilterItem;
+import org.quack.QUACKServer.domain.review.domain.Review;
+import org.quack.QUACKServer.global.constant.ValueEnum;
 
 public interface ReviewEnum {
 
@@ -13,7 +16,7 @@ public interface ReviewEnum {
         INGREDIENT("INGREDIENT", "재료 신선도"),
         NOISE("NOISE", "가게 소음도"),
         MENU("MENU", "메뉴 구성도"),
-        RESTROOM("RESTROOM", "화장실 청결"),
+        TOILET("TOILET", "화장실 청결"),
         ATMOSPHERE("ATMOSPHERE", "분위기"),
         SERVICE("SERVICE", "서비스 만족도"),
         PARKING("PARKING", "주차 편의성"),
@@ -26,8 +29,10 @@ public interface ReviewEnum {
         MEAT_STATUS("MEAT_STATUS", "고기 상태")
         ;
 
+        // private final Integer code;
         private final String value;
         private final String description;
+
     }
 
     @Getter

@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -22,6 +23,10 @@ public class QRestaurant extends EntityPathBase<Restaurant> {
     public final StringPath detailAddress = createString("detailAddress");
 
     public final SimplePath<org.springframework.data.geo.Point> location = createSimple("location", org.springframework.data.geo.Point.class);
+
+    public final ListPath<RestaurantArea, QRestaurantArea> restaurantAreas = this.<RestaurantArea, QRestaurantArea>createList("restaurantAreas", RestaurantArea.class, QRestaurantArea.class, PathInits.DIRECT2);
+
+    public final ListPath<RestaurantCategory, QRestaurantCategory> restaurantCategories = this.<RestaurantCategory, QRestaurantCategory>createList("restaurantCategories", RestaurantCategory.class, QRestaurantCategory.class, PathInits.DIRECT2);
 
     public final NumberPath<Long> restaurantId = createNumber("restaurantId", Long.class);
 

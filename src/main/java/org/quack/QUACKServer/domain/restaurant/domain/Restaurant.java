@@ -1,13 +1,12 @@
 package org.quack.QUACKServer.domain.restaurant.domain;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.geo.Point;
+
+import java.util.List;
 
 /**
  * @author : jung-kwanhee
@@ -30,11 +29,18 @@ public class Restaurant {
     @Column(nullable = false, name = "restaurant_name")
     private String restaurantName;
 
+    @Column(nullable = false, name = "detail_address")
     private String detailAddress;
 
     @Column(columnDefinition = "GEOMETRY")
     private Point location;
 
+    @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY)
+    private List<RestaurantCategory> restaurantCategories;
+
+
+    @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY)
+    private List<RestaurantArea> restaurantAreas;
 
 }
 
