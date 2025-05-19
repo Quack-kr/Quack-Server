@@ -1,15 +1,34 @@
 package org.quack.QUACKServer.domain.restaurant.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberTemplate;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.quack.QUACKServer.domain.restaurant.domain.QCustomerSavedRestaurant;
-import org.quack.QUACKServer.domain.restaurant.domain.QRestaurant;
-import org.quack.QUACKServer.domain.restaurant.dto.response.SubtractRestaurantItem;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
+import org.quack.QUACKServer.domain.menu.domain.QMenu;
+import org.quack.QUACKServer.domain.menu.domain.QMenuEval;
+import org.quack.QUACKServer.domain.menu.enums.MenuEnum;
+import org.quack.QUACKServer.domain.restaurant.domain.*;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSubtractFilter;
-import org.quack.QUACKServer.domain.review.domain.QReview;
-import org.quack.QUACKServer.domain.review.domain.QReviewSummary;
+import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractByDistanceVo;
+import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractByLikeVo;
+import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractBySavedVo;
+import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractSavedVo;
+import org.quack.QUACKServer.domain.review.domain.QReviewEvalSummary;
+import org.quack.QUACKServer.domain.user.domain.QCustomerSavedRestaurant;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
+
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -22,91 +41,220 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class RestaurantRepositoryImpl implements RestaurantRepositoryCustom {
-
+public class RestaurantRepositoryImpl implements RestaurantRepositorySupport {
 
     private final JPAQueryFactory queryFactory;
     private final QRestaurant restaurant = QRestaurant.restaurant;
+    private final QRestaurantMetadata restaurantMetadata = QRestaurantMetadata.restaurantMetadata;
+    private final QRestaurantOwnerMetadata restaurantOwnerMetadata = QRestaurantOwnerMetadata.restaurantOwnerMetadata;
+    private final QRestaurantCategory restaurantCategory = QRestaurantCategory.restaurantCategory;
+    private final QReviewEvalSummary reviewEvalSummary = QReviewEvalSummary.reviewEvalSummary;
+    private final QMenu menu = QMenu.menu;
+    private final QRestaurantHours restaurantHours = QRestaurantHours.restaurantHours;
     private final QCustomerSavedRestaurant customerSavedRestaurant = QCustomerSavedRestaurant.customerSavedRestaurant;
-    private final QReview review = QReview.review;
-    private final QReviewSummary  reviewSummary = QReviewSummary.reviewSummary;
+    private final QMenuEval menuEval = QMenuEval.menuEval;
 
     @Override
-    public List<SubtractRestaurantItem> findAllBySubtractFilterOrderByDistance(RestaurantSubtractFilter filter) {
+    public List<RestaurantSubtractByDistanceVo> findAllBySubtractFilterOrderByDistance(RestaurantSubtractFilter filter) {
 
-//        List<Restaurant> restaurants = queryFactory
-//                .selectFrom(Expressions.)
-//                .from(restaurant)
-//                .leftJoin(review).on(review.restaurantId.eq(restaurant.restaurantId))
-//                .orderBy(
-//                        Expressions.numberTemplate(Double.class,
-//                                "ST_Distance_Sphere(POINT({0}, {1}), {2})",
-//                                filter.getLongitude(), filter.getLatitude(), restaurant.location
-//                        ).asc()
-//                )
-//                .fetch();
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
-        return List.of();
+        Point userLocation = geometryFactory.createPoint(new Coordinate(filter.getLongitude(), filter.getLatitude()));
+
+        NumberTemplate<Double> longitude = Expressions.numberTemplate(
+                Double.class, "ST_X({0})", restaurant.location
+        );
+
+        NumberTemplate<Double> latitude = Expressions.numberTemplate(
+                Double.class, "ST_Y({0})", restaurant.location
+        );
+
+        NumberTemplate<Double> distance = Expressions.numberTemplate(
+                Double.class,
+                "ST_Distance_Sphere({0}, {1})",
+                restaurant.location,
+                Expressions.constant(userLocation)
+        );
+
+        BooleanExpression isSaved = getIsSavedExpression(filter.getCustomerUserId());
+
+        List<Long> restaurantIds = findRestaurantIdsBySubtractFilter(filter);
+
+        return queryFactory
+                .select(Projections.constructor(
+                        RestaurantSubtractByDistanceVo.class,
+                        restaurant.restaurantId,
+                        restaurant.restaurantName,
+                        restaurantMetadata.averagePrice,
+                        restaurantOwnerMetadata.simpleDescription,
+                        restaurantHours.openTime,
+                        restaurantHours.lastOrderTime,
+                        distance,
+                        longitude,
+                        latitude,
+                        isSaved == null ? Expressions.constant(false) : isSaved
+                ))
+                .from(restaurant)
+                .join(restaurantMetadata).on(restaurantMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantOwnerMetadata).on(restaurantOwnerMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantHours).on(restaurantHours.restaurantId.eq(restaurant.restaurantId))
+                .where(restaurant.restaurantId.in(restaurantIds))
+                .orderBy(builderOrderBySubtractFilter(filter))
+                .groupBy(restaurant.restaurantId)
+                .fetch();
     }
 
     @Override
-    public List<SubtractRestaurantItem> findAllBySubtractFilterOrderByLike(RestaurantSubtractFilter filter) {
-        return List.of();
+    public List<RestaurantSubtractByLikeVo> findAllBySubtractFilterOrderByLike(RestaurantSubtractFilter filter) {
+
+        BooleanExpression isSaved = getIsSavedExpression(filter.getCustomerUserId());
+
+        List<Long> restaurantIds = findRestaurantIdsBySubtractFilter(filter);
+
+        return queryFactory
+                .select(Projections.constructor(
+                        RestaurantSubtractByLikeVo.class,
+                        restaurant.restaurantId,
+                        restaurant.restaurantName,
+                        restaurantMetadata.averagePrice,
+                        restaurantOwnerMetadata.simpleDescription,
+                        restaurantHours.openTime,
+                        restaurantHours.lastOrderTime,
+                        menuEval.count(),
+                        isSaved == null ? Expressions.constant(false) : isSaved
+                ))
+                .from(restaurant)
+                .join(restaurantMetadata).on(restaurantMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantOwnerMetadata).on(restaurantOwnerMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantHours).on(restaurantHours.restaurantId.eq(restaurant.restaurantId))
+                .leftJoin(menu).on(menu.restaurantId.eq(restaurant.restaurantId))
+                .leftJoin(menuEval).on(menuEval.menuId.eq(menu.menuId))
+                .where(restaurant.restaurantId.in(restaurantIds).and(menuEval.menuEvalType.eq(MenuEnum.MenuEvalType.CRAZY)))
+                .groupBy(restaurant.restaurantId)
+                .orderBy(builderOrderBySubtractFilter(filter))
+                .fetch();
+
     }
 
     @Override
-    public List<SubtractRestaurantItem> findAllBySubtractFilterOrderBySaved(RestaurantSubtractFilter filter) {
-        return List.of();
+    public List<RestaurantSubtractBySavedVo> findAllBySubtractFilterOrderBySaved(RestaurantSubtractFilter filter) {
+        BooleanExpression isSaved = getIsSavedExpression(filter.getCustomerUserId());
+
+        List<Long> restaurantIds = findRestaurantIdsBySubtractFilter(filter);
+
+        return queryFactory
+                .select(Projections.constructor(
+                        RestaurantSubtractBySavedVo.class,
+                        restaurant.restaurantId,
+                        restaurant.restaurantName,
+                        restaurantMetadata.averagePrice,
+                        restaurantOwnerMetadata.simpleDescription,
+                        restaurantHours.openTime,
+                        restaurantHours.lastOrderTime,
+                        customerSavedRestaurant.count(),
+                        isSaved == null ? Expressions.constant(false) : isSaved
+                ))
+                .from(restaurant)
+                .join(restaurantMetadata).on(restaurantMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantOwnerMetadata).on(restaurantOwnerMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantHours).on(restaurantHours.restaurantId.eq(restaurant.restaurantId))
+                .join(customerSavedRestaurant).on(customerSavedRestaurant.restaurantId.eq(restaurant.restaurantId))
+                .where(restaurant.restaurantId.in(restaurantIds).and(menuEval.menuEvalType.eq(MenuEnum.MenuEvalType.CRAZY)))
+                .groupBy(restaurant.restaurantId)
+                .orderBy(builderOrderBySubtractFilter(filter))
+                .fetch();
     }
 
-    protected BooleanBuilder builderSubtractFilter() {
+    @Override
+    public RestaurantSubtractSavedVo findSavedSubtractRestaurant(Long restaurantId, Long customerUserId) {
+        return null;
+    }
+
+    protected BooleanBuilder builderConditionSubtractFilter(RestaurantSubtractFilter filter) {
         BooleanBuilder builder = new BooleanBuilder();
+
+        if (filter.getIsUniSexToilet()) {
+            builder.and(restaurantMetadata.isUniSexToilet.eq(false));
+        }
+
+        if (!CollectionUtils.isEmpty(filter.getParkingTypes())) {
+            builder.and(restaurantMetadata.parking.notIn(filter.getParkingTypes()));
+        }
+
+        if (!CollectionUtils.isEmpty(filter.getRestaurantCategoryTypes())) {
+            builder.and(restaurantCategory.restaurantCategoryName.notIn(filter.getRestaurantCategoryTypes()));
+        }
+
+        if (!CollectionUtils.isEmpty(filter.getReviewTags())) {
+            builder.and(reviewEvalSummary.reviewSummaryTag.notIn(filter.getReviewTags()));
+        }
+
+        if (filter.getIsOpen()) {
+            builder.and(restaurantHours.isClosed.eq(false));
+        }
+
+
+        if(filter.getIsSaved()) {
+            builder.and(getIsSavedExpression(filter.getCustomerUserId()).eq(true));
+        }
+
         return builder;
     }
 
-//    public OrderSpecifier<?> getOrderBy(double longitude, double latitude, RestaurantEnum.RestaurantSortType sortType) {
-//
-//        switch (sortType) {
-//            // 거리순
-//            case DISTANCE -> {
-//                return new OrderSpecifier<>(
-//                        Order.ASC,
-//                        Expressions.numberTemplate(
-//                                Double.class,
-//                                "ST_Distance_Sphere(POINT{0}, {1}, {2})",
-//                                longitude, latitude, restaurant.location)
-//                );
-//            }
-//            // 저장순
-//            case SAVED -> {
-//                return new OrderSpecifier<>(
-//                        Order.DESC,
-//                        JPAExpressions
-//                                .select(customerSavedRestaurant.count())
-//                                .of(customerSavedRestaurant)
-//                                .where(customerSavedRestaurant.restaurant.eq(restaurant))
-//                );
-//            }
-//            // 미친맛순
-//            case LIKE -> {
-//                return new OrderSpecifier<>(
-//                        Order.DESC,
-//                        JPAExpressions
-//                            .select(customerSavedRestaurant.count())
-//                );
-//            }
-//
-//            case null, default -> {
-//                // 기본은 최신순이다.
-//                return new OrderSpecifier<>(
-//                        Order.DESC,
-//                        restaurant.restaurantId
-//                );
-//            }
-//        }
-//    }
+    protected BooleanExpression getIsSavedExpression(Long customerUserId) {
+        return customerUserId == null ? null : JPAExpressions.selectOne()
+                .from(customerSavedRestaurant)
+                .where(
+                        customerSavedRestaurant.customerUserId.eq(customerUserId),
+                        customerSavedRestaurant.restaurantId.eq(restaurant.restaurantId))
+                .exists();
+    }
 
+    protected OrderSpecifier<?> builderOrderBySubtractFilter(RestaurantSubtractFilter filter) {
 
+        switch (filter.getSortType()) {
+            // 거리순
+            case DISTANCE -> {
+                return new OrderSpecifier<>(
+                        Order.ASC,
+                        Expressions.numberTemplate(
+                                Double.class,
+                                "ST_Distance_Sphere(POINT{0}, {1}, {2})",
+                                filter.getLongitude(), filter.getLatitude(), restaurant.location)
+                );
+            }
+            // 저장순
+            case SAVED -> {
+                return new OrderSpecifier<>(
+                        Order.DESC,
+                        customerSavedRestaurant.count()
+                );
+            }
+            // 미친맛순
+            case LIKE -> {
+                return new OrderSpecifier<>(
+                        Order.DESC,
+                        menuEval.count()
+                );
+            }
+            case null, default -> {
+                throw new IllegalArgumentException();
+            }
+        }
 
+    }
+
+    protected List<Long> findRestaurantIdsBySubtractFilter(RestaurantSubtractFilter filter) {
+        return queryFactory
+                .selectDistinct(restaurant.restaurantId)
+                .from(restaurant)
+                .join(restaurantMetadata).on(restaurantMetadata.restaurantId.eq(restaurantMetadata.restaurantId))
+                .join(restaurantHours).on(restaurantHours.restaurantId.eq(restaurant.restaurantId))
+                .leftJoin(restaurantCategory).on(restaurantCategory.restaurant.restaurantId.eq(restaurant.restaurantId))
+                .leftJoin(reviewEvalSummary).on(reviewEvalSummary.restaurantId.eq(reviewEvalSummary.restaurantId), reviewEvalSummary.historyAt.eq(LocalDate.now().minusDays(1)))
+                .where(builderConditionSubtractFilter(filter)).fetch();
+    }
 
 }
+
+

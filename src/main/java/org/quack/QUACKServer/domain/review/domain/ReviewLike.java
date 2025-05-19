@@ -28,7 +28,6 @@ public class ReviewLike {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-
     @Column(name = "like_type", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private ReviewEnum.ReviewLikeType likeType;

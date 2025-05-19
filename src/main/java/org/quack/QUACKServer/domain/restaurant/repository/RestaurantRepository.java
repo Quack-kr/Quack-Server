@@ -4,8 +4,6 @@ import org.quack.QUACKServer.domain.restaurant.domain.Restaurant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 /**
  * @author : jung-kwanhee
  * @description :
@@ -15,6 +13,6 @@ import java.util.List;
  */
 
 @Repository
-public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, RestaurantRepositoryCustom {
+public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, RestaurantRepositorySupport {
 
 }

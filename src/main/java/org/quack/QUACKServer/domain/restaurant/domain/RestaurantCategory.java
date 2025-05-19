@@ -26,6 +26,7 @@ public class RestaurantCategory {
     private Long restaurantCategoryId;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "restaurant_category_name",nullable = false)
     private RestaurantEnum.RestaurantCategoryType restaurantCategoryName;
 
     @ManyToOne(fetch = LAZY)

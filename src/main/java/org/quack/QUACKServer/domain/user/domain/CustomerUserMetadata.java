@@ -1,10 +1,9 @@
 package org.quack.QUACKServer.domain.user.domain;
 
 import jakarta.persistence.*;
-import org.quack.QUACKServer.domain.restaurant.domain.Restaurant;
-
-import java.util.HashSet;
-import java.util.Set;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * @author : jung-kwanhee
@@ -16,6 +15,8 @@ import java.util.Set;
 
 @Entity
 @Table(name ="customer_user_metadata")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CustomerUserMetadata {
 
     @Id
@@ -40,12 +41,4 @@ public class CustomerUserMetadata {
 
     @Column(name = "decibel")
     private Long decibel;
-
-    @ManyToMany
-    @JoinTable(
-            name = "customer_saved_restaurant",
-            joinColumns = @JoinColumn(name = "customer_user_id"),
-            inverseJoinColumns = @JoinColumn(name = "restaurant_id")
-    )
-    private Set<Restaurant> savedRestaurants = new HashSet<>();
 }

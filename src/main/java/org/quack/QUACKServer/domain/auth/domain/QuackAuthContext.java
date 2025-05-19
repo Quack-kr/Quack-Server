@@ -4,9 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 /**
  * @author : jung-kwanhee
@@ -19,12 +16,14 @@ import java.util.Objects;
 @Slf4j
 public class QuackAuthContext {
 
-    public Long getCustomerUserId() { return Objects.requireNonNull(getQuackUserDetails()).getCustomerUserId(); }
+    public static Long getCustomerUserId() {
+        return getAuthenticatedUser() == null ? null : getAuthenticatedUser().getCustomerUserId();
+    }
 
     public static QuackUser getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if(auth instanceof UsernamePasswordAuthenticationToken) {
+        if (auth instanceof UsernamePasswordAuthenticationToken) {
             return (QuackUser) auth.getPrincipal();
         }
 
@@ -32,11 +31,7 @@ public class QuackAuthContext {
     }
 
     public static QuackUser getQuackUserDetails() {
-        QuackUser userDetails = getAuthenticatedUser();
-        if(userDetails != null) {
-            return userDetails;
-        }
-        return null;
+        return getAuthenticatedUser();
     }
 
     public static boolean hasUserDetails() {

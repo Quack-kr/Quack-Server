@@ -12,6 +12,6 @@ import lombok.Builder;
  */
 
 @Builder(access = AccessLevel.PRIVATE)
-public record PageInfo(int pageNo, int pageSize, int totalElements, int totalPages, boolean last) {
+public record PageInfo(int pageNo, int pageSize) {
 
 }

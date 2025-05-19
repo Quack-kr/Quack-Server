@@ -1,7 +1,6 @@
 package org.quack.QUACKServer.domain.restaurant.dto.request;
 
 import jakarta.validation.constraints.NotNull;
-import org.quack.QUACKServer.domain.user.dto.UserLocationItem;
 import org.quack.QUACKServer.global.common.dto.PageInfo;
 
 /**
@@ -13,10 +12,9 @@ import org.quack.QUACKServer.global.common.dto.PageInfo;
  */
 
 
-public record SearchSubtractRestaurantsRequest(
+public record SearchSubtractRestaurantsNoAuthRequest(
         RestaurantSubtractFilterItem filter,
         @NotNull RestaurantSortItem sort,
-        UserLocationItem userLocationItem,
         PageInfo pageInfo
 ) {
 
