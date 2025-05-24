@@ -76,6 +76,8 @@ dependencies {
 
 	// encoding
 	implementation 'com.google.guava:guava:33.4.0-jre'
+	implementation "com.amazonaws:aws-java-sdk-s3:1.12.281"
+
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
