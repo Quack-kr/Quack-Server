@@ -18,13 +18,14 @@ import org.quack.QUACKServer.domain.menu.domain.QMenu;
 import org.quack.QUACKServer.domain.menu.domain.QMenuEval;
 import org.quack.QUACKServer.domain.menu.enums.MenuEnum;
 import org.quack.QUACKServer.domain.restaurant.domain.*;
+import org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum;
+import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSearchFilter;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSubtractFilter;
-import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractByDistanceVo;
-import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractByLikeVo;
-import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractBySavedVo;
-import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractSavedVo;
+import org.quack.QUACKServer.domain.restaurant.vo.*;
 import org.quack.QUACKServer.domain.review.domain.QReviewEvalSummary;
 import org.quack.QUACKServer.domain.user.domain.QCustomerSavedRestaurant;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -78,6 +79,8 @@ public class RestaurantRepositoryImpl implements RestaurantRepositorySupport {
 
         BooleanExpression isSaved = getIsSavedExpression(filter.getCustomerUserId());
 
+        BooleanExpression isOpen = Expressions.booleanTemplate("NOT {0}", restaurantHours.isClosed);
+
         List<Long> restaurantIds = findRestaurantIdsBySubtractFilter(filter);
 
         return queryFactory
@@ -99,8 +102,10 @@ public class RestaurantRepositoryImpl implements RestaurantRepositorySupport {
                 .join(restaurantOwnerMetadata).on(restaurantOwnerMetadata.restaurantId.eq(restaurant.restaurantId))
                 .join(restaurantHours).on(restaurantHours.restaurantId.eq(restaurant.restaurantId))
                 .where(restaurant.restaurantId.in(restaurantIds))
-                .orderBy(builderOrderBySubtractFilter(filter))
+                .orderBy(builderOrderBySubtractFilter(filter.getLongitude(), filter.getLatitude(), filter.getSortType()))
                 .groupBy(restaurant.restaurantId)
+                .offset(filter.getPageable().getOffset())
+                .limit(filter.getPageable().getPageSize() + 1)
                 .fetch();
     }
 
@@ -131,7 +136,9 @@ public class RestaurantRepositoryImpl implements RestaurantRepositorySupport {
                 .leftJoin(menuEval).on(menuEval.menuId.eq(menu.menuId))
                 .where(restaurant.restaurantId.in(restaurantIds).and(menuEval.menuEvalType.eq(MenuEnum.MenuEvalType.CRAZY)))
                 .groupBy(restaurant.restaurantId)
-                .orderBy(builderOrderBySubtractFilter(filter))
+                .orderBy(builderOrderBySubtractFilter(filter.getLongitude(), filter.getLatitude(), filter.getSortType()))
+                .offset(filter.getPageable().getOffset())
+                .limit(filter.getPageable().getPageSize() + 1)
                 .fetch();
 
     }
@@ -161,14 +168,133 @@ public class RestaurantRepositoryImpl implements RestaurantRepositorySupport {
                 .join(customerSavedRestaurant).on(customerSavedRestaurant.restaurantId.eq(restaurant.restaurantId))
                 .where(restaurant.restaurantId.in(restaurantIds).and(menuEval.menuEvalType.eq(MenuEnum.MenuEvalType.CRAZY)))
                 .groupBy(restaurant.restaurantId)
-                .orderBy(builderOrderBySubtractFilter(filter))
+                .orderBy(builderOrderBySubtractFilter(filter.getLongitude(), filter.getLatitude(), filter.getSortType()))
+                .offset(filter.getPageable().getOffset())
+                .limit(filter.getPageable().getPageSize() + 1)
                 .fetch();
     }
 
     @Override
-    public RestaurantSubtractSavedVo findSavedSubtractRestaurant(Long restaurantId, Long customerUserId) {
-        return null;
+    public Slice<RestaurantSearchByDistanceVo> findByRestaurantNameOrderByDistance(RestaurantSearchFilter filter) {
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+
+        Point userLocation = geometryFactory.createPoint(new Coordinate(filter.getLongitude(), filter.getLatitude()));
+
+        NumberTemplate<Double> distance = Expressions.numberTemplate(
+                Double.class,
+                "ST_Distance_Sphere({0}, {1})",
+                restaurant.location,
+                Expressions.constant(userLocation)
+        );
+
+        BooleanExpression isOpen = Expressions.booleanTemplate("NOT {0}", restaurantHours.isClosed);
+
+        List<RestaurantSearchByDistanceVo> restaurants = queryFactory
+                .select(Projections.constructor(
+                        RestaurantSearchByDistanceVo.class,
+                        restaurant.restaurantId,
+                        restaurant.restaurantName,
+                        restaurantMetadata.averagePrice,
+                        restaurantOwnerMetadata.simpleDescription,
+                        distance,
+                        isOpen
+                ))
+                .from(restaurant)
+                .join(restaurantMetadata).on(restaurantMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantOwnerMetadata).on(restaurantOwnerMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantHours).on(restaurantHours.restaurantId.eq(restaurant.restaurantId))
+                .where(restaurant.restaurantName.containsIgnoreCase(filter.getKeyword())
+                        .and(restaurantHours.isClosed.eq(!filter.isOpen())))
+                .groupBy(restaurant.restaurantId)
+                .offset(filter.getPageable().getOffset())
+                .limit(filter.getPageable().getPageSize() + 1)
+                .orderBy(builderOrderBySubtractFilter(filter.getLongitude(), filter.getLatitude(), filter.getSortType()))
+                .fetch();
+
+        boolean hasNext = restaurants.size() > filter.getPageable().getPageSize();
+
+        if (hasNext) {
+            restaurants.remove(filter.getPageable().getPageSize());
+        }
+
+        return new SliceImpl<>(restaurants);
     }
+
+    @Override
+    public Slice<RestaurantSearchByLikeVo> findByRestaurantNameOrderByLike(RestaurantSearchFilter filter) {
+
+        BooleanExpression isOpen = Expressions.booleanTemplate("NOT {0}", restaurantHours.isClosed);
+
+        List<RestaurantSearchByLikeVo> restaurants = queryFactory
+                .select(Projections.constructor(
+                        RestaurantSearchByLikeVo.class,
+                        restaurant.restaurantId,
+                        restaurant.restaurantName,
+                        restaurantMetadata.averagePrice,
+                        restaurantOwnerMetadata.simpleDescription,
+                        menuEval.count(),
+                        isOpen
+                ))
+                .from(restaurant)
+                .join(restaurantMetadata).on(restaurantMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantOwnerMetadata).on(restaurantOwnerMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantHours).on(restaurantHours.restaurantId.eq(restaurant.restaurantId))
+                .leftJoin(menu).on(menu.restaurantId.eq(restaurant.restaurantId))
+                .leftJoin(menuEval).on(menuEval.menuId.eq(menu.menuId))
+                .where(restaurant.restaurantName.containsIgnoreCase(filter.getKeyword())
+                        .and(restaurantHours.isClosed.eq(!filter.isOpen())))
+                .groupBy(restaurant.restaurantId)
+                .offset(filter.getPageable().getOffset())
+                .limit(filter.getPageable().getPageSize() + 1)
+                .orderBy(builderOrderBySubtractFilter(filter.getLongitude(), filter.getLatitude(), filter.getSortType()))
+                .fetch();
+
+        boolean hasNext = restaurants.size() > filter.getPageable().getPageSize();
+
+        if (hasNext) {
+            restaurants.remove(filter.getPageable().getPageSize());
+        }
+
+        return new SliceImpl<>(restaurants);
+    }
+
+    @Override
+    public Slice<RestaurantSearchBySavedVo> findByRestaurantNameOrderBySaved(RestaurantSearchFilter filter) {
+        BooleanExpression isOpen = Expressions.booleanTemplate("NOT {0}", restaurantHours.isClosed);
+
+        List<RestaurantSearchBySavedVo> restaurants = queryFactory
+                .select(Projections.constructor(
+                        RestaurantSearchBySavedVo.class,
+                        restaurant.restaurantId,
+                        restaurant.restaurantName,
+                        restaurantMetadata.averagePrice,
+                        restaurantOwnerMetadata.simpleDescription,
+                        customerSavedRestaurant.count(),
+                        isOpen
+                ))
+                .from(restaurant)
+                .join(restaurantMetadata).on(restaurantMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantOwnerMetadata).on(restaurantOwnerMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantHours).on(restaurantHours.restaurantId.eq(restaurant.restaurantId))
+                .join(customerSavedRestaurant).on(customerSavedRestaurant.restaurantId.eq(restaurant.restaurantId))
+                .where(restaurant.restaurantName.containsIgnoreCase(filter.getKeyword())
+                        .and(restaurantHours.isClosed.eq(!filter.isOpen()))
+                                .and(menuEval.menuEvalType.eq(MenuEnum.MenuEvalType.CRAZY)))
+                .groupBy(restaurant.restaurantId)
+                .orderBy(builderOrderBySubtractFilter(filter.getLongitude(), filter.getLatitude(), filter.getSortType()))
+                .offset(filter.getPageable().getOffset())
+                .limit(filter.getPageable().getPageSize() + 1)
+                .fetch();
+
+        boolean hasNext = restaurants.size() > filter.getPageable().getPageSize();
+
+        if (hasNext) {
+            restaurants.remove(filter.getPageable().getPageSize());
+        }
+
+        return new SliceImpl<>(restaurants);
+    }
+
 
     protected BooleanBuilder builderConditionSubtractFilter(RestaurantSubtractFilter filter) {
         BooleanBuilder builder = new BooleanBuilder();
@@ -194,7 +320,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositorySupport {
         }
 
 
-        if(filter.getIsSaved()) {
+        if (filter.getIsSaved()) {
             builder.and(getIsSavedExpression(filter.getCustomerUserId()).eq(true));
         }
 
@@ -210,9 +336,9 @@ public class RestaurantRepositoryImpl implements RestaurantRepositorySupport {
                 .exists();
     }
 
-    protected OrderSpecifier<?> builderOrderBySubtractFilter(RestaurantSubtractFilter filter) {
+    protected OrderSpecifier<?> builderOrderBySubtractFilter(double longitude, double latitude, RestaurantEnum.RestaurantSortType sortType) {
 
-        switch (filter.getSortType()) {
+        switch (sortType) {
             // 거리순
             case DISTANCE -> {
                 return new OrderSpecifier<>(
@@ -220,7 +346,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositorySupport {
                         Expressions.numberTemplate(
                                 Double.class,
                                 "ST_Distance_Sphere(POINT{0}, {1}, {2})",
-                                filter.getLongitude(), filter.getLatitude(), restaurant.location)
+                                longitude, latitude, restaurant.location)
                 );
             }
             // 저장순

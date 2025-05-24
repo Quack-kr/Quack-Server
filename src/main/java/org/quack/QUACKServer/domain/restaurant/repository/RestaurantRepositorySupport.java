@@ -1,11 +1,10 @@
 package org.quack.QUACKServer.domain.restaurant.repository;
 
 
+import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSearchFilter;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSubtractFilter;
-import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractByDistanceVo;
-import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractByLikeVo;
-import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractBySavedVo;
-import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractSavedVo;
+import org.quack.QUACKServer.domain.restaurant.vo.*;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 
@@ -25,6 +24,9 @@ public interface RestaurantRepositorySupport {
 
     List<RestaurantSubtractBySavedVo> findAllBySubtractFilterOrderBySaved(RestaurantSubtractFilter filter);
 
-    RestaurantSubtractSavedVo findSavedSubtractRestaurant(Long restaurantId, Long customerUserId);
+    Slice<RestaurantSearchByDistanceVo> findByRestaurantNameOrderByDistance(RestaurantSearchFilter filter);
 
+    Slice<RestaurantSearchByLikeVo> findByRestaurantNameOrderByLike(RestaurantSearchFilter filter);
+
+    Slice<RestaurantSearchBySavedVo> findByRestaurantNameOrderBySaved(RestaurantSearchFilter filter);
 }
