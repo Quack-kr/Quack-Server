@@ -7,6 +7,7 @@ import org.quack.QUACKServer.domain.restaurant.dto.request.SearchSubtractRestaur
 import org.quack.QUACKServer.domain.restaurant.dto.request.SearchSubtractRestaurantsRequest;
 import org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum;
 import org.quack.QUACKServer.domain.review.enums.ReviewEnum;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -38,6 +39,8 @@ public class RestaurantSubtractFilter {
     // 리뷰 빼기 필터
     private List<ReviewEnum.ReviewTag> reviewTags;
 
+    // 정렬 필터링
+    private Pageable pageable;
 
     public static RestaurantSubtractFilter from(SearchSubtractRestaurantsRequest request) {
 
