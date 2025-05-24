@@ -1,7 +1,8 @@
-package org.quack.QUACKServer.domain.photos;
+package org.quack.QUACKServer.domain.photos.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -43,5 +44,16 @@ public class Photos {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    @Builder
+    public Photos(String imageUrl, Long targetId, String photoType,
+                  Integer sortOrder) {
+        this.imageUrl = imageUrl;
+        this.targetId = targetId;
+        this.photoType = photoType;
+        this.sortOrder = sortOrder;
+        this.updatedAt = LocalDateTime.now();
+        this.deletedAt = LocalDateTime.now();
+    }
 
 }
