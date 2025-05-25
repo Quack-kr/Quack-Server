@@ -3,7 +3,6 @@ package org.quack.QUACKServer.global.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.core.ApplicationContext;
 import org.quack.QUACKServer.global.security.filter.RequestParamCamelizingFilter;
 import org.quack.QUACKServer.global.security.filter.SocialAuthLoginFilter;
 import org.quack.QUACKServer.global.security.jwt.JwtExceptionFilter;
@@ -17,11 +16,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
-import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 /**
@@ -51,10 +48,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authenticationManager(quackAuthenticationManager)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(new MvcRequestMatcher(introspector, "/public/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/public/**")).hasAuthority("ANONYMOUS")
                         .requestMatchers(new MvcRequestMatcher(introspector, "/auth/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/common/health-check")).permitAll()
-                        .anyRequest().authenticated())
+                                .anyRequest().authenticated())
+                .anonymous(anon -> anon
+                        .principal("guest-user")
+                        .authorities("ANONYMOUS")
+                )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(socialAuthLoginFilter, LogoutFilter.class)
                 .addFilterAfter(requestParamCamelizingFilter, socialAuthLoginFilter.getClass())

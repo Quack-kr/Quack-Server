@@ -18,9 +18,4 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
-//    @PostMapping("/user/signup")
-//    public CommonResponse signup() {
-//        QuackUser quackUser = QuackAuthContext.getQuackUserDetails();
-//        return CommonResponse.of("201","필터 정상적으로 탐", HttpStatus.OK, null);
-//    }
 }

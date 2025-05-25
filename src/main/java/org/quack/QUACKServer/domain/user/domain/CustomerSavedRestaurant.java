@@ -39,6 +39,6 @@ public class CustomerSavedRestaurant {
     @Column(name = "update_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime updateAt;
 
-    @Column(name = "status", columnDefinition = "1")
+    @Column(name = "status")
     private Boolean status;
 }
