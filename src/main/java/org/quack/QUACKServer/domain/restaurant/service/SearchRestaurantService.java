@@ -2,6 +2,7 @@ package org.quack.QUACKServer.domain.restaurant.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
 import org.quack.QUACKServer.domain.restaurant.dto.request.SearchRestaurantsByKeywordRequest;
 import org.quack.QUACKServer.domain.restaurant.dto.response.SearchRestaurantsByKeywordItem;
 import org.quack.QUACKServer.domain.restaurant.dto.response.SearchRestaurantsByKeywordResponse;
@@ -11,12 +12,15 @@ import org.quack.QUACKServer.domain.restaurant.repository.RestaurantRepositoryIm
 import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSearchByDistanceVo;
 import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSearchByLikeVo;
 import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSearchBySavedVo;
+import org.quack.QUACKServer.domain.user.domain.CustomerUserMetadata;
+import org.quack.QUACKServer.domain.user.repository.CustomerUserMetadataRepository;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -30,12 +34,27 @@ import java.util.Map;
 @Slf4j
 @Service
 public class SearchRestaurantService {
+    private final CustomerUserMetadataRepository customerUserMetadataRepository;
 
 
     private final RestaurantRepositoryImpl restaurantRepositoryImpl;
     private final SubtractRestaurantService subtractRestaurantService;
 
     public SearchRestaurantsByKeywordResponse searchRestaurantByName(SearchRestaurantsByKeywordRequest request) {
+
+        if(RestaurantEnum.RestaurantSortType.DISTANCE.equals(request.sort().sortType()) && !QuackAuthContext.isAnonymous()) {
+            CustomerUserMetadata metadata = customerUserMetadataRepository.findById(Objects.requireNonNull(QuackAuthContext.getCustomerUserId()))
+                    .orElseThrow(() -> new RuntimeException("서버 에러 발생"));
+
+            if(!metadata.getLocationTermsAgreed()) {
+                throw new IllegalArgumentException("위치 체크를 확인해주세요.");
+            }
+
+            if ((request.userLocation() == null
+                    || (request.userLocation().longitude() == null && request.userLocation().latitude() == null))) {
+                throw new IllegalArgumentException("사용자 위치를 읽을 수 없습니다.");
+            }
+        }
 
         RestaurantSearchFilter filter = RestaurantSearchFilter.from(request);
 
