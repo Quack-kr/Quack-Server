@@ -2,6 +2,8 @@ package org.quack.QUACKServer.domain.user.repository;
 
 import org.quack.QUACKServer.domain.user.domain.CustomerUser;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -11,6 +13,7 @@ public interface CustomerUserRepository extends JpaRepository<CustomerUser, Long
 
     Optional<CustomerUser> findByProviderId(String providerId);
 
-    Optional<CustomerUser> findByNickname(String nickname);
+    @Query("SELECT EXISTS (SELECT cu FROM CustomerUser cu WHERE cu.isDeleted = false AND cu.nickname = :nickname)")
+    boolean existsByNickname(@Param("nickname") String nickname);
 
 }

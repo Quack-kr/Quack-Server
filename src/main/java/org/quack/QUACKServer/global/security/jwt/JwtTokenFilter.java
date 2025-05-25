@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.domain.auth.domain.QuackAuthenticationToken;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,7 +42,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         if(StringUtils.hasText(jwt) && jwtProvider.isTokenValid(jwt)) {
             Authentication authentication = jwtProvider.getAuthentication(jwt);
 
-            String socialId = jwtProvider.getAuthKey(jwt);
+            Long userId = jwtProvider.getAuthKey(jwt);
 
             // 레디스 토큰 만료시간 조금 더 두기
             QuackUser quackUser = (QuackUser) jwtProvider.extractUserDetails(jwt);

@@ -28,7 +28,6 @@ public class QuackUser implements UserDetails {
     @Setter
     private Long customerUserId;
     private ProviderType provider;
-    private Boolean isMarketingCheck;
     private String nickname;
     private String email;
 
@@ -59,6 +58,10 @@ public class QuackUser implements UserDetails {
     public static QuackUser empty() {
         return QuackUser.builder()
                 .build();
+    }
+
+    public boolean isEmpty() {
+        return customerUserId == null && nickname == null && email == null ;
     }
 
     @Override public boolean isAccountNonExpired() { return true; }

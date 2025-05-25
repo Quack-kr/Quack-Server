@@ -5,9 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.user.domain.CustomerUser;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserRepository;
-import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
-import org.quack.QUACKServer.global.security.enums.ProviderType;
-import org.quack.QUACKServer.global.security.exception.BeforeSignUpException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -36,16 +33,8 @@ public class UserService implements UserDetailsService {
         if(user.isPresent()) {
             return QuackUser.from(user.get());
         } else {
-            throw new BeforeSignUpException("회원가입을 해야합니다", QuackUser.empty());
+            return QuackUser.empty();
         }
     }
-
-//    public CustomerUser createBeforeSignUp (ProviderType clientType, SocialAuthDto socialAuthDto) {
-//        CustomerUser user = CustomerUser.createBySocial(
-//                clientType, socialAuthDto.getProviderId(), socialAuthDto.getEmail(), "");
-//
-//        return customerUserRepository.save(user);
-//
-//    }
 
 }

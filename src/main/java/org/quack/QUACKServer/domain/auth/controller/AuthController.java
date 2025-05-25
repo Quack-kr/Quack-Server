@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.dto.request.SignupRequest;
 import org.quack.QUACKServer.domain.auth.dto.response.AuthResponse;
 import org.quack.QUACKServer.domain.auth.service.AuthService;
+import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
@@ -46,6 +47,12 @@ public class AuthController {
             @Valid @NotBlank @RequestHeader("id-token") String idToken,
             @Valid @RequestBody SignupRequest request) {
          return authService.signup(request, idToken);
+    }
+
+    @PostMapping("/validate-nickname")
+    public CommonResponse validateUserNickname(
+            @Valid @RequestParam("nickname") String nickname) {
+        return authService.validateNickName(nickname);
     }
 
 

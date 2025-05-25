@@ -13,7 +13,9 @@ import org.quack.QUACKServer.global.security.enums.ProviderType;
  */
 public record SignupRequest(
         @NotBlank String nickname,
-        @NotNull ProviderType clientType,
-        Boolean agreeMarketingPolicy
+        @NotNull ProviderType providerType,
+        Boolean termsAgreed,
+        Boolean privacyAgreed,
+        Boolean locationTermsAgreed
 ) {
 }
