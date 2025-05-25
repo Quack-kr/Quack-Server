@@ -63,7 +63,6 @@ public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilte
 
             LoginAuthenticationProvider provider = providerFactory.get(clientType);
 
-            // TODO : 네이버 에서는 토큰이 없기 때문에 여기서도 메소드 내부적으로 구현 해야함 우선 애플만.
             QuackAuthenticationToken quackAuthenticationToken = new QuackAuthenticationToken(clientType, "", idToken);
 
             return provider.authenticate(quackAuthenticationToken);

@@ -1,4 +1,4 @@
-package org.quack.QUACKServer.domain.photos;
+package org.quack.QUACKServer.domain.photos.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
-import org.quack.QUACKServer.domain.photos.domain.Photos;
 
 
 /**
@@ -16,7 +15,7 @@ import org.quack.QUACKServer.domain.photos.domain.Photos;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QPhotos extends EntityPathBase<Photos> {
 
-    private static final long serialVersionUID = -1561626371L;
+    private static final long serialVersionUID = -1594770129L;
 
     public static final QPhotos photos = new QPhotos("photos");
 

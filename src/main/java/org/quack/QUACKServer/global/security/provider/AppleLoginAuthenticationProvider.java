@@ -9,6 +9,7 @@ import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.global.infra.social.apple.AppleHttpInterface;
 import org.quack.QUACKServer.global.infra.social.apple.dto.ApplePublicKeys;
 import org.quack.QUACKServer.global.security.enums.ProviderType;
+import org.quack.QUACKServer.global.security.exception.BeforeSignUpException;
 import org.quack.QUACKServer.global.security.jwt.JwtProvider;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -44,8 +45,11 @@ public class AppleLoginAuthenticationProvider implements LoginAuthenticationProv
 
         SocialAuthDto socialAuthDto = getSocialAuth(quackAuthenticationToken.getIdToken());
         QuackUser quackUser = userService.loadUserByUsername(socialAuthDto.getProviderId());
-        return new QuackAuthenticationToken(quackUser, provider, quackAuthenticationToken.getAccessToken(),quackAuthenticationToken.getIdToken());
 
+        if(quackUser.isEmpty()) {
+            throw new BeforeSignUpException("회원가입을 해야합니다", quackUser.toBuilder().email(socialAuthDto.getEmail()).build());
+        }
+        return new QuackAuthenticationToken(quackUser, provider, quackAuthenticationToken.getAccessToken(),quackAuthenticationToken.getIdToken());
 
     }
 

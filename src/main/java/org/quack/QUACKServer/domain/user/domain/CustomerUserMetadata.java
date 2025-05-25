@@ -2,6 +2,7 @@ package org.quack.QUACKServer.domain.user.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -41,4 +42,25 @@ public class CustomerUserMetadata {
 
     @Column(name = "decibel")
     private Long decibel;
+
+
+    @Builder(access = AccessLevel.PRIVATE, builderMethodName = "createBuilder")
+    private CustomerUserMetadata(Long customerUserId, Boolean privacyAgreed, Boolean termsAgreed, Boolean locationTermsAgreed){
+        this.customerUserId = customerUserId;
+        this.profileImageId = null;
+        this.privacyAgreed = privacyAgreed;
+        this.termsAgreed = termsAgreed;
+        this.locationTermsAgreed = locationTermsAgreed;
+        this.decibel = 0L;
+    }
+
+
+    public static CustomerUserMetadata create(Long customerUserId, Boolean privacyAgreed, Boolean termsAgreed, Boolean locationTermsAgreed) {
+        return CustomerUserMetadata.createBuilder()
+                .customerUserId(customerUserId)
+                .privacyAgreed(privacyAgreed)
+                .termsAgreed(termsAgreed)
+                .locationTermsAgreed(locationTermsAgreed)
+                .build();
+    }
 }

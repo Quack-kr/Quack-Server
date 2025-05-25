@@ -44,7 +44,6 @@ public class SubtractRestaurantController {
      */
     @GetMapping("/public/restaurants")
     public SearchSubtractRestaurantsResponse searchSubtractRestaurantsByNoAuth(@Valid SearchSubtractRestaurantsRequest request) {
-        // TODO : 추후 리팩토링
         return baseSubtractRestaurantService.searchSubtractRestaurants(request);
     }
 

@@ -49,7 +49,7 @@ public class RestaurantSubtractFilter {
                 .latitude(request.userLocationItem() != null ? request.userLocationItem().latitude() : null)
                 .sortType(request.sort().sortType())
                 .isOpen(request.sort().isOpen())
-                .customerUserId(QuackAuthContext.getCustomerUserId())
+                .customerUserId(QuackAuthContext.getCustomerUserId() == null ? QuackAuthContext.getCustomerUserId() : 0L)
                 .build();
 
     }

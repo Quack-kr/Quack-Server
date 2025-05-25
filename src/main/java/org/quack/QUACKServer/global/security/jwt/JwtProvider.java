@@ -5,11 +5,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-
-import java.security.Key;
-import java.security.PublicKey;
-import java.util.*;
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
@@ -24,6 +19,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.security.Key;
+import java.security.PublicKey;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -44,55 +42,16 @@ public class JwtProvider {
     private static final String USER_ID = "userId";
     private static final String PROVIDER = "provider";
     private static final String PROVIDER_ID = "providerId";
-    private static final String IS_SIGN_UP = "isSignUp";
-    private static final String HAS_AGREED = "hasAgreed";
     private static final String NICKNAME = "nickname";
     private static final String EMAIL = "email";
-
-//
-//    @PostConstruct
-//    protected void init() {
-//        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
-//    }
-//
-//    public String createAccessToken(Long userId) {
-//        return createToken(userId, accessTokenExpiration, "access");
-//    }
-//
-//    public String createRefreshToken(Long userId) {
-//        return createToken(userId, refreshTokenExpiration, "refresh");
-//    }
-//
-//    private String createToken(Long userId, Long expiration, String tokenType) {
-//
-//        return Jwts.builder()
-//                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-//                .setClaims(generateClaims(userId, expiration, tokenType))
-//                .signWith(getSignKey(), SignatureAlgorithm.HS256)
-//                .compact();
-//    }
-//
-//    private Claims generateClaims(Long userId, Long expiration, String tokenType) {
-//        long now = System.currentTimeMillis();
-//        final Claims claims = Jwts.claims()
-//                .setSubject(tokenType)
-//                .setIssuedAt(new Date(now))
-//                .setExpiration(new Date(now + expiration));
-//        claims.put("userId", userId);
-//        return claims;
-//    }
-
-//    protected SecretKey getSignKey() {
-//        return Keys.hmacShaKeyFor(secretKey.getBytes());
-//    }
 
 
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
-    public String extractSocialId(String accessToken) {
-        return extractClaim(accessToken, claims -> claims.get(PROVIDER_ID, String.class));
+    public Long extractUserId(String accessToken) {
+        return extractClaim(accessToken, claims -> claims.get(USER_ID, Long.class));
     }
 
     public String resolveToken(HttpServletRequest request) {
@@ -102,7 +61,7 @@ public class JwtProvider {
 
     }
     public boolean isTokenValid(String token) {
-        return !extractSocialId(token).isBlank() && !isTokenExpired(token);
+        return extractUserId(token) != null && !isTokenExpired(token);
     }
 
     private Date extractExpiration(String token) {
@@ -150,8 +109,8 @@ public class JwtProvider {
              .getBody();
     }
 
-    public String getAuthKey(String jwt) {
-        return extractSocialId(jwt);
+    public Long getAuthKey(String jwt) {
+        return extractUserId(jwt);
     }
 
     public UserDetails extractUserDetails(String token) {
@@ -160,7 +119,6 @@ public class JwtProvider {
                 .nickname(claims.get(NICKNAME, String.class))
                 .email(claims.get(EMAIL, String.class))
                 .provider(ProviderType.from(claims.get(PROVIDER, String.class)))
-                .isMarketingCheck(claims.get(HAS_AGREED, Boolean.class))
                 .build());
     }
 
@@ -182,7 +140,6 @@ public class JwtProvider {
                 .claim(AUTHORITIES_KEY, userDetails.getAuthorities())
                 .claim(USER_ID, userDetails.getCustomerUserId())
                 .claim(PROVIDER, userDetails.getProvider())
-                .claim(HAS_AGREED, userDetails.getIsMarketingCheck())
                 .claim(NICKNAME, userDetails.getNickname())
                 .claim(EMAIL, userDetails.getEmail())
                 .setSubject(String.valueOf(userDetails.getCustomerUserId()))

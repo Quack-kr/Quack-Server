@@ -2,6 +2,7 @@ package org.quack.QUACKServer.domain.restaurant.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
 import org.quack.QUACKServer.domain.restaurant.domain.Restaurant;
 import org.quack.QUACKServer.domain.restaurant.domain.RestaurantCategory;
 import org.quack.QUACKServer.domain.restaurant.domain.RestaurantMetadata;
@@ -17,6 +18,9 @@ import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractByDistanceVo
 import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractByLikeVo;
 import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractBySavedVo;
 import org.quack.QUACKServer.domain.review.enums.ReviewEnum;
+import org.quack.QUACKServer.domain.user.domain.CustomerUserMetadata;
+import org.quack.QUACKServer.domain.user.repository.CustomerUserMetadataRepository;
+import org.quack.QUACKServer.domain.user.repository.CustomerUserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -45,20 +49,32 @@ import static org.quack.QUACKServer.domain.review.enums.ReviewEnum.ReviewTag.WAI
 @Slf4j
 @Service
 public class SubtractRestaurantService {
+    private final CustomerUserMetadataRepository customerUserMetadataRepository;
     private final RestaurantRepositoryImpl restaurantRepositoryImpl;
     private final RestaurantCategoryRepository restaurantCategoryRepository;
     private final RestaurantRepository restaurantRepository;
     private final RestaurantMetadataRepository restaurantMetadataRepository;
     private final RestaurantOwnerMetadataRepository restaurantOwnerMetadataRepository;
+    private final CustomerUserRepository customerUserRepository;
 
     @Transactional(readOnly = true)
     public SearchSubtractRestaurantsResponse searchSubtractRestaurants(SearchSubtractRestaurantsRequest request) {
 
-        if (RestaurantEnum.RestaurantSortType.DISTANCE.equals(request.sort().sortType())
-                && (request.userLocationItem() == null
-                || (request.userLocationItem().longitude() == null && request.userLocationItem().latitude() == null))) {
-            throw new IllegalArgumentException("사용자 위치를 읽을 수 없습니다.");
+        if(RestaurantEnum.RestaurantSortType.DISTANCE.equals(request.sort().sortType()) && !QuackAuthContext.isAnonymous()) {
+            CustomerUserMetadata metadata = customerUserMetadataRepository.findById(Objects.requireNonNull(QuackAuthContext.getCustomerUserId()))
+                    .orElseThrow(() -> new RuntimeException("서버 에러 발생"));
+
+            if(!metadata.getLocationTermsAgreed()) {
+                throw new IllegalArgumentException("위치 체크를 확인해주세요.");
+            }
+
+            if ((request.userLocationItem() == null
+                    || (request.userLocationItem().longitude() == null && request.userLocationItem().latitude() == null))) {
+                throw new IllegalArgumentException("사용자 위치를 읽을 수 없습니다.");
+            }
         }
+
+
 
         RestaurantSubtractFilter filter = RestaurantSubtractFilter.from(request);
 
@@ -131,8 +147,6 @@ public class SubtractRestaurantService {
 
         return SearchSubtractRestaurantsResponse.from(subtractRestaurantItems);
     }
-
-
 
     public SearchSubtractRestaurantLocationsResponse searchSubtractRestaurantLocations(SearchSubtractRestaurantLocationsRequest request) {
 
