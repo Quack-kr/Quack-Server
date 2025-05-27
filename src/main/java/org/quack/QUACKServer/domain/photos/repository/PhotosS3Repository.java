@@ -4,11 +4,15 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.photos.dto.PhotosFileDto;
 import org.quack.QUACKServer.global.infra.s3.repository.S3Repository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -66,6 +70,16 @@ public class PhotosS3Repository implements S3Repository<PhotosFileDto, String> {
         URL url = s3Client.generatePresignedUrl(request);
 
         return url.toString();
+
+    }
+
+    public Resource get(PhotosFileDto photosFileDto) {
+        String path = convertPath(photosFileDto);
+
+        S3Object file = s3Client.getObject(bucket, path);
+        S3ObjectInputStream inputStream = file.getObjectContent();
+
+        return new InputStreamResource(inputStream);
 
     }
 }

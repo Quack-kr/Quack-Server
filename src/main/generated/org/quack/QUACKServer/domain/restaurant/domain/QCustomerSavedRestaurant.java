@@ -1,4 +1,4 @@
-package org.quack.QUACKServer.domain.user.domain;
+package org.quack.QUACKServer.domain.restaurant.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -15,7 +15,7 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QCustomerSavedRestaurant extends EntityPathBase<CustomerSavedRestaurant> {
 
-    private static final long serialVersionUID = 20369838L;
+    private static final long serialVersionUID = -113394500L;
 
     public static final QCustomerSavedRestaurant customerSavedRestaurant = new QCustomerSavedRestaurant("customerSavedRestaurant");
 

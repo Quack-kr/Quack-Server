@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
-import org.quack.QUACKServer.domain.user.service.UserService;
+import org.quack.QUACKServer.domain.auth.service.UserService;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.global.infra.social.apple.AppleHttpInterface;
 import org.quack.QUACKServer.global.infra.social.apple.dto.ApplePublicKeys;

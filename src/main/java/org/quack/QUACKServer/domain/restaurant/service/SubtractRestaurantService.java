@@ -20,7 +20,6 @@ import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSubtractBySavedVo;
 import org.quack.QUACKServer.domain.review.enums.ReviewEnum;
 import org.quack.QUACKServer.domain.user.domain.CustomerUserMetadata;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserMetadataRepository;
-import org.quack.QUACKServer.domain.user.repository.CustomerUserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -55,7 +54,6 @@ public class SubtractRestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final RestaurantMetadataRepository restaurantMetadataRepository;
     private final RestaurantOwnerMetadataRepository restaurantOwnerMetadataRepository;
-    private final CustomerUserRepository customerUserRepository;
 
     @Transactional(readOnly = true)
     public SearchSubtractRestaurantsResponse searchSubtractRestaurants(SearchSubtractRestaurantsRequest request) {
@@ -199,6 +197,7 @@ public class SubtractRestaurantService {
         return GetSubtractRestaurantResponse.from(restaurantItem);
     }
 
+    // TODO : Implementation Layer 로 내리기
     protected Map<Long, List<RestaurantEnum.RestaurantCategoryType>> getRestaurantCategoryMap(List<Long> restaurantIds) {
         List<RestaurantCategory> restaurantCategories = restaurantCategoryRepository.findAllByRestaurants(restaurantIds);
 

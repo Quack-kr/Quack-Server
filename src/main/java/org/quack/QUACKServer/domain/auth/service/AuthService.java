@@ -1,6 +1,5 @@
 package org.quack.QUACKServer.domain.auth.service;
 
-import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +16,7 @@ import org.quack.QUACKServer.global.security.jwt.JwtProvider;
 import org.quack.QUACKServer.global.security.provider.AppleLoginAuthenticationProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.regex.Pattern;
 
@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class AuthService {
 
     private final CustomerUserMetadataRepository customerUserMetadataRepository;
@@ -39,6 +38,7 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private static final Pattern REGX = Pattern.compile("^[가-힣a-zA-Z0-9]+(?: [가-힣a-zA-Z0-9]+)*$");
 
+    @Transactional
     public AuthResponse signup(SignupRequest request, String idToken) {
 
         switch (request.providerType()) {
