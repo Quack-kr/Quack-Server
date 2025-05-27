@@ -1,6 +1,7 @@
 package org.quack.QUACKServer.domain.restaurant.repository;
 
 
+import org.quack.QUACKServer.domain.restaurant.filter.RestaurantFindDistanceFilter;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSearchFilter;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSubtractFilter;
 import org.quack.QUACKServer.domain.restaurant.vo.*;
@@ -29,4 +30,6 @@ public interface RestaurantRepositorySupport {
     Slice<RestaurantSearchByLikeVo> findByRestaurantNameOrderByLike(RestaurantSearchFilter filter);
 
     Slice<RestaurantSearchBySavedVo> findByRestaurantNameOrderBySaved(RestaurantSearchFilter filter);
+
+    List<RestaurantSimpleByDistanceVo> findDistanceByRestaurants(RestaurantFindDistanceFilter filter);
 }

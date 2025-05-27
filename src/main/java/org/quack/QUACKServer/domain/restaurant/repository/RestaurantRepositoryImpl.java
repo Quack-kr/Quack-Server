@@ -19,11 +19,11 @@ import org.quack.QUACKServer.domain.menu.domain.QMenuEval;
 import org.quack.QUACKServer.domain.menu.enums.MenuEnum;
 import org.quack.QUACKServer.domain.restaurant.domain.*;
 import org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum;
+import org.quack.QUACKServer.domain.restaurant.filter.RestaurantFindDistanceFilter;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSearchFilter;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSubtractFilter;
 import org.quack.QUACKServer.domain.restaurant.vo.*;
 import org.quack.QUACKServer.domain.review.domain.QReviewEvalSummary;
-import org.quack.QUACKServer.domain.user.domain.QCustomerSavedRestaurant;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
@@ -79,7 +79,6 @@ public class RestaurantRepositoryImpl implements RestaurantRepositorySupport {
 
         BooleanExpression isSaved = getIsSavedExpression(filter.getCustomerUserId());
 
-        BooleanExpression isOpen = Expressions.booleanTemplate("NOT {0}", restaurantHours.isClosed);
 
         List<Long> restaurantIds = findRestaurantIdsBySubtractFilter(filter);
 
@@ -279,7 +278,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositorySupport {
                 .join(customerSavedRestaurant).on(customerSavedRestaurant.restaurantId.eq(restaurant.restaurantId))
                 .where(restaurant.restaurantName.containsIgnoreCase(filter.getKeyword())
                         .and(restaurantHours.isClosed.eq(!filter.isOpen()))
-                                .and(menuEval.menuEvalType.eq(MenuEnum.MenuEvalType.CRAZY)))
+                        .and(menuEval.menuEvalType.eq(MenuEnum.MenuEvalType.CRAZY)))
                 .groupBy(restaurant.restaurantId)
                 .orderBy(builderOrderBySubtractFilter(filter.getLongitude(), filter.getLatitude(), filter.getSortType()))
                 .offset(filter.getPageable().getOffset())
@@ -293,6 +292,51 @@ public class RestaurantRepositoryImpl implements RestaurantRepositorySupport {
         }
 
         return new SliceImpl<>(restaurants);
+    }
+
+    @Override
+    public List<RestaurantSimpleByDistanceVo> findDistanceByRestaurants(RestaurantFindDistanceFilter filter) {
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+
+        Point userLocation = geometryFactory.createPoint(new Coordinate(filter.getLongitude(), filter.getLatitude()));
+
+        NumberTemplate<Double> longitude = Expressions.numberTemplate(
+                Double.class, "ST_X({0})", restaurant.location
+        );
+
+        NumberTemplate<Double> latitude = Expressions.numberTemplate(
+                Double.class, "ST_Y({0})", restaurant.location
+        );
+
+        NumberTemplate<Double> distance = Expressions.numberTemplate(
+                Double.class,
+                "ST_Distance_Sphere({0}, {1})",
+                restaurant.location,
+                Expressions.constant(userLocation)
+        );
+        BooleanExpression isOpen = Expressions.booleanTemplate("NOT {0}", restaurantHours.isClosed);
+
+        return queryFactory
+                .select(Projections.constructor(
+                        RestaurantSimpleByDistanceVo.class,
+                        restaurant.restaurantId,
+                        restaurant.restaurantName,
+                        restaurantMetadata.averagePrice,
+                        restaurantOwnerMetadata.simpleDescription,
+                        distance,
+                        longitude,
+                        latitude,
+                        isOpen
+                ))
+                .from(restaurant)
+                .join(restaurantMetadata).on(restaurantMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantOwnerMetadata).on(restaurantOwnerMetadata.restaurantId.eq(restaurant.restaurantId))
+                .join(restaurantHours).on(restaurantHours.restaurantId.eq(restaurant.restaurantId))
+                .where(restaurant.restaurantId.in(filter.getRestaurantIds())
+                        .and(restaurantHours.isClosed.eq(!filter.isOpen())))
+                .orderBy(builderOrderBySubtractFilter(filter.getLongitude(), filter.getLatitude(), RestaurantEnum.RestaurantSortType.DISTANCE))
+                .groupBy(restaurant.restaurantId)
+                .fetch();
     }
 
 

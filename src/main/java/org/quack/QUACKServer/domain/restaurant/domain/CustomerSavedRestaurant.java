@@ -1,4 +1,4 @@
-package org.quack.QUACKServer.domain.user.domain;
+package org.quack.QUACKServer.domain.restaurant.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

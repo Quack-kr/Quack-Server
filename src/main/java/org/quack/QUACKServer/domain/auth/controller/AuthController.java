@@ -49,7 +49,7 @@ public class AuthController {
          return authService.signup(request, idToken);
     }
 
-    @PostMapping("/validate-nickname")
+    @PostMapping("/auth/validate-nickname")
     public CommonResponse validateUserNickname(
             @Valid @RequestParam("nickname") String nickname) {
         return authService.validateNickName(nickname);
