@@ -16,6 +16,7 @@ public interface PhotoEnum {
     enum PhotoType {
 
         DEFAULT_PROFILE("/profile/", "프로필 디폴트 이미지"),
+        RESTAURANT("restaurant", "식당 사진"),
         MENU_BOARD("menu_board", "메뉴판 사진"),
         REVIEW("review", "리뷰 남긴 사진"),
         ;
