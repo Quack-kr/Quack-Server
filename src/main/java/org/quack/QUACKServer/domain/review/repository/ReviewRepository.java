@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
  * @fileName : ReviewRepository
  * @date : 25. 5. 27.
  */
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewRepositoryCustom{
 
 
     @Query("SELECT COUNT (r) FROM Review r WHERE r.userId = :userId")
