@@ -1,0 +1,2 @@
+package org.quack.QUACKServer.domain.menu.repository;public interface MenuRepositoryCustom {
+}
