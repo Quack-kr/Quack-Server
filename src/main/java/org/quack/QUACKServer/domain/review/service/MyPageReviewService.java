@@ -78,8 +78,10 @@ public class MyPageReviewService {
 
             List<ReviewImageResponse> reviewImageList = new ArrayList<>();
 
-            for (Photos photos : photosList) {
-                reviewImageList.add(ReviewImageResponse.from(photos.getImageUrl()));
+            if (!photosList.isEmpty()) {
+                for (Photos photos : photosList) {
+                    reviewImageList.add(ReviewImageResponse.from(photos.getImageUrl()));
+                }
             }
 
             List<MenuEvalResponse> menuEvalList = menuEvalService.getMenuEvalsForReview(reviewInfo.reviewId());
@@ -109,7 +111,7 @@ public class MyPageReviewService {
                 customerUserProfile.profileImageId());
 
         GetMyReviewResponse reviews = GetMyReviewResponse.of(allMyReview, customerUserProfile.nickname(), userProfile);
-        
+
         return reviews;
     }
 }
