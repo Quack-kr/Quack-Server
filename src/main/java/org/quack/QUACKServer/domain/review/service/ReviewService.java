@@ -3,6 +3,7 @@ package org.quack.QUACKServer.domain.review.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.menu.dto.response.GetReviewMenusResponse;
 import org.quack.QUACKServer.domain.menu.service.MenuEvalService;
@@ -48,8 +49,12 @@ public class ReviewService {
     }
 
     @Transactional
-    public String createReview(QuackUser user,  Long restaurantId, CreateReviewRequest request) {
-        checkLoginUser(user);
+    public String createReview(Long restaurantId, CreateReviewRequest request) {
+        if(QuackAuthContext.isAnonymous()) {
+            throw new IllegalStateException("비로그인 시 리뷰 작성을 할 수 없습니다.");
+        }
+
+        QuackUser user = QuackAuthContext.getQuackUserDetails();
 
         boolean validationExistence = restaurantService.validateExistence(restaurantId);
         if(!validationExistence) throw new IllegalArgumentException("식당 정보 없음.");

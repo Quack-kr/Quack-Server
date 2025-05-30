@@ -33,9 +33,8 @@ public class ReviewController {
     @PostMapping("/{restaurantId}/create")
     public String createReview(@PathVariable Long restaurantId,
                                @RequestBody CreateReviewRequest request) {
-        QuackUser loginUser = getAuthenticatedUser();
 
-        return reviewService.createReview(loginUser, restaurantId, request);
+        return reviewService.createReview(restaurantId, request);
     }
 
     @PostMapping("/{reviewId}/delete")
