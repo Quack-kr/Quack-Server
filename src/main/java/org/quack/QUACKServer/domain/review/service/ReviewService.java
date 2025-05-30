@@ -1,35 +1,21 @@
 package org.quack.QUACKServer.domain.review.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.menu.dto.response.GetReviewMenusResponse;
-import org.quack.QUACKServer.domain.menu.dto.response.MenuEvalResponse;
 import org.quack.QUACKServer.domain.menu.service.MenuEvalService;
 import org.quack.QUACKServer.domain.menu.service.MenuService;
-import org.quack.QUACKServer.domain.photos.domain.Photos;
 import org.quack.QUACKServer.domain.photos.dto.ReviewPhotoUploadRequest;
-import org.quack.QUACKServer.domain.photos.enums.PhotoEnum.PhotoType;
-import org.quack.QUACKServer.domain.photos.repository.PhotosRepository;
 import org.quack.QUACKServer.domain.photos.service.ReviewPhotoService;
 import org.quack.QUACKServer.domain.restaurant.dto.response.GetRestaurantInfoResponse;
 import org.quack.QUACKServer.domain.restaurant.service.RestaurantService;
 import org.quack.QUACKServer.domain.review.domain.Review;
 import org.quack.QUACKServer.domain.review.dto.request.CreateReviewRequest;
-import org.quack.QUACKServer.domain.review.dto.response.MyReviewResponse;
-import org.quack.QUACKServer.domain.review.dto.response.ReviewImageResponse;
-import org.quack.QUACKServer.domain.review.dto.response.ReviewInfoResponse;
 import org.quack.QUACKServer.domain.review.dto.response.ReviewInitResponse;
-import org.quack.QUACKServer.domain.review.dto.response.ReviewWithRestaurantResponse;
 import org.quack.QUACKServer.domain.review.enums.ReviewEnum.ReviewKeywordType;
 import org.quack.QUACKServer.domain.review.repository.ReviewRepository;
-import org.quack.QUACKServer.domain.user.dto.response.GetCustomerUserProfileResponse;
-import org.quack.QUACKServer.domain.user.service.CustomerUserService;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +30,6 @@ public class ReviewService {
     private final MenuService menuService;
     private final RestaurantService restaurantService;
     private final ReviewPhotoService reviewPhotoService;
-    private final PhotosRepository photosRepository;
-    private final CustomerUserService customerUserService;
 
     public ReviewInitResponse getInitData(Long restaurantId, String reviewType) {
 
@@ -109,52 +93,6 @@ public class ReviewService {
 
         return "Success";
     }
-
-    public MyReviewResponse getMyReviews(QuackUser user, int pageNum, int sizeNum) {
-        checkLoginUser(user);
-
-        Pageable pageable = PageRequest.of(pageNum, sizeNum);
-
-        List<ReviewInfoResponse> reviewInfos = reviewRepository.findAllMyReview(user.getCustomerUserId(), pageable);
-        List<ReviewWithRestaurantResponse> content = new ArrayList<>();
-
-
-        for (ReviewInfoResponse reviewInfo : reviewInfos) {
-            List<Photos> photosList = photosRepository.findAllByTargetIdAndPhotoType(
-                    reviewInfo.getReviewId(), PhotoType.REVIEW.name());
-
-            List<ReviewImageResponse> reviewImageList = new ArrayList<>();
-
-            for (Photos photos : photosList) {
-                reviewImageList.add(ReviewImageResponse.from(photos.getImageUrl()));
-            }
-
-            List<MenuEvalResponse> menuEvalList = menuEvalService.getMenuEvalsForReview(reviewInfo.reviewId());
-
-            ReviewWithRestaurantResponse response = ReviewWithRestaurantResponse.of(reviewInfo.getRestaurantName(),
-                    reviewInfo.getReviewCreatedAt(),
-                    reviewInfo.getReviewContent(), reviewImageList, menuEvalList, reviewInfo.getLikeCount(),
-                    reviewInfo.getDislikeCount());
-
-            content.add(response);
-        }
-
-        boolean hasNext = false;
-        if (content.size() > pageable.getPageSize()) {
-            hasNext = true;
-            content.remove(content.size() - 1);
-        }
-
-        SliceImpl<ReviewWithRestaurantResponse> allMyReview = new SliceImpl<>(content, pageable, hasNext);
-
-        GetCustomerUserProfileResponse customerUserProfile = customerUserService.getCustomerUserProfile();
-
-        MyReviewResponse reviews = MyReviewResponse.of(allMyReview, customerUserProfile.nickname(),
-                customerUserProfile.profileImageId());
-
-        return reviews;
-    }
-
 
     private void checkLoginUser(QuackUser user) {
         if (user == null) {

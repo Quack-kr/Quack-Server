@@ -6,12 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.review.dto.request.CreateReviewRequest;
-import org.quack.QUACKServer.domain.review.dto.response.MyReviewResponse;
 import org.quack.QUACKServer.domain.review.dto.response.ReviewInitResponse;
-import org.quack.QUACKServer.domain.review.dto.response.ReviewWithRestaurantResponse;
 import org.quack.QUACKServer.domain.review.enums.ReviewType;
 import org.quack.QUACKServer.domain.review.service.ReviewService;
-import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,11 +45,4 @@ public class ReviewController {
         return reviewService.deleteReview(loginUser, reviewId);
     }
 
-    @GetMapping("/my-reviews")
-    public MyReviewResponse getMyReviews(@RequestParam(defaultValue = "0") int pageNum,
-                                         @RequestParam(defaultValue = "10") int sizeNum){
-        QuackUser loginUser = getAuthenticatedUser();
-
-        return reviewService.getMyReviews(loginUser, pageNum, sizeNum);
-    }
 }
