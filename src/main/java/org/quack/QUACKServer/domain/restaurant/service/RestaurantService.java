@@ -11,6 +11,7 @@ import org.quack.QUACKServer.domain.photos.enums.PhotoEnum;
 import org.quack.QUACKServer.domain.photos.repository.PhotosRepository;
 import org.quack.QUACKServer.domain.photos.repository.PhotosS3Repository;
 import org.quack.QUACKServer.domain.restaurant.domain.Restaurant;
+import org.quack.QUACKServer.domain.restaurant.domain.RestaurantCategory;
 import org.quack.QUACKServer.domain.restaurant.dto.response.GetRestaurantInfoResponse;
 import org.quack.QUACKServer.domain.restaurant.repository.RestaurantRepository;
 import org.springframework.core.io.Resource;
@@ -25,21 +26,24 @@ public class RestaurantService {
     private final PhotosS3Repository photosS3Repository;
 
     public GetRestaurantInfoResponse getRestaurantBasicInfo(Long restaurantId){
-        Optional<Restaurant> findRestaurant = restaurantRepository.findById(restaurantId);
+        Restaurant findRestaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new IllegalArgumentException("식당 정보 없음"));
 
-        Restaurant restaurant = findRestaurant.get();
+        List<RestaurantCategory> restaurantCategories = findRestaurant.getRestaurantCategories();
 
         List<String> restaurantCategory = new ArrayList<>();
 
-        for (String category : restaurantCategory) {
-            restaurantCategory.add(category);
+        if(!restaurantCategories.isEmpty()){
+            for (RestaurantCategory category : restaurantCategories) {
+                restaurantCategory.add(category.getRestaurantCategoryName().getDescription());
+            }
         }
 
         Resource restaurantRepresentativePhoto = getRestaurantRepresentativePhoto(restaurantId);
 
         return GetRestaurantInfoResponse.of(
-                restaurant.getRestaurantName(),
-                restaurant.getDetailAddress(),
+                findRestaurant.getRestaurantName(),
+                findRestaurant.getDetailAddress(),
                 restaurantCategory,
                 restaurantRepresentativePhoto
         );

@@ -35,9 +35,6 @@ public class ReviewService {
 
     public ReviewInitResponse getInitData(Long restaurantId, String reviewType) {
 
-        boolean validationExistence = restaurantService.validateExistence(restaurantId);
-        if(!validationExistence) throw new IllegalArgumentException("식당 정보 없음.");
-
         GetRestaurantInfoResponse restaurantInfo = restaurantService.getRestaurantBasicInfo(restaurantId);
 
         if (reviewType.equals("FULL")) {
