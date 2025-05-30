@@ -39,9 +39,8 @@ public class ReviewController {
 
     @PostMapping("/{reviewId}/delete")
     public String deleteReview(@PathVariable Long reviewId) {
-        QuackUser loginUser = getAuthenticatedUser();
 
-        return reviewService.deleteReview(loginUser, reviewId);
+        return reviewService.deleteReview(reviewId);
     }
 
 }

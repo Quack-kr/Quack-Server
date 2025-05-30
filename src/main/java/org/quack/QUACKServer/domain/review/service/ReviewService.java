@@ -31,6 +31,7 @@ public class ReviewService {
     private final MenuService menuService;
     private final RestaurantService restaurantService;
     private final ReviewPhotoService reviewPhotoService;
+    private final ReviewLikeService reviewLikeService;
 
     public ReviewInitResponse getInitData(Long restaurantId, String reviewType) {
 
@@ -87,23 +88,25 @@ public class ReviewService {
     }
 
     @Transactional
-    public String deleteReview(QuackUser user, Long reviewId){
-        checkLoginUser(user);
+    public String deleteReview(Long reviewId){
+
+        if(QuackAuthContext.isAnonymous()) {
+            throw new IllegalStateException("비로그인 시 리뷰를 삭제할 수 없습니다.");
+        }
+
+        QuackUser user = QuackAuthContext.getQuackUserDetails();
+
 
         validateDeletableReview(user.getCustomerUserId(), reviewId);
 
         reviewRepository.deleteById(reviewId);
         menuEvalService.menuEvalDelete(reviewId);
-        // ReviewLike 삭제, ReviewPhoto 삭제 구현
+        reviewLikeService.reviewLikeDelete(reviewId);
+        // ReviewPhoto 삭제 구현
 
         return "Success";
     }
 
-    private void checkLoginUser(QuackUser user) {
-        if (user == null) {
-            throw new RuntimeException("로그인이 필요합니다.");
-        }
-    }
 
     private void validateDeletableReview(Long userId, Long reviewId){
         Review findReview = reviewRepository.findById(reviewId)
