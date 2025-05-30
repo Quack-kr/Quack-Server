@@ -57,4 +57,19 @@ public class ReviewPhotoService implements PhotoService<Object, ReviewPhotoUploa
 
         return CommonResponse.of("201", "파일 업로드 성공", HttpStatus.CREATED, "");
     }
+
+    public CommonResponse delete(Long reviewId) {
+        List<Photos> reviewPhotoList = photosRepository.findAllByTargetIdAndPhotoType(reviewId,
+                PhotoType.REVIEW.name());
+
+        if (!reviewPhotoList.isEmpty()) {
+            for (Photos photos : reviewPhotoList) {
+                photosS3Repository.delete(PhotosFileDto.builder().keyName(photos.getImageUrl()).build());
+            }
+        }
+
+        return CommonResponse.of("200", "파일 삭제 성공", HttpStatus.OK, "");
+    }
+
+
 }

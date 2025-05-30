@@ -102,7 +102,7 @@ public class ReviewService {
         reviewRepository.deleteById(reviewId);
         menuEvalService.menuEvalDelete(reviewId);
         reviewLikeService.reviewLikeDelete(reviewId);
-        // ReviewPhoto 삭제 구현
+        reviewPhotoService.delete(reviewId);
 
         return "Success";
     }
