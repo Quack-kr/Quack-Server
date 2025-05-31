@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.quack.QUACKServer.domain.menu.enums.MenuEnum;
+import org.quack.QUACKServer.domain.review.domain.Review;
 
 @Getter
 @Entity
@@ -32,5 +33,15 @@ public class MenuEval {
     @Enumerated(EnumType.STRING)
     @Column(name = "menu_eval_type", nullable = false)
     private MenuEnum.MenuEvalType menuEvalType;
+
+    private MenuEval(Long reviewId, Long menuId, MenuEnum.MenuEvalType menuEvalType) {
+        this.reviewId = reviewId;
+        this.menuId = menuId;
+        this.menuEvalType = menuEvalType;
+    }
+
+    public static MenuEval create(Long reviewId, Long menuId, MenuEnum.MenuEvalType menuEvalType) {
+        return new MenuEval(reviewId, menuId, menuEvalType);
+    }
 
 }

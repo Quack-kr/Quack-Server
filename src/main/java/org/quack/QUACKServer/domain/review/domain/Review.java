@@ -44,5 +44,15 @@ public class Review{
 //    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = false)
 //    private List<ReviewImage> reviewImages = new ArrayList<>();
 
+    private Review(Long userId, Long restaurantId, String reviewContent) {
+        this.userId = userId;
+        this.restaurantId = restaurantId;
+        this.reviewContent = reviewContent;
+    }
+
+    public static Review createReview(Long userId, Long restaurantId, String reviewContent) {
+        return new Review(userId, restaurantId, reviewContent);
+    }
+
 
 }
