@@ -9,6 +9,7 @@ import org.quack.QUACKServer.domain.auth.dto.request.SignupRequest;
 import org.quack.QUACKServer.domain.auth.dto.response.AuthResponse;
 import org.quack.QUACKServer.domain.auth.service.AuthService;
 import org.quack.QUACKServer.global.common.dto.CommonResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
@@ -25,14 +26,14 @@ import java.util.Map;
 
 @RestController
 @Slf4j
-@RequestMapping(path = "")
+@RequestMapping(path = "/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
 
     // TODO : 배포과정에서 삭제.
-    @PostMapping(value = "/auth/apple/callback", consumes = "application/x-www-form-urlencoded")
+    @PostMapping(value = "/apple/callback", consumes = "application/x-www-form-urlencoded")
     public String callback(HttpServletRequest request) {
 
         Map<String, String[]> parameterMap = request.getParameterMap();
@@ -42,16 +43,24 @@ public class AuthController {
 
     }
 
-    @PostMapping("/auth/signup")
+    @GetMapping("/apple/callback")
+    public ResponseEntity<?> kakaoCallback(@RequestParam("code") String code) {
+        // 1. 받은 code로 토큰 요청
+        // 2. 토큰으로 사용자 정보 요청
+        // 3. 회원가입 or 로그인 처리
+        return ResponseEntity.ok("성공");
+    }
+
+    @PostMapping("/signup")
     public AuthResponse signup(
             @Valid @NotBlank @RequestHeader("id-token") String idToken,
             @Valid @RequestBody SignupRequest request) {
          return authService.signup(request, idToken);
     }
 
-    @PostMapping("/auth/validate-nickname")
+    @PostMapping("/validate-nickname")
     public CommonResponse validateUserNickname(
-            @Valid @RequestParam("nickname") String nickname) {
+            @Valid @RequestBody String nickname) {
         return authService.validateNickName(nickname);
     }
 

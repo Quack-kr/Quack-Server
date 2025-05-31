@@ -42,6 +42,9 @@ public class LoginAuthenticationProviderFactory {
             case AppleLoginAuthenticationProvider appleLoginAuthenticationProvider-> {
                 return ProviderType.APPLE;
             }
+            case KakaoLoginAuthenticationProvider kakaoLoginAuthenticationProvider-> {
+                return ProviderType.KAKAO;
+            }
             case null, default -> {
                 throw new IllegalArgumentException("알 수 없는 로그인 방식 : " +  Objects.requireNonNull(provider).getClass());
             }

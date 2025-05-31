@@ -6,10 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.auth.dto.request.SignupRequest;
 import org.quack.QUACKServer.domain.auth.dto.response.AuthResponse;
+import org.quack.QUACKServer.domain.auth.enums.AuthEnum;
 import org.quack.QUACKServer.domain.user.domain.CustomerUser;
 import org.quack.QUACKServer.domain.user.domain.CustomerUserMetadata;
+import org.quack.QUACKServer.domain.user.domain.NicknameSequence;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserMetadataRepository;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserRepository;
+import org.quack.QUACKServer.domain.user.repository.NicknameSequenceRepository;
 import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.global.security.jwt.JwtProvider;
@@ -18,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -31,6 +35,7 @@ import java.util.regex.Pattern;
 @Slf4j
 @RequiredArgsConstructor
 public class AuthService {
+    private final NicknameSequenceRepository nicknameSequenceRepository;
 
     private final CustomerUserMetadataRepository customerUserMetadataRepository;
     private final CustomerUserRepository customerUserRepository;
@@ -50,6 +55,24 @@ public class AuthService {
 
                 CustomerUser user = CustomerUser.createBySocial(request.providerType(),
                         socialAuthDto.getProviderId(), socialAuthDto.getEmail(), request.nickname());
+
+                AuthEnum.NicknameColorPrefix nicknameColorPrefix = AuthEnum.NicknameColorPrefix.getByNickname(request.nickname());
+                AuthEnum.NicknameMenuPrefix nicknameMenuPrefix = AuthEnum.NicknameMenuPrefix.getByNickname(request.nickname());
+
+                if(nicknameColorPrefix != null && nicknameMenuPrefix != null) {
+                    Optional<NicknameSequence> nicknameSequence = nicknameSequenceRepository.findByColorPrefixAndMenuPrefix(nicknameColorPrefix, nicknameMenuPrefix);
+
+                    if(nicknameSequence.isPresent()) {
+                        nicknameSequence.get().increase();
+                    } else {
+                        nicknameSequenceRepository.save(
+                                NicknameSequence.createBuilder()
+                                        .colorPrefix(nicknameColorPrefix)
+                                        .menuPrefix(nicknameMenuPrefix)
+                                        .build());
+                    }
+
+                }
 
                 customerUserRepository.save(user);
 

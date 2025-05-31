@@ -10,6 +10,7 @@ import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.auth.dto.response.AuthResponse;
 import org.quack.QUACKServer.domain.auth.dto.response.LoginResponse;
 import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
+import org.quack.QUACKServer.domain.user.service.CustomerUserService;
 import org.quack.QUACKServer.global.common.dto.BaseResponse;
 import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.quack.QUACKServer.global.security.exception.BeforeSignUpException;
@@ -41,13 +42,15 @@ public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilte
     private final LoginAuthenticationProviderFactory providerFactory;
     private final ObjectMapper objectMapper;
     private final JwtProvider jwtProvider;
+    private final CustomerUserService customerUserService;
 
-    public SocialAuthLoginFilter(AuthenticationManager authenticationManager, LoginAuthenticationProviderFactory providerFactory, ObjectMapper objectMapper, JwtProvider jwtProvider) {
+    public SocialAuthLoginFilter(AuthenticationManager authenticationManager, LoginAuthenticationProviderFactory providerFactory, ObjectMapper objectMapper, JwtProvider jwtProvider, CustomerUserService customerUserService) {
         super(new AntPathRequestMatcher("/api/v1/auth/login", "POST"));
         this.providerFactory = providerFactory;
         this.objectMapper = objectMapper;
         setAuthenticationManager(authenticationManager);
         this.jwtProvider = jwtProvider;
+        this.customerUserService = customerUserService;
     }
 
     @Override
@@ -69,7 +72,7 @@ public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilte
 
         } catch (AuthenticationException e) {
             log.error("Authentication failed: ", e);
-            throw e;  // 예외를 다시 던져서 스프링 시큐리티가 처리하도록 함
+            throw e;
         }
     }
 
@@ -83,6 +86,7 @@ public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilte
             LoginResponse loginResponse = LoginResponse.builder()
                     .signUpStatus(SignUpStatus.BEFORE)
                     .email(beforeSignUpException.getQuackUser().getEmail())
+                    .nickname(customerUserService.generateNickname())
                     .build();
 
             response.setStatus(HttpServletResponse.SC_OK);

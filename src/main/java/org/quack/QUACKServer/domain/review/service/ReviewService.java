@@ -1,7 +1,5 @@
 package org.quack.QUACKServer.domain.review.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
@@ -18,11 +16,7 @@ import org.quack.QUACKServer.domain.restaurant.dto.response.GetRestaurantInfoRes
 import org.quack.QUACKServer.domain.restaurant.service.RestaurantService;
 import org.quack.QUACKServer.domain.review.domain.Review;
 import org.quack.QUACKServer.domain.review.dto.request.CreateReviewRequest;
-import org.quack.QUACKServer.domain.review.dto.response.MyReviewResponse;
-import org.quack.QUACKServer.domain.review.dto.response.ReviewImageResponse;
-import org.quack.QUACKServer.domain.review.dto.response.ReviewInfoResponse;
-import org.quack.QUACKServer.domain.review.dto.response.ReviewInitResponse;
-import org.quack.QUACKServer.domain.review.dto.response.ReviewWithRestaurantResponse;
+import org.quack.QUACKServer.domain.review.dto.response.*;
 import org.quack.QUACKServer.domain.review.enums.ReviewEnum.ReviewKeywordType;
 import org.quack.QUACKServer.domain.review.repository.ReviewRepository;
 import org.quack.QUACKServer.domain.user.dto.response.GetCustomerUserProfileResponse;
@@ -32,6 +26,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -121,7 +118,7 @@ public class ReviewService {
 
         for (ReviewInfoResponse reviewInfo : reviewInfos) {
             List<Photos> photosList = photosRepository.findAllByTargetIdAndPhotoType(
-                    reviewInfo.getReviewId(), PhotoType.REVIEW.name());
+                    reviewInfo.reviewId(), PhotoType.REVIEW.name());
 
             List<ReviewImageResponse> reviewImageList = new ArrayList<>();
 
@@ -131,10 +128,10 @@ public class ReviewService {
 
             List<MenuEvalResponse> menuEvalList = menuEvalService.getMenuEvalsForReview(reviewInfo.reviewId());
 
-            ReviewWithRestaurantResponse response = ReviewWithRestaurantResponse.of(reviewInfo.getRestaurantName(),
-                    reviewInfo.getReviewCreatedAt(),
-                    reviewInfo.getReviewContent(), reviewImageList, menuEvalList, reviewInfo.getLikeCount(),
-                    reviewInfo.getDislikeCount());
+            ReviewWithRestaurantResponse response = ReviewWithRestaurantResponse.of(reviewInfo.restaurantName(),
+                    reviewInfo.reviewCreatedAt(),
+                    reviewInfo.reviewContent(), reviewImageList, menuEvalList, reviewInfo.likeCount(),
+                    reviewInfo.dislikeCount());
 
             content.add(response);
         }
@@ -142,17 +139,15 @@ public class ReviewService {
         boolean hasNext = false;
         if (content.size() > pageable.getPageSize()) {
             hasNext = true;
-            content.remove(content.size() - 1);
+            content.removeLast();
         }
 
         SliceImpl<ReviewWithRestaurantResponse> allMyReview = new SliceImpl<>(content, pageable, hasNext);
 
         GetCustomerUserProfileResponse customerUserProfile = customerUserService.getCustomerUserProfile();
 
-        MyReviewResponse reviews = MyReviewResponse.of(allMyReview, customerUserProfile.nickname(),
+        return MyReviewResponse.of(allMyReview, customerUserProfile.nickname(),
                 customerUserProfile.profileImageId());
-
-        return reviews;
     }
 
 

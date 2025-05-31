@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.global.infra.social.apple.AppleHttpInterface;
+import org.quack.QUACKServer.global.infra.social.kakao.KakaoHttpInterface;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -31,16 +32,19 @@ import java.io.IOException;
 public class HttpInterfaceConfig {
 
     private final String appleApiBaseUrl;
+    private final String kakaoApiBaseUrl;
     private final DefaultListableBeanFactory beanFactory;
     private final GlobalHttpInterfaceFactory globalHttpInterfaceFactory;
     // private final String naverApiBaseUrl;
-    // private final String kakaoApiBaseUrl;
+
 
     public HttpInterfaceConfig(
             DefaultListableBeanFactory beanFactory,
-            @Value("${social.apple.base-url}") String appleApiBaseUrl
+            @Value("${social.apple.base-url}") String appleApiBaseUrl,
+            @Value("${social.kakao.base-url}") String kakaoApiBaseUrl
     ) {
         this.appleApiBaseUrl = appleApiBaseUrl;
+        this.kakaoApiBaseUrl = kakaoApiBaseUrl;
         this.beanFactory = beanFactory;
         this.globalHttpInterfaceFactory = new GlobalHttpInterfaceFactory();
     }
@@ -99,6 +103,13 @@ public class HttpInterfaceConfig {
     public AppleHttpInterface appleHttpInterface() {
         Class<AppleHttpInterface> interfaceClass = AppleHttpInterface.class;
         RestClient restClient = createRestClient(appleApiBaseUrl, interfaceClass.getSimpleName());
+        return globalHttpInterfaceFactory.create(interfaceClass, restClient);
+    }
+
+    @Bean
+    public KakaoHttpInterface kakaoHttpInterface() {
+        Class<KakaoHttpInterface> interfaceClass = KakaoHttpInterface.class;
+        RestClient restClient = createRestClient(kakaoApiBaseUrl, interfaceClass.getSimpleName());
         return globalHttpInterfaceFactory.create(interfaceClass, restClient);
     }
 
