@@ -47,7 +47,7 @@ public class ReviewMyPageController {
      *
      * 마이페이지 - 핵공감 데시벨 조회
      */
-    @PostMapping("/my-page/delete-review")
+    @PostMapping("/my-page/decibel")
     public CommonResponse deleteMyPageReview() {
         return myPageReviewService.searchDecibel();
     }
