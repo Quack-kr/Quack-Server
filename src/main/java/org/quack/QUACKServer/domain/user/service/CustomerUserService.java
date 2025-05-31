@@ -6,18 +6,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.auth.enums.AuthEnum;
+import org.quack.QUACKServer.domain.auth.service.AuthService;
 import org.quack.QUACKServer.domain.photos.domain.Photos;
-import org.quack.QUACKServer.domain.photos.dto.PhotosFileDto;
 import org.quack.QUACKServer.domain.photos.enums.PhotoEnum;
 import org.quack.QUACKServer.domain.photos.repository.PhotosRepository;
-import org.quack.QUACKServer.domain.photos.repository.PhotosS3Repository;
 import org.quack.QUACKServer.domain.user.domain.CustomerUser;
 import org.quack.QUACKServer.domain.user.domain.CustomerUserMetadata;
+import org.quack.QUACKServer.domain.user.dto.UpdateProfileRequest;
 import org.quack.QUACKServer.domain.user.dto.response.GetCustomerUserProfileResponse;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserMetadataRepository;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserRepository;
 import org.quack.QUACKServer.domain.user.repository.NicknameSequenceRepository;
-import org.springframework.core.io.Resource;
+import org.quack.QUACKServer.global.common.dto.CommonResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -40,8 +41,8 @@ public class CustomerUserService {
     private final CustomerUserRepository customerUserRepository;
     private final CustomerUserMetadataRepository customerUserMetadataRepository;
     private final PhotosRepository photosRepository;
-    private final PhotosS3Repository photosS3Repository;
     private final NicknameSequenceRepository nicknameSequenceRepository;
+    private final AuthService authService;
 
     public GetCustomerUserProfileResponse getCustomerUserProfile() {
 
@@ -56,16 +57,38 @@ public class CustomerUserService {
         return GetCustomerUserProfileResponse.of(customerUser, customerUserMetadata);
     }
 
-    public Resource getCustomerUserProfilePhoto(Long profileId) {
+    public CommonResponse getCustomerUserProfilePhoto(Long profileId) {
 
         Photos photos = photosRepository.findFirstByTargetIdAndPhotoType(profileId, PhotoEnum.PhotoType.DEFAULT_PROFILE.name())
                 .orElseThrow(() -> new IllegalArgumentException("이미지 정보 없음"));
 
-        return photosS3Repository.get(PhotosFileDto.builder().keyName(photos.getImageUrl()).build());
-
+        return CommonResponse.of("200", "프로필 이미지 조회 성공", HttpStatus.OK, photos.getImageUrl());
     }
 
     @Transactional
+    public CommonResponse updateCustomerUserProfile(UpdateProfileRequest request) {
+
+        QuackUser quackUser = QuackAuthContext.getQuackUserDetails();
+
+        CustomerUser customerUser = customerUserRepository.findById(quackUser.getCustomerUserId())
+                .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
+
+        CustomerUserMetadata customerUserMetadata = customerUserMetadataRepository.findByCustomerUserId(quackUser.getCustomerUserId())
+                .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
+
+        authService.validateNickName(request.nickname());
+
+        customerUser.updateNickname(request.nickname());
+
+        authService.updateNicknameSequence(request.nickname());
+
+        if(request.profileImageId() != null && request.profileImageId() > 0) {
+            customerUserMetadata.updateProfileImageId(request.profileImageId());
+        }
+        
+        return CommonResponse.of("201", "프로필 수정이 완료되었습니다.", HttpStatus.CREATED, "");
+    }
+
     public String generateNickname() {
         LocalDateTime now = LocalDateTime.now();
 

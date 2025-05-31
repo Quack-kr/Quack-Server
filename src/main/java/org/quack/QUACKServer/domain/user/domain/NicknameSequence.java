@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
  * @date : 25. 5. 31.
  */
 @Entity
-@Table(name ="customer_user_metadata")
+@Table(name ="nickname-sequence")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class NicknameSequence {

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : jung-kwanhee
@@ -23,4 +24,6 @@ public interface CustomerSavedRestaurantRepository extends JpaRepository<Custome
     List<CustomerSavedRestaurant> findAllByCustomerUserId(Long customerUserId);
 
     Slice<CustomerSavedRestaurant> findAllByCustomerUserId(Long customerUserId, Pageable pageable);
+
+    Optional<CustomerSavedRestaurant> findByCustomerUserIdAndRestaurantId(Long customerUserId, Long restaurantId);
 }

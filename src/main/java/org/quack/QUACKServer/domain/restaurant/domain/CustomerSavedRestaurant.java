@@ -2,6 +2,7 @@ package org.quack.QUACKServer.domain.restaurant.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -41,4 +42,19 @@ public class CustomerSavedRestaurant {
 
     @Column(name = "status")
     private Boolean status;
+
+    @Builder(builderMethodName = "createBuilder")
+    private CustomerSavedRestaurant(Long customerUserId, Long restaurantId) {
+        this.customerUserId = customerUserId;
+        this.restaurantId = restaurantId;
+        this.updateAt = LocalDateTime.now();
+        this.status = Boolean.TRUE;
+    }
+
+    public static CustomerSavedRestaurant create(Long customerUserId, Long restaurantId) {
+        return CustomerSavedRestaurant.createBuilder()
+                .customerUserId(customerUserId)
+                .restaurantId(restaurantId)
+                .build();
+    }
 }

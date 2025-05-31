@@ -56,23 +56,7 @@ public class AuthService {
                 CustomerUser user = CustomerUser.createBySocial(request.providerType(),
                         socialAuthDto.getProviderId(), socialAuthDto.getEmail(), request.nickname());
 
-                AuthEnum.NicknameColorPrefix nicknameColorPrefix = AuthEnum.NicknameColorPrefix.getByNickname(request.nickname());
-                AuthEnum.NicknameMenuPrefix nicknameMenuPrefix = AuthEnum.NicknameMenuPrefix.getByNickname(request.nickname());
-
-                if(nicknameColorPrefix != null && nicknameMenuPrefix != null) {
-                    Optional<NicknameSequence> nicknameSequence = nicknameSequenceRepository.findByColorPrefixAndMenuPrefix(nicknameColorPrefix, nicknameMenuPrefix);
-
-                    if(nicknameSequence.isPresent()) {
-                        nicknameSequence.get().increase();
-                    } else {
-                        nicknameSequenceRepository.save(
-                                NicknameSequence.createBuilder()
-                                        .colorPrefix(nicknameColorPrefix)
-                                        .menuPrefix(nicknameMenuPrefix)
-                                        .build());
-                    }
-
-                }
+                updateNicknameSequence(request.nickname());
 
                 customerUserRepository.save(user);
 
@@ -93,6 +77,26 @@ public class AuthService {
         }
 
 
+    }
+
+    public void updateNicknameSequence(String nickname) {
+        AuthEnum.NicknameColorPrefix nicknameColorPrefix = AuthEnum.NicknameColorPrefix.getByNickname(nickname);
+        AuthEnum.NicknameMenuPrefix nicknameMenuPrefix = AuthEnum.NicknameMenuPrefix.getByNickname(nickname);
+
+        if(nicknameColorPrefix != null && nicknameMenuPrefix != null) {
+            Optional<NicknameSequence> nicknameSequence = nicknameSequenceRepository.findByColorPrefixAndMenuPrefix(nicknameColorPrefix, nicknameMenuPrefix);
+
+            if(nicknameSequence.isPresent()) {
+                nicknameSequence.get().increase();
+            } else {
+                nicknameSequenceRepository.save(
+                        NicknameSequence.createBuilder()
+                                .colorPrefix(nicknameColorPrefix)
+                                .menuPrefix(nicknameMenuPrefix)
+                                .build());
+            }
+
+        }
     }
 
     public CommonResponse validateNickName(String nickname) {

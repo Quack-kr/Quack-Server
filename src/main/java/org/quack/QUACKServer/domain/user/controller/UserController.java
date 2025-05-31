@@ -1,17 +1,13 @@
 package org.quack.QUACKServer.domain.user.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.domain.user.dto.UpdateProfileRequest;
 import org.quack.QUACKServer.domain.user.dto.response.GetCustomerUserProfileResponse;
 import org.quack.QUACKServer.domain.user.service.CustomerUserService;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.quack.QUACKServer.global.common.dto.CommonResponse;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author : jung-kwanhee
@@ -39,16 +35,17 @@ public class UserController {
     /**
      * 마이 페이지 - 프로필 이미지 조회
      */
-    @GetMapping("/my-page/{profile-id}")
-    public ResponseEntity<Resource> getProfilePhoto(@PathVariable("profile-id") Long profileId) {
-        Resource resource = customerUserService.getCustomerUserProfilePhoto(profileId);
-
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
+    @GetMapping("/my-page/{profile_photos_id}")
+    public CommonResponse getProfilePhoto(@PathVariable("profile_photos_id") Long profileId) {
+        return customerUserService.getCustomerUserProfilePhoto(profileId);
     }
 
-    // @GetMapping("/my-page/")
+    /**
+     * 마이 페이지 - 프로필 수정
+     */
+    @PostMapping("/my-page/profile-update")
+    public CommonResponse updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
+        return customerUserService.updateCustomerUserProfile(request);
+    }
+
 }

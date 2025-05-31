@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -128,7 +129,9 @@ public class ReviewService {
 
             List<MenuEvalResponse> menuEvalList = menuEvalService.getMenuEvalsForReview(reviewInfo.reviewId());
 
-            ReviewWithRestaurantResponse response = ReviewWithRestaurantResponse.of(reviewInfo.restaurantName(),
+            ReviewWithRestaurantResponse response = ReviewWithRestaurantResponse.of(
+                    reviewInfo.reviewId(),
+                    reviewInfo.restaurantName(),
                     reviewInfo.reviewCreatedAt(),
                     reviewInfo.reviewContent(), reviewImageList, menuEvalList, reviewInfo.likeCount(),
                     reviewInfo.dislikeCount());
@@ -147,7 +150,7 @@ public class ReviewService {
         GetCustomerUserProfileResponse customerUserProfile = customerUserService.getCustomerUserProfile();
 
         return MyReviewResponse.of(allMyReview, customerUserProfile.nickname(),
-                customerUserProfile.profileImageId());
+                customerUserProfile.profilePhotosId());
     }
 
 
@@ -161,7 +164,7 @@ public class ReviewService {
         Review findReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("리뷰가 존재하지 않습니다."));
 
-        if (findReview.getUserId() != userId) {
+        if (!Objects.equals(findReview.getUserId(), userId)) {
             throw new RuntimeException("삭제할 수 있는 권한이 없습니다.");
         }
     }
