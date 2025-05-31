@@ -33,8 +33,22 @@ public class ReviewMyPageController {
     }
 
 
+    /**
+     *
+     * 마이페이지 - 리뷰 삭제
+     */
     @PostMapping("/my-page/delete-review")
     public CommonResponse deleteMyPageReview(@Valid @NotNull @RequestBody Long reviewId ) {
         return myPageReviewService.deleteMyReview(reviewId);
+    }
+
+
+    /**
+     *
+     * 마이페이지 - 핵공감 데시벨 조회
+     */
+    @PostMapping("/my-page/delete-review")
+    public CommonResponse deleteMyPageReview() {
+        return myPageReviewService.searchDecibel();
     }
 }
