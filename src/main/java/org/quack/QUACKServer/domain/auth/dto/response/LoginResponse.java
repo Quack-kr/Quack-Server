@@ -13,7 +13,8 @@ import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
 @Builder
 public record LoginResponse(
         SignUpStatus signUpStatus,
-        String email
+        String email,
+        String nickname
 ) {
 
 }

@@ -1,6 +1,5 @@
 package org.quack.QUACKServer.global.security.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.global.security.filter.RequestParamCamelizingFilter;
@@ -35,7 +34,6 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 public class SecurityConfig {
 
     private final AuthenticationManager quackAuthenticationManager;
-    private final ObjectMapper objectMapper;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -50,6 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(new MvcRequestMatcher(introspector, "/public/**")).hasAuthority("ANONYMOUS")
                         .requestMatchers(new MvcRequestMatcher(introspector, "/auth/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/auth/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/common/health-check")).permitAll()
                                 .anyRequest().authenticated())
                 .anonymous(anon -> anon

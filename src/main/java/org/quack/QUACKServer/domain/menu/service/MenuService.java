@@ -1,19 +1,15 @@
 package org.quack.QUACKServer.domain.menu.service;
 
 
-import static org.quack.QUACKServer.domain.menu.domain.QMenu.menu;
-import static org.quack.QUACKServer.domain.menu.domain.QMenuCategory.menuCategory;
-import static org.quack.QUACKServer.domain.photos.domain.QPhotos.photos;
-
-import com.querydsl.core.Tuple;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.menu.dto.response.GetReviewMenusResponse;
 import org.quack.QUACKServer.domain.menu.repository.MenuRepository;
 import org.quack.QUACKServer.domain.photos.dto.PhotosFileDto;
 import org.quack.QUACKServer.domain.photos.repository.PhotosS3Repository;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,16 +25,16 @@ public class MenuService {
         for (GetReviewMenusResponse reviewMenu : reviewMenus) {
 
             String imagePath = null;
-            if (reviewMenu.getMenuImagePath() != null) {
+            if (reviewMenu.menuImagePath() != null) {
                 imagePath = photosS3Repository.convertPath(
                         PhotosFileDto.builder().keyName(reviewMenu.menuImagePath()).build());
 
             }
 
             GetReviewMenusResponse response = GetReviewMenusResponse.of(
-                    reviewMenu.getMenuName(),
-                    reviewMenu.getMenuCategory(),
-                    reviewMenu.getMenuPrice(),
+                    reviewMenu.menuName(),
+                    reviewMenu.menuCategory(),
+                    reviewMenu.menuPrice(),
                     imagePath
             );
 

@@ -1,9 +1,11 @@
 package org.quack.QUACKServer.domain.user.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
+import org.quack.QUACKServer.domain.auth.enums.AuthEnum;
 import org.quack.QUACKServer.domain.photos.domain.Photos;
 import org.quack.QUACKServer.domain.photos.dto.PhotosFileDto;
 import org.quack.QUACKServer.domain.photos.enums.PhotoEnum;
@@ -14,8 +16,13 @@ import org.quack.QUACKServer.domain.user.domain.CustomerUserMetadata;
 import org.quack.QUACKServer.domain.user.dto.response.GetCustomerUserProfileResponse;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserMetadataRepository;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserRepository;
+import org.quack.QUACKServer.domain.user.repository.NicknameSequenceRepository;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * @author : jung-kwanhee
@@ -34,6 +41,7 @@ public class CustomerUserService {
     private final CustomerUserMetadataRepository customerUserMetadataRepository;
     private final PhotosRepository photosRepository;
     private final PhotosS3Repository photosS3Repository;
+    private final NicknameSequenceRepository nicknameSequenceRepository;
 
     public GetCustomerUserProfileResponse getCustomerUserProfile() {
 
@@ -55,6 +63,21 @@ public class CustomerUserService {
 
         return photosS3Repository.get(PhotosFileDto.builder().keyName(photos.getImageUrl()).build());
 
+    }
+
+    @Transactional
+    public String generateNickname() {
+        LocalDateTime now = LocalDateTime.now();
+
+        DayOfWeek dayOfWeek = now.getDayOfWeek();
+        Integer currentHour = now.getHour();
+
+        AuthEnum.NicknameColorPrefix colorPrefix = AuthEnum.NicknameColorPrefix.of(dayOfWeek);
+        AuthEnum.NicknameMenuPrefix menuPrefix = AuthEnum.NicknameMenuPrefix.of(currentHour);
+
+        long seq = nicknameSequenceRepository.findMaxSequenceByPrefix(colorPrefix, menuPrefix);
+
+        return Objects.requireNonNull(colorPrefix).getDescription() + Objects.requireNonNull(menuPrefix).getDescription() + String.format("%04d", seq);
 
     }
 }
