@@ -82,8 +82,9 @@ public class CustomerUser {
                 .build();
     }
 
-    public void registerUser(String nickname) {
+    public void updateNickname(String nickname){
         this.nickname = nickname;
     }
+
 
 }

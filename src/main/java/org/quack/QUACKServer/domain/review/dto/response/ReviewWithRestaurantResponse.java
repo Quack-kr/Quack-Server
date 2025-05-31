@@ -1,14 +1,16 @@
 package org.quack.QUACKServer.domain.review.dto.response;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import org.quack.QUACKServer.domain.menu.dto.response.MenuEvalResponse;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 
 @Builder(access = AccessLevel.PRIVATE)
 public record ReviewWithRestaurantResponse(
+        Long reviewId,
         String restaurantName,
         LocalDateTime reviewCreatedAt,
         String reviewContent,
@@ -17,7 +19,7 @@ public record ReviewWithRestaurantResponse(
         Long likeCount,
         Long dislikeCount
 ) {
-    public static ReviewWithRestaurantResponse of(String restaurantName, LocalDateTime reviewCreatedAt,
+    public static ReviewWithRestaurantResponse of(Long reviewId, String restaurantName, LocalDateTime reviewCreatedAt,
                                                   String reviewContent,
                                                   List<ReviewImageResponse> reviewImages,
                                                   List<MenuEvalResponse> menuEvals, Long likeCount,

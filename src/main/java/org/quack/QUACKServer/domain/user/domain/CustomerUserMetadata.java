@@ -63,4 +63,8 @@ public class CustomerUserMetadata {
                 .locationTermsAgreed(locationTermsAgreed)
                 .build();
     }
+
+    public void updateProfileImageId(Long profileImageId) {
+        this.profileImageId = profileImageId;
+    }
 }

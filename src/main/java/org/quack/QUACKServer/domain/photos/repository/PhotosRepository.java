@@ -16,6 +16,7 @@ import java.util.Optional;
 public interface PhotosRepository extends JpaRepository<Photos, Long> {
 
     Optional<Photos> findFirstByTargetIdAndPhotoType(Long targetId, String photoType);
+
     List<Photos> findAllByTargetIdAndPhotoType(Long targetId, String photoType);
 
 }

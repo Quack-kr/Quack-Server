@@ -15,13 +15,13 @@ import org.quack.QUACKServer.domain.user.domain.CustomerUserMetadata;
 @Builder(access = AccessLevel.PRIVATE)
 public record GetCustomerUserProfileResponse(
         String nickname,
-        Long profileImageId
+        Long profilePhotosId
 ) {
 
     public static GetCustomerUserProfileResponse of(CustomerUser user, CustomerUserMetadata metadata) {
         return GetCustomerUserProfileResponse.builder()
                 .nickname(user.getNickname())
-                .profileImageId(metadata.getProfileImageId())
+                .profilePhotosId(metadata.getProfileImageId())
                 .build();
     }
 }
