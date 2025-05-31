@@ -1,6 +1,7 @@
 package org.quack.QUACKServer.domain.review.service;
 
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
@@ -38,7 +39,7 @@ public class ReviewService {
         GetRestaurantInfoResponse restaurantInfo = restaurantService.getRestaurantBasicInfo(restaurantId);
 
         if (reviewType.equals("FULL")) {
-            List<GetReviewMenusResponse> menus = menuService.getMenusForReview(restaurantId);
+            Map<String, List<GetReviewMenusResponse>> menus = menuService.getMenusForReview(restaurantId);
 
             return ReviewInitResponse.of(restaurantInfo, menus);
         }
