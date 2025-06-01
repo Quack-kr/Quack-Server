@@ -1,7 +1,7 @@
 package org.quack.QUACKServer.core.security.exception;
 
 import lombok.Getter;
-import org.quack.QUACKServer.domain.auth.domain.QuackUser;
+import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
 import org.springframework.security.core.AuthenticationException;
 
 /**
@@ -14,15 +14,15 @@ import org.springframework.security.core.AuthenticationException;
 @Getter
 public class BeforeSignUpException extends AuthenticationException {
 
-    private final QuackUser quackUser;
+    private final CustomerUserInfo customerUserInfo;
 
-    public BeforeSignUpException(String msg, Throwable cause, QuackUser quackUser) {
+    public BeforeSignUpException(String msg, Throwable cause, CustomerUserInfo customerUserInfo) {
         super(msg, cause);
-        this.quackUser = quackUser;
+        this.customerUserInfo = customerUserInfo;
     }
 
-    public BeforeSignUpException(String msg, QuackUser quackUser) {
+    public BeforeSignUpException(String msg, CustomerUserInfo customerUserInfo) {
         super(msg);
-        this.quackUser = quackUser;
+        this.customerUserInfo = customerUserInfo;
     }
 }

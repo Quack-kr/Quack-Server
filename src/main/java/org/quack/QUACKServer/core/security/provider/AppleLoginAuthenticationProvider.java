@@ -3,9 +3,9 @@ package org.quack.QUACKServer.core.security.provider;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.domain.auth.domain.QuackAuthenticationDto;
-import org.quack.QUACKServer.domain.auth.domain.QuackUser;
-import org.quack.QUACKServer.domain.auth.service.UserService;
+import org.quack.QUACKServer.auth.domain.QuackAuthenticationDto;
+import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
+import org.quack.QUACKServer.auth.service.UserService;
 import org.quack.QUACKServer.core.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.core.external.social.apple.AppleHttpInterface;
 import org.quack.QUACKServer.core.external.social.apple.dto.ApplePublicKeys;
@@ -44,12 +44,12 @@ public class AppleLoginAuthenticationProvider implements LoginAuthenticationProv
         ProviderType provider = quackAuthenticationDto.getProvider();
 
         SocialAuthDto socialAuthDto = getSocialAuth(quackAuthenticationDto.getIdToken());
-        QuackUser quackUser = userService.loadUserByUsername(socialAuthDto.getProviderId());
+        CustomerUserInfo customerUserInfo = userService.loadUserByUsername(socialAuthDto.getProviderId());
 
-        if(quackUser.isEmpty()) {
-            throw new BeforeSignUpException("회원가입을 해야합니다", quackUser.toBuilder().email(socialAuthDto.getEmail()).build());
+        if(customerUserInfo.isEmpty()) {
+            throw new BeforeSignUpException("회원가입을 해야합니다", customerUserInfo.toBuilder().email(socialAuthDto.getEmail()).build());
         }
-        return new QuackAuthenticationDto(quackUser, provider, quackAuthenticationDto.getAccessToken(), quackAuthenticationDto.getIdToken());
+        return new QuackAuthenticationDto(customerUserInfo, provider, quackAuthenticationDto.getAccessToken(), quackAuthenticationDto.getIdToken());
 
     }
 

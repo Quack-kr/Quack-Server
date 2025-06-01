@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.quack.QUACKServer.domain.auth.domain.QuackUser;
+import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,10 +39,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // 토큰이 잘 들어 왔는지 검증
         if (!StringUtils.isEmpty(token) && jwtUtil.isValidToken(token)) {
-            QuackUser quackUser = jwtUtil.getQuackUserByToken(token);
+            CustomerUserInfo customerUserInfo = jwtUtil.getQuackUserByToken(token);
 
             UsernamePasswordAuthenticationToken beforeAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(quackUser, null, quackUser.getAuthorities());
+                    new UsernamePasswordAuthenticationToken(customerUserInfo, null, customerUserInfo.getAuthorities());
 
             // 인증 객체 넣기
             SecurityContextHolder.getContext().setAuthentication(beforeAuthenticationToken);

@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
 import org.quack.QUACKServer.core.common.constant.ErrorCode;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.core.error.exception.CommonException;
@@ -14,12 +15,11 @@ import org.quack.QUACKServer.core.security.exception.BeforeSignUpException;
 import org.quack.QUACKServer.core.security.jwt.JwtUtil;
 import org.quack.QUACKServer.core.security.provider.LoginAuthenticationProvider;
 import org.quack.QUACKServer.core.security.provider.LoginAuthenticationProviderFactory;
-import org.quack.QUACKServer.domain.auth.domain.QuackAuthenticationDto;
-import org.quack.QUACKServer.domain.auth.domain.QuackUser;
-import org.quack.QUACKServer.domain.auth.dto.response.AuthResponse;
-import org.quack.QUACKServer.domain.auth.dto.response.BeforeSignUpResponse;
-import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
-import org.quack.QUACKServer.domain.user.service.CustomerUserService;
+import org.quack.QUACKServer.auth.domain.QuackAuthenticationDto;
+import org.quack.QUACKServer.auth.dto.response.AuthResponse;
+import org.quack.QUACKServer.auth.dto.response.BeforeSignUpResponse;
+import org.quack.QUACKServer.auth.enums.SignUpStatus;
+import org.quack.QUACKServer.user.service.CustomerUserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -85,7 +85,7 @@ public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilte
 
             BeforeSignUpResponse beforeSignUpResponse = BeforeSignUpResponse.builder()
                     .signUpStatus(SignUpStatus.BEFORE)
-                    .email(beforeSignUpException.getQuackUser().getEmail())
+                    .email(beforeSignUpException.getCustomerUserInfo().getEmail())
                     .nickname(customerUserService.generateNickname())
                     .build();
 
@@ -103,8 +103,8 @@ public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
                                             Authentication authResult) throws IOException {
-        QuackUser quackUser = (QuackUser) authResult.getDetails();
-        AuthResponse authResponse = AuthResponse.from(jwtUtil.generateToken(quackUser.getEmail(), quackUser.getCustomerUserId()));
+        CustomerUserInfo customerUserInfo = (CustomerUserInfo) authResult.getDetails();
+        AuthResponse authResponse = AuthResponse.from(jwtUtil.generateToken(customerUserInfo.getEmail(), customerUserInfo.getCustomerUserId()));
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json; charset=UTF-8");

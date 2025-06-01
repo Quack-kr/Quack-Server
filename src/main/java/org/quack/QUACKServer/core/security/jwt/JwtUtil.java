@@ -8,8 +8,8 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.quack.QUACKServer.domain.auth.domain.JwtTokenDto;
-import org.quack.QUACKServer.domain.auth.domain.QuackUser;
+import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
+import org.quack.QUACKServer.auth.domain.JwtTokenDto;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -83,11 +83,11 @@ public class JwtUtil implements InitializingBean {
                 .getBody();
     }
 
-    public QuackUser getQuackUserByToken(String token){
+    public CustomerUserInfo getQuackUserByToken(String token){
 
         final Claims claims = getClaimsFromToken(token);
 
-        return QuackUser.builder()
+        return CustomerUserInfo.builder()
                 .customerUserId(claims.get(USER_ID, Long.class))
                 .email(claims.get(EMAIL, String.class))
                 .build();

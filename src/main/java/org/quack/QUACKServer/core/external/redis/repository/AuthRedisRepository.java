@@ -6,7 +6,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.core.common.constant.ErrorCode;
 import org.quack.QUACKServer.core.error.exception.CommonException;
-import org.quack.QUACKServer.domain.auth.domain.JwtTokenDto;
+import org.quack.QUACKServer.auth.domain.JwtTokenDto;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;

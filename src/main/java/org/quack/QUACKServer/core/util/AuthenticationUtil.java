@@ -2,7 +2,7 @@ package org.quack.QUACKServer.core.util;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.quack.QUACKServer.domain.auth.domain.QuackUser;
+import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
 
 /**
  * @author : jung-kwanhee
@@ -14,7 +14,7 @@ import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AuthenticationUtil {
 
-    public static boolean isSignUp(QuackUser user) {
+    public static boolean isSignUp(CustomerUserInfo user) {
         return false;
     }
 
