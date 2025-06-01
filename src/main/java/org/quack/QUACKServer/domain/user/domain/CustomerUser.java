@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
 @SQLRestriction("is_deleted = false AND deleted_at is NULL")
-@SQLDelete(sql = "UPDATE customer_user SET is_deleted = true, deleted_at = NOW() WHERE id = ?")
+@SQLDelete(sql = "UPDATE customer_user SET is_deleted = true, deleted_at = NOW() WHERE customer_user_id = ?")
 public class CustomerUser {
 
     @Id
