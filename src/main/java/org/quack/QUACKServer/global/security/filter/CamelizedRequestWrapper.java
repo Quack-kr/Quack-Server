@@ -6,8 +6,8 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author : jung-kwanhee
@@ -22,16 +22,23 @@ public class CamelizedRequestWrapper extends HttpServletRequestWrapper {
 
     public CamelizedRequestWrapper(HttpServletRequest request) {
         super(request);
-        this.camelizedParameterMap = request.getParameterMap().entrySet().stream()
-                .collect(Collectors.toMap(
-                        entry -> CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, entry.getKey()),
-                        Map.Entry::getValue
-                ));
+        this.camelizedParameterMap = convertToCamelCaseMap(request.getParameterMap());
+    }
+
+
+    private Map<String, String[]> convertToCamelCaseMap(Map<String, String[]> originalMap) {
+        Map<String, String[]> result = new LinkedHashMap<>();
+        for (Map.Entry<String, String[]> entry : originalMap.entrySet()) {
+            String originalKey = entry.getKey();
+            String camelKey = CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, originalKey);
+            result.putIfAbsent(camelKey, entry.getValue());
+        }
+        return result;
     }
 
     @Override
     public String[] getParameterValues(String name) {
-        return camelizedParameterMap.get(name);
+        return camelizedParameterMap.getOrDefault(name, null);
     }
 
     @Override
@@ -46,6 +53,7 @@ public class CamelizedRequestWrapper extends HttpServletRequestWrapper {
 
     @Override
     public String getParameter(String name) {
-        return camelizedParameterMap.containsKey(name) ? camelizedParameterMap.get(name)[0] : null;
+        String[] values = camelizedParameterMap.get(name);
+        return (values != null && values.length > 0) ? values[0] : null;
     }
 }

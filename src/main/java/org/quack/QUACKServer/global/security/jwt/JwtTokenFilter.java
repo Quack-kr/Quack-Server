@@ -7,10 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.quack.QUACKServer.domain.auth.domain.QuackAuthTokenBuilder;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthTokenValue;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
-import org.quack.QUACKServer.global.external.redis.QuackAuthTokenManager;
+import org.quack.QUACKServer.global.external.redis.repository.QuackAuthTokenManager;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
@@ -50,7 +49,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             Authentication authentication = jwtProvider.getAuthentication(jwt);
 
             String authKey  = jwtProvider.getAuthKey(jwt);
-             QuackAuthTokenValue tokenValue = quackAuthTokenManager.findTokenByKey(authKey);
+            QuackAuthTokenValue tokenValue = quackAuthTokenManager.findTokenByKey(authKey);
 
              if(!tokenValue.accessToken().equals(jwt)) {
                  // 중복 로그인 허용할 것인가..?
@@ -82,7 +81,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private void updateToken(QuackAuthTokenValue tokenValue) {
 
         if (tokenValue.isAfterMinute()) {
-            QuackAuthTokenValue newTokenValue = QuackAuthTokenBuilder.updateRequestTime(tokenValue);
+            QuackAuthTokenValue newTokenValue = QuackAuthTokenValue.updateRequestTime(tokenValue);
             quackAuthTokenManager.insertToken(newTokenValue);
         }
     }

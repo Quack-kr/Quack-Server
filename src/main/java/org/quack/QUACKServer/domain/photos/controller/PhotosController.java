@@ -1,12 +1,11 @@
 package org.quack.QUACKServer.domain.photos.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.photos.dto.ProfileUploadRequest;
 import org.quack.QUACKServer.domain.photos.service.ProfilePhotoService;
 import org.quack.QUACKServer.global.common.dto.CommonResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author : jung-kwanhee
@@ -22,8 +21,8 @@ public class PhotosController {
 
     private final ProfilePhotoService profilePhotoService;
 
-    @GetMapping(path = "/upload/profile-default")
-    public CommonResponse createDefaultProfileImage(ProfileUploadRequest request) {
+    @PostMapping(path = "/upload/profile-default")
+    public CommonResponse createDefaultProfileImage(@Valid @ModelAttribute ProfileUploadRequest request) {
         return profilePhotoService.upload(request);
     }
 

@@ -54,10 +54,12 @@ public class ProfilePhotoService implements PhotoService<Object, ProfileUploadRe
                     .build();
 
             photosRepository.save(photos);
+
+            return CommonResponse.of("201", "파일 업로드 성공", HttpStatus.CREATED, photos.getImageUrl());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        return CommonResponse.of("201", "파일 업로드 성공", HttpStatus.CREATED, "");
+
     }
 }

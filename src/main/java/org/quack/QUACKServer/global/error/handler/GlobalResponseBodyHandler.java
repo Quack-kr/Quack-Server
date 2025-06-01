@@ -3,7 +3,9 @@ package org.quack.QUACKServer.global.error.handler;
 import jakarta.servlet.http.HttpServletResponse;
 import org.quack.QUACKServer.global.common.constant.QuackCode;
 import org.quack.QUACKServer.global.common.dto.BaseResponse;
+import org.quack.QUACKServer.global.common.dto.CommonExceptionResponse;
 import org.quack.QUACKServer.global.common.dto.CommonResponse;
+import org.quack.QUACKServer.global.error.exception.QuackGlobalException;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -24,7 +26,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @RestControllerAdvice
 public class GlobalResponseBodyHandler implements ResponseBodyAdvice<Object> {
 
-
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         return MappingJackson2HttpMessageConverter.class.isAssignableFrom(converterType);
@@ -36,17 +37,26 @@ public class GlobalResponseBodyHandler implements ResponseBodyAdvice<Object> {
         String path = request.getURI().getPath();
 
         switch (body) {
-            case QuackCode.ExceptionCode detailCode -> {
-                servletResponse.setStatus(detailCode.getHttpStatus().value());
-                return build(path, null, detailCode.getDescription(), detailCode.name());
+            case QuackCode.ExceptionCode exceptionCode -> {
+                servletResponse.setStatus(exceptionCode.getHttpStatus().value());
+                return build(path, null, exceptionCode.getDescription(), exceptionCode.name());
             }
             case CommonResponse commonResponse -> {
                 servletResponse.setStatus(commonResponse.httpStatusCode().value());
                 return build(path, commonResponse.data(), commonResponse.message(),
                         commonResponse.code());
             }
+            case CommonExceptionResponse commonExceptionResponse -> {
+                servletResponse.setStatus(commonExceptionResponse.exceptionCode().getHttpStatus().value());
+                return build(path, null, commonExceptionResponse.customMessaged(), commonExceptionResponse.exceptionCode().getCode());
+            }
+
+            case QuackGlobalException globalException -> {
+                servletResponse.setStatus(Integer.parseInt(globalException.getExceptionCode().getCode()));
+                return build(path, null, globalException.getExceptionCode().getDescription(), globalException.getExceptionCode().getCode());
+            }
             default -> {
-                QuackCode.DefaultCode success = QuackCode.DefaultCode.SUCCESS;
+                QuackCode.ExceptionCode success = QuackCode.ExceptionCode.SUCCESS;
                 servletResponse.setStatus(success.getHttpStatus().value());
                 return build(path, body, success.getDescription(), success.name());
             }

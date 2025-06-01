@@ -13,9 +13,8 @@ public interface RedisRepository<K, T> {
 
     Optional<T> get(K k);
 
-    void insert(K k, T t, long timeout);
+    void insert(K k, T t);
 
     void delete(K k);
-
 }
 

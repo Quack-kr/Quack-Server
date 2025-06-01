@@ -1,5 +1,6 @@
 package org.quack.QUACKServer.domain.photos.dto;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -10,6 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
  * @date : 25. 5. 24.
  */
 public record ProfileUploadRequest(
-        MultipartFile photoFile
+        @NotNull MultipartFile photoFile
 ) {
 }

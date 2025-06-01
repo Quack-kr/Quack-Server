@@ -8,8 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
-import org.quack.QUACKServer.global.external.redis.RedisKeyManager;
-import org.quack.QUACKServer.global.external.redis.repository.RedisDocument;
+import org.quack.QUACKServer.global.external.redis.repository.QuackAuthTokenManager;
 import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -32,6 +31,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class JwtProvider {
     public static final String TOKEN_PREFIX = "Bearer ";
+    private final QuackAuthTokenManager quackAuthTokenManager;
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -113,11 +113,7 @@ public class JwtProvider {
     public String getAuthKey(String jwt) {
         String nickname = extractNickname(jwt);
         Long customerUserId = extractUserId(jwt);
-        return RedisKeyManager.builder()
-                .append(RedisDocument.hashKey.AUTH_TOKEN.getPrefix())
-                .append(String.valueOf(customerUserId))
-                .append(nickname)
-                .build();
+        return quackAuthTokenManager.buildKey(nickname, customerUserId);
     }
     public String extractNickname(String accessToken) {
         return extractClaim(accessToken, claims -> claims.get(NICKNAME, String.class));
