@@ -3,6 +3,7 @@ package org.quack.QUACKServer.domain.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.auth.enums.AuthEnum;
@@ -17,8 +18,6 @@ import org.quack.QUACKServer.domain.user.dto.response.GetCustomerUserProfileResp
 import org.quack.QUACKServer.domain.user.repository.CustomerUserMetadataRepository;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserRepository;
 import org.quack.QUACKServer.domain.user.repository.NicknameSequenceRepository;
-import org.quack.QUACKServer.global.common.dto.CommonResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -57,16 +56,16 @@ public class CustomerUserService {
         return GetCustomerUserProfileResponse.of(customerUser, customerUserMetadata);
     }
 
-    public CommonResponse getCustomerUserProfilePhoto(Long profileId) {
+    public ResponseDto<?> getCustomerUserProfilePhoto(Long profileId) {
 
         Photos photos = photosRepository.findFirstByTargetIdAndPhotoType(profileId, PhotoEnum.PhotoType.DEFAULT_PROFILE.name())
                 .orElseThrow(() -> new IllegalArgumentException("이미지 정보 없음"));
 
-        return CommonResponse.of("200", "프로필 이미지 조회 성공", HttpStatus.OK, photos.getImageUrl());
+        return ResponseDto.success(photos.getImageUrl());
     }
 
     @Transactional
-    public CommonResponse updateCustomerUserProfile(UpdateProfileRequest request) {
+    public ResponseDto<?> updateCustomerUserProfile(UpdateProfileRequest request) {
 
         QuackUser quackUser = QuackAuthContext.getQuackUserDetails();
 
@@ -86,7 +85,7 @@ public class CustomerUserService {
             customerUserMetadata.updateProfileImageId(request.profileImageId());
         }
         
-        return CommonResponse.of("201", "프로필 수정이 완료되었습니다.", HttpStatus.CREATED, "");
+        return ResponseDto.successCreate(null);
     }
 
     public String generateNickname() {

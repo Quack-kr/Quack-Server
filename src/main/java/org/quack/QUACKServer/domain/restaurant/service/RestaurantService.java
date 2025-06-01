@@ -1,6 +1,7 @@
 package org.quack.QUACKServer.domain.restaurant.service;
 
 import lombok.RequiredArgsConstructor;
+import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
 import org.quack.QUACKServer.domain.photos.domain.Photos;
 import org.quack.QUACKServer.domain.photos.dto.PhotosFileDto;
@@ -12,9 +13,7 @@ import org.quack.QUACKServer.domain.restaurant.domain.Restaurant;
 import org.quack.QUACKServer.domain.restaurant.dto.response.GetRestaurantInfoResponse;
 import org.quack.QUACKServer.domain.restaurant.repository.CustomerSavedRestaurantRepository;
 import org.quack.QUACKServer.domain.restaurant.repository.RestaurantRepository;
-import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +52,7 @@ public class RestaurantService {
     }
 
     @Transactional
-    public CommonResponse updateCustomerUserRestaurant(Long restaurantId) {
+    public ResponseDto<?> updateCustomerUserRestaurant(Long restaurantId) {
         Long customerUserId = QuackAuthContext.getCustomerUserId();
 
         Optional<CustomerSavedRestaurant> customerSavedRestaurant = customerSavedRestaurantRepository
@@ -65,7 +64,7 @@ public class RestaurantService {
             customerSavedRestaurantRepository.save(CustomerSavedRestaurant.create(customerUserId, restaurantId));
         }
 
-        return CommonResponse.of("201", "해당 식당 저장을 완료했습니다.", HttpStatus.CREATED, "");
+        return ResponseDto.successCreate(null);
 
     }
     public Resource getRestaurantRepresentativePhoto(Long restaurantId) {

@@ -2,7 +2,7 @@ package org.quack.QUACKServer.domain.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.quack.QUACKServer.global.security.enums.ProviderType;
+import org.quack.QUACKServer.core.security.enums.ProviderType;
 
 /**
  * @author : jung-kwanhee

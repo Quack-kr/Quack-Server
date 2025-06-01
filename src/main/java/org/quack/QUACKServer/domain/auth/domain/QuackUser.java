@@ -2,7 +2,6 @@ package org.quack.QUACKServer.domain.auth.domain;
 
 import lombok.*;
 import org.quack.QUACKServer.domain.user.domain.CustomerUser;
-import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,8 +26,8 @@ public class QuackUser implements UserDetails {
 
     @Setter
     private Long customerUserId;
-    private ProviderType provider;
-    private String nickname;
+    // private ProviderType provider;
+    // private String nickname;
     private String email;
 
     @Override
@@ -46,15 +45,9 @@ public class QuackUser implements UserDetails {
         return List.of(new SimpleGrantedAuthority("USER"));
     }
 
-    public String getAuthKey() {
-        return "AUTH" + ":" + customerUserId + ":" + nickname;
-    }
-
     public static QuackUser from (CustomerUser user) {
         return QuackUser.builder()
                 .customerUserId(user.getCustomerUserId())
-                .nickname(user.getNickname())
-                .provider(user.getProvider())
                 .email(user.getEmail())
                 .build();
     }
@@ -65,7 +58,7 @@ public class QuackUser implements UserDetails {
     }
 
     public boolean isEmpty() {
-        return customerUserId == null && nickname == null && email == null ;
+        return customerUserId == null && email == null ;
     }
 
     @Override public boolean isAccountNonExpired() { return true; }

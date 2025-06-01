@@ -2,9 +2,9 @@ package org.quack.QUACKServer.domain.photos.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.domain.photos.dto.ProfileUploadRequest;
 import org.quack.QUACKServer.domain.photos.service.ProfilePhotoService;
-import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -22,7 +22,7 @@ public class PhotosController {
     private final ProfilePhotoService profilePhotoService;
 
     @PostMapping(path = "/upload/profile-default")
-    public CommonResponse createDefaultProfileImage(@Valid @ModelAttribute ProfileUploadRequest request) {
+    public ResponseDto<?> createDefaultProfileImage(@Valid @ModelAttribute ProfileUploadRequest request) {
         return profilePhotoService.upload(request);
     }
 

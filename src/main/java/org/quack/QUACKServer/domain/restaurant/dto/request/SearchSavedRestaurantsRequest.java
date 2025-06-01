@@ -1,7 +1,7 @@
 package org.quack.QUACKServer.domain.restaurant.dto.request;
 
 import jakarta.validation.constraints.NotNull;
-import org.quack.QUACKServer.global.common.dto.PageInfo;
+import org.quack.QUACKServer.core.common.dto.PageInfo;
 
 /**
  * @author : jung-kwanhee

@@ -17,7 +17,7 @@ import org.quack.QUACKServer.domain.restaurant.repository.RestaurantRepositoryIm
 import org.quack.QUACKServer.domain.restaurant.vo.RestaurantSimpleByDistanceVo;
 import org.quack.QUACKServer.domain.user.domain.CustomerUserMetadata;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserMetadataRepository;
-import org.quack.QUACKServer.global.common.dto.PageInfo;
+import org.quack.QUACKServer.core.common.dto.PageInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
