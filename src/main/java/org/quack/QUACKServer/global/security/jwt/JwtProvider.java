@@ -8,6 +8,8 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
+import org.quack.QUACKServer.global.infra.redis.RedisKeyManager;
+import org.quack.QUACKServer.global.infra.redis.repository.RedisDocument;
 import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -109,8 +111,17 @@ public class JwtProvider {
              .getBody();
     }
 
-    public Long getAuthKey(String jwt) {
-        return extractUserId(jwt);
+    public String getAuthKey(String jwt) {
+        String nickname = extractNickname(jwt);
+        Long customerUserId = extractUserId(jwt);
+        return RedisKeyManager.builder()
+                .append(RedisDocument.hashKey.AUTH_TOKEN.getPrefix())
+                .append(String.valueOf(customerUserId))
+                .append(nickname)
+                .build();
+    }
+    public String extractNickname(String accessToken) {
+        return extractClaim(accessToken, claims -> claims.get(NICKNAME, String.class));
     }
 
     public UserDetails extractUserDetails(String token) {
