@@ -19,38 +19,32 @@
 ## 🗂 Folder Architecture
 <pre>
 org.quack.QUACKServer
-├── domain
-│   ├── auth
-│   │   ├── service
-│   │   ├── domain
-│   │   └── validation
-│   │  
-│   ├── user                    # 사용자 관련 도메인
-│   │   ├── controller
-│   │   ├── service
-│   │   ├── domain
-│   │   └── repository
-│   │
-│   ├── inquiry                 # 문의 관련 도메인
-│   │   ├── controller
-│   │   ├── service
-│   │   ├── domain
-│   │   └── repository
-│   │
-│   ├── restaurant              # 식당 관련 도메인
-│   │   ├── controller
-│   │   ├── service
-│   │   ├── domain
-│   │   └── repository
-│   │
-│   └── review                  # 리뷰 관련 도메인
-│       ├── controller
-│       ├── service
-│       ├── domain
-│       └── repository
-│
-├── global
-│   ├── common                  # 공통 유틸, DTO, 상수 등
+├── auth
+│   ├── service
+│   ├── domain
+│   └── validation
+├── user
+│   ├── controller
+│   ├── service
+│   ├── domain
+│   └── repository
+├── inquiry
+│   ├── controller
+│   ├── service
+│   ├── domain
+│   └── repository
+├── restaurant
+│   ├── controller
+│   ├── service
+│   ├── domain
+│   └── repository
+├── review
+│   ├── controller
+│   ├── service
+│   ├── domain
+│   └── repository
+├── core
+│   ├── common
 │   │   ├── constant
 │   │   ├── converter
 │   │   ├── dto
@@ -59,26 +53,24 @@ org.quack.QUACKServer
 │   │   ├── log
 │   │   ├── util
 │   │   └── validation
-│   │
-│   ├── config                  # 설정 관련 클래스
+│   ├── config
 │   │   ├── filter
 │   │   ├── http
 │   │   ├── security
 │   │   ├── storage
 │   │   │   ├── db
 │   │   │   └── redis
-│   │   └── value
-│   │
-│   ├── infra                   # 외부 시스템 연동
-│   │   ├── db
-│   │   ├── redis
-│   │   └── social
-│   │
-│   ├── error                   # 공통 에러 처리
-│   ├── enums                   # 글로벌 enum 모음
-│   └── jwt                     # JWT 관련 처리
-│
-└── QuackServerApplication      # 스프링 부트 메인 클래스
+│   │   └── dto
+│   ├── error
+│   ├── enums
+│   └── jwt
+
+├── external
+│   ├── db
+│   ├── redis
+│   └── social
+└── QuackServerApplication
+
 </pre>
 
 
