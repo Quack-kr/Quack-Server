@@ -1,7 +1,6 @@
 package org.quack.QUACKServer.domain.auth.service;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
@@ -36,7 +35,7 @@ import org.springframework.util.StringUtils;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import static org.quack.QUACKServer.global.common.constant.QuackCode.ExceptionCode.INVALID_REFRESH_TOKEN;
+import static org.quack.QUACKServer.global.common.constant.QuackCode.ExceptionCode.*;
 
 /**
  * @author : jung-kwanhee
@@ -86,8 +85,7 @@ public class AuthService {
                 return AuthResponse.of(accessToken, refreshToken);
             }
             default -> {
-                // TODO : 공통 예외처리 로직 적용
-                throw new ValidationException("Invalid client type");
+                throw new QuackGlobalException(INVALID_PROVIDER_TYPE);
             }
         }
     }
@@ -198,23 +196,23 @@ public class AuthService {
     public CommonResponse validateNickName(String nickname) {
 
         if (nickname == null) {
-            throw new IllegalArgumentException("닉네임을 입력하세요.");
+            throw new QuackGlobalException(INVALID_NULL_NICKNAME);
         }
         if (nickname.isBlank()) {
-            throw new IllegalArgumentException("닉네임을 입력하세요.");
+            throw new QuackGlobalException(INVALID_BLANK_NICKNAME);
         }
         if (nickname.length() <= 2) {
-            throw new IllegalArgumentException("3자이상 입력해주세요.");
+            throw new QuackGlobalException(INVALID_SHORT_LENGTH_NICKNAME);
         }
         if (nickname.length() > 15) {
-            throw new IllegalArgumentException("15자미만 입력해주세요.");
+            throw new QuackGlobalException(INVALID_LONG_LENGTH_NICKNAME);
         }
         if (!REGX.matcher(nickname).matches()) {
-            throw new IllegalArgumentException("닉네임은 한글만 가능합니다.");
+            throw new QuackGlobalException(INVALID_PATTERN_NICKNAME);
         }
 
         if(customerUserRepository.existsByNickname(nickname)) {
-            throw new ValidationException("사용중인 닉네임이에요");
+            throw new QuackGlobalException(DUPLICATE_NICKNAME);
         }
 
         return CommonResponse.of("200","꽥에서 사용하실 이름이에요", HttpStatus.OK, "");

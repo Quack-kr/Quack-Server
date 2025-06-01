@@ -37,8 +37,8 @@ public interface QuackCode {
         // Error 별 응답 코드 작성
         INVALID_REQUEST_INFO(BAD_REQUEST, "요청값이 잘못되었습니다."),
         MISMATCH_REFRESH_TOKEN(BAD_REQUEST, "리프레시 토큰의 유저 정보가 일치하지 않습니다"),
-
-        /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
+        INVALID_PROVIDER_TYPE(BAD_REQUEST, "소셜 로그인 인증 타입이 존재하지 않습니다."),
+        // 401
         INVALID_REFRESH_TOKEN(UNAUTHORIZED, "인증되지 않은 접근입니다"),
         UN_AUTHENTICATION_ACCESS(UNAUTHORIZED, "인증되지 않은 접근입니다"),
         LOGIN_FAIL(UNAUTHORIZED, "로그인에 실패하였습니다"),
@@ -53,7 +53,8 @@ public interface QuackCode {
         DUPLICATE_NICKNAME(FORBIDDEN, "이미 사용중인 닉네임입니다."),
         INVALID_NULL_NICKNAME(BAD_REQUEST, "닉네임은 null일 수 없습니다."),
         INVALID_BLANK_NICKNAME(BAD_REQUEST, "닉네임은 blank일 수 없습니다."),
-        INVALID_LENGTH_NICKNAME(BAD_REQUEST, "닉네임은 2자 이상 15자 미만으로 입력해야 합니다."),
+        INVALID_SHORT_LENGTH_NICKNAME(BAD_REQUEST, "닉네임은 3자 이상 입력해야 합니다."),
+        INVALID_LONG_LENGTH_NICKNAME(BAD_REQUEST, "닉네임은 15자 미만 입력해야 합니다."),
         INVALID_PATTERN_NICKNAME(BAD_REQUEST, "닉네임은 영어, 한글, 숫자로만 사용할 수 있습니다."),
 
         ;

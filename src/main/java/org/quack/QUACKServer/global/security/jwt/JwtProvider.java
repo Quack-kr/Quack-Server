@@ -100,7 +100,6 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody();
     }
-    // APPLE 로그인 jwt 토큰 새 Claims
     public Claims parseClaims(String token, PublicKey publicKey) {
 
      return Jwts
