@@ -34,7 +34,6 @@ public record QuackAuthTokenValue(
         return QuackAuthTokenValue.builder()
                 .accessToken(dto.accessToken())
                 .refreshToken(dto.refreshToken())
-                .tokenStatus(dto.tokenStatus())
                 .generatedAt(dto.generatedAt())
                 .quackUser(QuackUser.builder()
                         .customerUserId(dto.quackUser().customerUserId())

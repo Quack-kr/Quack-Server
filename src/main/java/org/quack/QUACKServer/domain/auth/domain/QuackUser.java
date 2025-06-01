@@ -2,8 +2,6 @@ package org.quack.QUACKServer.domain.auth.domain;
 
 import lombok.*;
 import org.quack.QUACKServer.domain.user.domain.CustomerUser;
-import org.quack.QUACKServer.global.external.redis.RedisKeyManager;
-import org.quack.QUACKServer.global.external.redis.repository.RedisDocument;
 import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -49,11 +47,7 @@ public class QuackUser implements UserDetails {
     }
 
     public String getAuthKey() {
-        return RedisKeyManager.builder()
-                .append(RedisDocument.hashKey.AUTH_TOKEN.getPrefix())
-                .append(String.valueOf(this.customerUserId))
-                .append(this.nickname)
-                .build();
+        return "AUTH" + ":" + customerUserId + ":" + nickname;
     }
 
     public static QuackUser from (CustomerUser user) {

@@ -41,4 +41,9 @@ public class QuackAuthTokenManager {
     public void deleteTokenByKey(String authKey) {
         authRedisRepository.delete(authKey);
     }
+
+
+    public String buildKey(String nickname, Long customerUsrId) {
+        return "AUTH" + ":" + customerUsrId + ":" + nickname;
+    }
 }

@@ -23,8 +23,6 @@ import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.global.error.exception.QuackGlobalException;
 import org.quack.QUACKServer.global.external.redis.QuackAuthTokenManager;
-import org.quack.QUACKServer.global.external.redis.RedisKeyManager;
-import org.quack.QUACKServer.global.external.redis.repository.RedisDocument;
 import org.quack.QUACKServer.global.security.jwt.JwtProvider;
 import org.quack.QUACKServer.global.security.provider.AppleLoginAuthenticationProvider;
 import org.springframework.http.HttpStatus;
@@ -127,11 +125,7 @@ public class AuthService {
     }
 
     private QuackAuthTokenValue getRedisToken(String nickname, Long customerUserId) {
-        String authKey = RedisKeyManager.builder()
-                .append(RedisDocument.hashKey.AUTH_TOKEN.getPrefix())
-                .append(String.valueOf(customerUserId))
-                .append(nickname)
-                .build();
+        String authKey = quackAuthTokenManager.buildKey(nickname, customerUserId);
 
         return quackAuthTokenManager.findTokenByKey(authKey);
     }

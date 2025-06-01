@@ -45,15 +45,15 @@ public class AuthRedisRepository implements RedisRepository<String, RedisAuthTok
 
     @Override
     public Optional<RedisAuthTokenValue> get(String s) {
-        String findValueByKey = valueOperations.get(s);
+        String value = valueOperations.get(s);
 
-        if(!StringUtils.hasText(findValueByKey)) {
+        if(!StringUtils.hasText(value)) {
             return Optional.empty();
         }
 
         try {
             return Optional.ofNullable(
-                    objectMapper.readValue(findValueByKey, RedisAuthTokenValue.class));
+                    objectMapper.readValue(value, RedisAuthTokenValue.class));
         } catch (JsonProcessingException e) {
             throw new QuackGlobalException(QuackCode.ExceptionCode.SERVER_ERROR);
         }
@@ -61,15 +61,13 @@ public class AuthRedisRepository implements RedisRepository<String, RedisAuthTok
 
     @Override
     public void insert(String s, RedisAuthTokenValue redisAuthTokenValue) {
-
-        String value;
         try {
-            value = objectMapper.writeValueAsString(redisAuthTokenValue);
+            valueOperations.set(s, objectMapper.writeValueAsString(redisAuthTokenValue), defaultTtl, TimeUnit.SECONDS);
         } catch (JsonProcessingException e) {
             throw new QuackGlobalException(QuackCode.ExceptionCode.SERVER_ERROR);
         }
 
-        valueOperations.set(s, value, defaultTtl, TimeUnit.SECONDS);
+
     }
 
     @Override

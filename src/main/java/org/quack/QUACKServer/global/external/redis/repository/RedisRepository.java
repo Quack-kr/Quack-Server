@@ -16,6 +16,5 @@ public interface RedisRepository<K, T> {
     void insert(K k, T t);
 
     void delete(K k);
-
 }
 
