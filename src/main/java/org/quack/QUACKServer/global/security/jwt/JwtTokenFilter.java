@@ -6,7 +6,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.quack.QUACKServer.domain.auth.domain.QuackAuthTokenBuilder;
+import org.quack.QUACKServer.domain.auth.domain.QuackAuthTokenValue;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
+import org.quack.QUACKServer.global.infra.redis.QuackAuthTokenManager;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
@@ -15,7 +19,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -35,6 +38,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     protected final AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
+    private final QuackAuthTokenManager quackAuthTokenManager;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -44,12 +49,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         if (!StringUtils.isEmpty(jwt) && jwtProvider.isTokenValid(jwt)) {
             Authentication authentication = jwtProvider.getAuthentication(jwt);
 
-            Long userId = jwtProvider.getAuthKey(jwt);
+            String authKey  = jwtProvider.getAuthKey(jwt);
+             QuackAuthTokenValue tokenValue = quackAuthTokenManager.findTokenByKey(authKey);
+
+             if(!tokenValue.accessToken().equals(jwt)) {
+                 // 중복 로그인 허용할 것인가..?
+             }
+
+             updateToken(tokenValue);
 
             // 레디스 토큰 만료시간 조금 더 두기
             QuackUser quackUser = (QuackUser) jwtProvider.extractUserDetails(jwt);
 
-            // TODO : QuackUser 정보는 레디스 토큰을 통해서 가져올 예정 ->
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                     quackUser, null, authentication.getAuthorities());
 
@@ -66,6 +77,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                               UsernamePasswordAuthenticationToken authRequest) {
         authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
 
+    }
+
+    private void updateToken(QuackAuthTokenValue tokenValue) {
+
+        if (tokenValue.isAfterMinute()) {
+            QuackAuthTokenValue newTokenValue = QuackAuthTokenBuilder.updateRequestTime(tokenValue);
+            quackAuthTokenManager.insertToken(newTokenValue);
+        }
     }
 
     @Override
