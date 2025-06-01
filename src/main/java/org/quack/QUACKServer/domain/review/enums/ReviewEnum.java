@@ -2,9 +2,6 @@ package org.quack.QUACKServer.domain.review.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.quack.QUACKServer.domain.restaurant.dto.request.RestaurantSubtractFilterItem;
-import org.quack.QUACKServer.domain.review.domain.Review;
-import org.quack.QUACKServer.global.constant.ValueEnum;
 
 public interface ReviewEnum {
 

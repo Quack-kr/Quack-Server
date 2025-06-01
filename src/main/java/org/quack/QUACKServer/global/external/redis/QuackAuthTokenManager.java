@@ -26,9 +26,8 @@ public class QuackAuthTokenManager {
     public void insertToken(QuackAuthTokenValue token) {
         try{
             authRedisRepository.insert(token.quackUser().getAuthKey(),
-                    RedisAuthTokenValue.from(token), 3600);
+                    RedisAuthTokenValue.from(token));
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
             throw new QuackGlobalException(QuackCode.ExceptionCode.UN_AUTHENTICATION_ACCESS);
         }
     }

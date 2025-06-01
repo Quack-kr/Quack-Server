@@ -13,27 +13,10 @@ public interface QuackCode {
     String getCode();
 
     @Getter
-    enum DefaultCode implements QuackCode {
-        SUCCESS(HttpStatus.OK, "성공"),
-        FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "실패");
-
-        final HttpStatus httpStatus;
-        final String description;
-
-        DefaultCode(HttpStatus httpStatus, String description) {
-            this.httpStatus = httpStatus;
-            this.description = description;
-        }
-
-        @Override
-        public String getCode() {
-            return name();
-        }
-    }
-
-    @Getter
     enum ExceptionCode implements QuackCode {
 
+        // 성공 코드
+        SUCCESS(HttpStatus.OK, "성공"),
         // Error 별 응답 코드 작성
         INVALID_REQUEST_INFO(BAD_REQUEST, "요청값이 잘못되었습니다."),
         MISMATCH_REFRESH_TOKEN(BAD_REQUEST, "리프레시 토큰의 유저 정보가 일치하지 않습니다"),
@@ -48,6 +31,7 @@ public interface QuackCode {
         // 500 ERROR
         SERVER_ERROR(INTERNAL_SERVER_ERROR, "서버 오류"),
         PHOTO_UPLOAD_ERROR(INTERNAL_SERVER_ERROR, "이미지를 업로드하는데 오류가 발생하였습니다."),
+        PARSING_ERROR(INTERNAL_SERVER_ERROR, "응답값 변환 시 오류 발생하였습니다."),
 
         // 닉네임
         USER_NOT_FOUND(NOT_FOUND, "유저를 찾을 수 없습니다."),
