@@ -37,11 +37,6 @@ public class RedisKeyManager {
             return this;
         }
 
-        public RedisKeyManagerBuilder prepend(String key) {
-            instance.keys.addFirst(key);
-            return this;
-        }
-
         public String build() {
             return String.join(":", instance.keys);
         }

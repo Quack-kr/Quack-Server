@@ -43,6 +43,7 @@ public class AuthController {
 
     }
 
+    // TODO : 배포 과정에서 삭제.
     @GetMapping("/apple/callback")
     public ResponseEntity<?> kakaoCallback(@RequestParam("code") String code) {
         // 1. 받은 code로 토큰 요청
@@ -64,5 +65,15 @@ public class AuthController {
         return authService.validateNickName(nickname);
     }
 
+    @PostMapping("/withdraw")
+    public CommonResponse withdraw() {
+        return authService.deleteCustomerUser();
+    }
+
+
+    @PostMapping("/refresh-token")
+    public AuthResponse getRefreshToken(HttpServletRequest request) {
+        return authService.refreshToken(request);
+    }
 
 }

@@ -35,4 +35,8 @@ public class QuackAuthTokenManager {
                 .orElseThrow(RuntimeException::new);
         return QuackAuthTokenValue.from(authTokenValue);
     }
+
+    public void deleteTokenByKey(String authKey) {
+        authRedisRepository.delete(authKey);
+    }
 }

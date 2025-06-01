@@ -1,28 +1,41 @@
 package org.quack.QUACKServer.domain.auth.service;
 
-import jakarta.validation.ValidationException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
+import org.quack.QUACKServer.domain.auth.domain.QuackAuthTokenBuilder;
+import org.quack.QUACKServer.domain.auth.domain.QuackAuthTokenValue;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.auth.dto.request.SignupRequest;
 import org.quack.QUACKServer.domain.auth.dto.response.AuthResponse;
 import org.quack.QUACKServer.domain.auth.enums.AuthEnum;
+import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
+import org.quack.QUACKServer.domain.auth.enums.TokenStatus;
 import org.quack.QUACKServer.domain.user.domain.CustomerUser;
 import org.quack.QUACKServer.domain.user.domain.CustomerUserMetadata;
 import org.quack.QUACKServer.domain.user.domain.NicknameSequence;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserMetadataRepository;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserRepository;
 import org.quack.QUACKServer.domain.user.repository.NicknameSequenceRepository;
+import org.quack.QUACKServer.global.common.constant.QuackCode;
 import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
+import org.quack.QUACKServer.global.error.exception.QuackGlobalException;
+import org.quack.QUACKServer.global.infra.redis.QuackAuthTokenManager;
+import org.quack.QUACKServer.global.infra.redis.RedisKeyManager;
+import org.quack.QUACKServer.global.infra.redis.repository.RedisDocument;
 import org.quack.QUACKServer.global.security.jwt.JwtProvider;
 import org.quack.QUACKServer.global.security.provider.AppleLoginAuthenticationProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
+
+import static org.quack.QUACKServer.global.common.constant.QuackCode.ExceptionCode.*;
 
 /**
  * @author : jung-kwanhee
@@ -42,6 +55,7 @@ public class AuthService {
     private final AppleLoginAuthenticationProvider appleLoginAuthenticationProvider;
     private final JwtProvider jwtProvider;
     private static final Pattern REGX = Pattern.compile("^[가-힣a-zA-Z0-9]+(?: [가-힣a-zA-Z0-9]+)*$");
+    private final QuackAuthTokenManager quackAuthTokenManager;
 
     @Transactional
     public AuthResponse signup(SignupRequest request, String idToken) {
@@ -71,14 +85,94 @@ public class AuthService {
                 return AuthResponse.of(accessToken, refreshToken);
             }
             default -> {
-                // TODO : 공통 예외처리 로직 적용
-                throw new ValidationException("Invalid client type");
+                throw new QuackGlobalException(INVALID_PROVIDER_TYPE);
             }
         }
+    }
 
+    public AuthResponse refreshToken(HttpServletRequest request) {
+        String refreshToken = getRefreshToken(request);
+
+        validateToken(refreshToken);
+
+        String nickname = jwtProvider.extractNickname(refreshToken);
+        Long customerUserId = jwtProvider.extractUserId(refreshToken);
+
+        if(!StringUtils.hasText(nickname) || customerUserId == null) {
+            throw new QuackGlobalException(INVALID_REFRESH_TOKEN);
+        }
+
+        QuackAuthTokenValue sessionToken = getRedisToken(nickname, customerUserId);
+
+        if (sessionToken.isExpired() || !refreshToken.equals(sessionToken.refreshToken())) {
+            quackAuthTokenManager.deleteTokenByKey(sessionToken.accessToken());
+            throw new QuackGlobalException(INVALID_REFRESH_TOKEN);
+        }
+
+        String newAccessToken = jwtProvider.generateToken(sessionToken.quackUser());
+        String newRefreshToken = jwtProvider.generateRefreshToken(sessionToken.quackUser());
+
+        QuackAuthTokenValue tokenValue = QuackAuthTokenBuilder
+                .build(QuackUser.builder().build(), newAccessToken, newRefreshToken, TokenStatus.ACTIVE);
+
+        quackAuthTokenManager.deleteTokenByKey(tokenValue.accessToken());
+
+
+        return AuthResponse.builder()
+                .signUpStatus(SignUpStatus.REFRESH)
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
 
     }
 
+    private QuackAuthTokenValue getRedisToken(String nickname, Long customerUserId) {
+        String authKey = RedisKeyManager.builder()
+                .append(RedisDocument.hashKey.AUTH_TOKEN.getPrefix())
+                .append(String.valueOf(customerUserId))
+                .append(nickname)
+                .build();
+
+        return quackAuthTokenManager.findTokenByKey(authKey);
+    }
+    private void validateToken(String refreshToken) {
+        try {
+            if(!jwtProvider.isTokenValid(refreshToken)) {
+                throw new QuackGlobalException(INVALID_REFRESH_TOKEN);
+            }
+
+        }catch (Exception e){
+            throw new QuackGlobalException(INVALID_REFRESH_TOKEN);
+        }
+    }
+
+
+    public String getRefreshToken(HttpServletRequest request) {
+        String refreshToken = jwtProvider.resolveToken(request);
+
+        if(refreshToken == null) {
+            throw new QuackGlobalException(INVALID_REFRESH_TOKEN);
+        }
+
+        return refreshToken;
+    }
+
+    @Transactional
+    public CommonResponse deleteCustomerUser() {
+
+        if(QuackAuthContext.getCustomerUserId() == null) {
+           throw new QuackGlobalException(INVALID_REFRESH_TOKEN);
+        }
+
+        CustomerUser customerUser = customerUserRepository.findById(QuackAuthContext.getCustomerUserId())
+                .orElseThrow(() -> new QuackGlobalException(QuackCode.ExceptionCode.USER_NOT_FOUND));
+
+        customerUserRepository.delete(customerUser);
+
+        return CommonResponse.success(HttpStatus.CREATED, "회원 탈퇴가 완료되었습니다.", null);
+    }
+
+    @Transactional
     public void updateNicknameSequence(String nickname) {
         AuthEnum.NicknameColorPrefix nicknameColorPrefix = AuthEnum.NicknameColorPrefix.getByNickname(nickname);
         AuthEnum.NicknameMenuPrefix nicknameMenuPrefix = AuthEnum.NicknameMenuPrefix.getByNickname(nickname);
@@ -102,23 +196,23 @@ public class AuthService {
     public CommonResponse validateNickName(String nickname) {
 
         if (nickname == null) {
-            throw new IllegalArgumentException("닉네임을 입력하세요.");
+            throw new QuackGlobalException(INVALID_NULL_NICKNAME);
         }
         if (nickname.isBlank()) {
-            throw new IllegalArgumentException("닉네임을 입력하세요.");
+            throw new QuackGlobalException(INVALID_BLANK_NICKNAME);
         }
         if (nickname.length() <= 2) {
-            throw new IllegalArgumentException("3자이상 입력해주세요.");
+            throw new QuackGlobalException(INVALID_SHORT_LENGTH_NICKNAME);
         }
         if (nickname.length() > 15) {
-            throw new IllegalArgumentException("15자미만 입력해주세요.");
+            throw new QuackGlobalException(INVALID_LONG_LENGTH_NICKNAME);
         }
         if (!REGX.matcher(nickname).matches()) {
-            throw new IllegalArgumentException("닉네임은 한글만 가능합니다.");
+            throw new QuackGlobalException(INVALID_PATTERN_NICKNAME);
         }
 
         if(customerUserRepository.existsByNickname(nickname)) {
-            throw new ValidationException("사용중인 닉네임이에요");
+            throw new QuackGlobalException(DUPLICATE_NICKNAME);
         }
 
         return CommonResponse.of("200","꽥에서 사용하실 이름이에요", HttpStatus.OK, "");

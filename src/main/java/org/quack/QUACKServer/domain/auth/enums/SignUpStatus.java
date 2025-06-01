@@ -3,8 +3,6 @@ package org.quack.QUACKServer.domain.auth.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.Arrays;
-
 /**
  * @author : jung-kwanhee
  * @description :
@@ -18,7 +16,8 @@ import java.util.Arrays;
 public enum SignUpStatus {
 
     BEFORE("BEFORE"),
-    FINISH("FINISH");
+    FINISH("FINISH"),
+    REFRESH("REFRESH");
     private final String value;
 
 }
