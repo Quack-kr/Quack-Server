@@ -4,9 +4,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.domain.review.dto.response.GetReviewMyCountResponse;
 import org.quack.QUACKServer.domain.review.service.MyPageReviewService;
-import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -38,7 +38,7 @@ public class ReviewMyPageController {
      * 마이페이지 - 리뷰 삭제
      */
     @PostMapping("/my-page/delete-review")
-    public CommonResponse deleteMyPageReview(@Valid @NotNull @RequestBody Long reviewId ) {
+    public ResponseDto<?> deleteMyPageReview(@Valid @NotNull @RequestBody Long reviewId ) {
         return myPageReviewService.deleteMyReview(reviewId);
     }
 
@@ -48,7 +48,7 @@ public class ReviewMyPageController {
      * 마이페이지 - 핵공감 데시벨 조회
      */
     @PostMapping("/my-page/decibel")
-    public CommonResponse deleteMyPageReview() {
+    public ResponseDto<?> deleteMyPageReview() {
         return myPageReviewService.searchDecibel();
     }
 }

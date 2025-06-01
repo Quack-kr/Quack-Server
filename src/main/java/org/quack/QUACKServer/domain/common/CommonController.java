@@ -1,10 +1,12 @@
 package org.quack.QUACKServer.domain.common;
 
 import lombok.RequiredArgsConstructor;
-import org.quack.QUACKServer.global.common.dto.CommonResponse;
+import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
 
 /**
  * @author : jung-kwanhee
@@ -18,7 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommonController {
 
     @GetMapping("/common/health-check")
-    public CommonResponse healthCheck() {
-        return CommonResponse.of(String.valueOf(HttpStatus.OK.value()), "헬스 체크 성공", HttpStatus.OK, null);
+    public ResponseDto<?> healthCheck() {
+        return ResponseDto.builder()
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .isSuccess(true)
+                .message("헬스체크 OK")
+                .build();
     }
 }

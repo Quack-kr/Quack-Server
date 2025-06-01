@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.quack.QUACKServer.global.security.enums.ProviderType;
+import org.quack.QUACKServer.core.security.enums.ProviderType;
 
 import java.time.LocalDateTime;
 

@@ -31,7 +31,7 @@ public class QCustomerUser extends EntityPathBase<CustomerUser> {
 
     public final StringPath nickname = createString("nickname");
 
-    public final EnumPath<org.quack.QUACKServer.global.security.enums.ProviderType> provider = createEnum("provider", org.quack.QUACKServer.global.security.enums.ProviderType.class);
+    public final EnumPath<org.quack.QUACKServer.core.security.enums.ProviderType> provider = createEnum("provider", org.quack.QUACKServer.core.security.enums.ProviderType.class);
 
     public final StringPath providerId = createString("providerId");
 

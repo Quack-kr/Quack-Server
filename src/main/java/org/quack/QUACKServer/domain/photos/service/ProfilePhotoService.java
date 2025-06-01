@@ -2,6 +2,9 @@ package org.quack.QUACKServer.domain.photos.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.core.common.constant.ErrorCode;
+import org.quack.QUACKServer.core.common.dto.ResponseDto;
+import org.quack.QUACKServer.core.error.exception.CommonException;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
 import org.quack.QUACKServer.domain.photos.domain.Photos;
 import org.quack.QUACKServer.domain.photos.dto.PhotosFileDto;
@@ -9,8 +12,6 @@ import org.quack.QUACKServer.domain.photos.dto.ProfileUploadRequest;
 import org.quack.QUACKServer.domain.photos.enums.PhotoEnum;
 import org.quack.QUACKServer.domain.photos.repository.PhotosRepository;
 import org.quack.QUACKServer.domain.photos.repository.PhotosS3Repository;
-import org.quack.QUACKServer.global.common.dto.CommonResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,9 +34,9 @@ public class ProfilePhotoService implements PhotoService<Object, ProfileUploadRe
     private final PhotosRepository photosRepository;
 
     @Override
-    public CommonResponse upload(ProfileUploadRequest profileUploadRequest) {
+    public ResponseDto<?> upload(ProfileUploadRequest profileUploadRequest) {
 
-        try{
+        try {
             MultipartFile file = profileUploadRequest.photoFile();
             String fileName = PhotoEnum.PhotoType.DEFAULT_PROFILE.getValue() + UUID.randomUUID() + file.getOriginalFilename();
 
@@ -55,9 +56,9 @@ public class ProfilePhotoService implements PhotoService<Object, ProfileUploadRe
 
             photosRepository.save(photos);
 
-            return CommonResponse.of("201", "파일 업로드 성공", HttpStatus.CREATED, photos.getImageUrl());
+            return ResponseDto.successCreate(photos.getPhotosId());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CommonException(ErrorCode.SERVER_ERROR);
         }
 
 

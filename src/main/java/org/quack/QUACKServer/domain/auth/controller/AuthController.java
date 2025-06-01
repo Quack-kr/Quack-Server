@@ -5,10 +5,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.domain.auth.dto.request.SignupRequest;
 import org.quack.QUACKServer.domain.auth.dto.response.AuthResponse;
 import org.quack.QUACKServer.domain.auth.service.AuthService;
-import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -60,13 +60,13 @@ public class AuthController {
     }
 
     @PostMapping("/validate-nickname")
-    public CommonResponse validateUserNickname(
+    public ResponseDto<?> validateUserNickname(
             @Valid @RequestBody String nickname) {
         return authService.validateNickName(nickname);
     }
 
     @PostMapping("/withdraw")
-    public CommonResponse withdraw() {
+    public ResponseDto<?> withdraw() {
         return authService.deleteCustomerUser();
     }
 

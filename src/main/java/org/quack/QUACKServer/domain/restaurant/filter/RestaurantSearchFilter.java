@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
 import org.quack.QUACKServer.domain.restaurant.dto.request.SearchRestaurantsByKeywordRequest;
 import org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum;
-import org.quack.QUACKServer.global.common.dto.PageInfo;
+import org.quack.QUACKServer.core.common.dto.PageInfo;
 import org.springframework.data.domain.Pageable;
 
 /**

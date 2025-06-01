@@ -1,6 +1,7 @@
 package org.quack.QUACKServer.domain.auth.dto.response;
 
 import lombok.Builder;
+import org.quack.QUACKServer.domain.auth.domain.JwtTokenDto;
 import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
 
 /**
@@ -16,11 +17,11 @@ public record AuthResponse(
         String accessToken,
         String refreshToken
 ) {
-    public static AuthResponse of(String accessToken, String refreshToken) {
+    public static AuthResponse from(JwtTokenDto tokenDto) {
         return AuthResponse.builder()
                 .signUpStatus(SignUpStatus.FINISH)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .accessToken(tokenDto.accessToken())
+                .refreshToken(tokenDto.refreshToken())
                 .build();
     }
 }

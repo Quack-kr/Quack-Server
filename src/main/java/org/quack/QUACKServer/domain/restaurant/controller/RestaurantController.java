@@ -4,11 +4,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.domain.restaurant.dto.request.SearchRestaurantsByKeywordRequest;
 import org.quack.QUACKServer.domain.restaurant.dto.response.SearchRestaurantsByKeywordResponse;
 import org.quack.QUACKServer.domain.restaurant.service.RestaurantService;
 import org.quack.QUACKServer.domain.restaurant.service.SearchRestaurantService;
-import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -40,7 +40,7 @@ public class RestaurantController {
      * 식당 저장
      */
     @PostMapping("/my-restaurant/update")
-    public CommonResponse updateCustomerUserRestaurant(@RequestBody @Valid @NotNull Long restaurantId) {
+    public ResponseDto<?> updateCustomerUserRestaurant(@RequestBody @Valid @NotNull Long restaurantId) {
         return restaurantService.updateCustomerUserRestaurant(restaurantId);
     }
 }

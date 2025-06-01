@@ -9,8 +9,8 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.photos.dto.PhotosFileDto;
-import org.quack.QUACKServer.global.error.exception.QuackGlobalException;
-import org.quack.QUACKServer.global.external.s3.repository.S3Repository;
+import org.quack.QUACKServer.core.error.exception.CommonException;
+import org.quack.QUACKServer.core.external.s3.repository.S3Repository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -22,7 +22,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import static org.quack.QUACKServer.global.common.constant.QuackCode.ExceptionCode.PHOTO_UPLOAD_ERROR;
+import static org.quack.QUACKServer.core.common.constant.ErrorCode.PHOTO_UPLOAD_ERROR;
+
 
 /**
  * @author : jung-kwanhee
@@ -54,7 +55,7 @@ public class PhotosS3Repository implements S3Repository<PhotosFileDto, String> {
             return URLDecoder.decode(s3Client.getUrl(bucket, photosFileDto.getFileName()).toString(), StandardCharsets.UTF_8);
 
         }catch (IOException e){
-            throw new QuackGlobalException(PHOTO_UPLOAD_ERROR);
+            throw new CommonException(PHOTO_UPLOAD_ERROR);
         }
     }
 

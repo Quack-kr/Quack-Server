@@ -3,10 +3,10 @@ package org.quack.QUACKServer.domain.user.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.domain.user.dto.UpdateProfileRequest;
 import org.quack.QUACKServer.domain.user.dto.response.GetCustomerUserProfileResponse;
 import org.quack.QUACKServer.domain.user.service.CustomerUserService;
-import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -36,7 +36,7 @@ public class UserController {
      * 마이 페이지 - 프로필 이미지 조회
      */
     @GetMapping("/my-page/{profile_photos_id}")
-    public CommonResponse getProfilePhoto(@PathVariable("profile_photos_id") Long profileId) {
+    public ResponseDto<?> getProfilePhoto(@PathVariable("profile_photos_id") Long profileId) {
         return customerUserService.getCustomerUserProfilePhoto(profileId);
     }
 
@@ -44,7 +44,7 @@ public class UserController {
      * 마이 페이지 - 프로필 수정
      */
     @PostMapping("/my-page/profile-update")
-    public CommonResponse updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
+    public ResponseDto<?> updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
         return customerUserService.updateCustomerUserProfile(request);
     }
 
