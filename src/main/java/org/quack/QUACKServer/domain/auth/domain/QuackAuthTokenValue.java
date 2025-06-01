@@ -2,7 +2,6 @@ package org.quack.QUACKServer.domain.auth.domain;
 
 import lombok.AccessLevel;
 import lombok.Builder;
-import org.quack.QUACKServer.domain.auth.enums.TokenStatus;
 import org.quack.QUACKServer.global.external.redis.dto.RedisAuthTokenValue;
 
 import java.time.LocalDateTime;
@@ -19,7 +18,6 @@ public record QuackAuthTokenValue(
         QuackUser quackUser,
         String accessToken,
         String refreshToken,
-        TokenStatus tokenStatus,
         LocalDateTime generatedAt
 ) {
     public boolean isAfterMinute() {
@@ -43,4 +41,23 @@ public record QuackAuthTokenValue(
                         .build()
                 ).build();
     }
+
+    public static QuackAuthTokenValue of(QuackUser quackUser, String accessToken, String refreshToken) {
+        return QuackAuthTokenValue.builder()
+                .quackUser(quackUser)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .generatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static QuackAuthTokenValue updateRequestTime(QuackAuthTokenValue newToken) {
+        return QuackAuthTokenValue.builder()
+                .quackUser(newToken.quackUser())
+                .accessToken(newToken.accessToken())
+                .refreshToken(newToken.refreshToken())
+                .generatedAt(newToken.generatedAt())
+                .build();
+    }
+
 }

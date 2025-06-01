@@ -4,14 +4,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthContext;
-import org.quack.QUACKServer.domain.auth.domain.QuackAuthTokenBuilder;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthTokenValue;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
 import org.quack.QUACKServer.domain.auth.dto.request.SignupRequest;
 import org.quack.QUACKServer.domain.auth.dto.response.AuthResponse;
 import org.quack.QUACKServer.domain.auth.enums.AuthEnum;
 import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
-import org.quack.QUACKServer.domain.auth.enums.TokenStatus;
 import org.quack.QUACKServer.domain.user.domain.CustomerUser;
 import org.quack.QUACKServer.domain.user.domain.CustomerUserMetadata;
 import org.quack.QUACKServer.domain.user.domain.CustomerUserNicknameSequence;
@@ -22,9 +20,10 @@ import org.quack.QUACKServer.global.common.constant.QuackCode;
 import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.global.error.exception.QuackGlobalException;
-import org.quack.QUACKServer.global.external.redis.QuackAuthTokenManager;
+import org.quack.QUACKServer.global.external.redis.repository.QuackAuthTokenManager;
 import org.quack.QUACKServer.global.security.jwt.JwtProvider;
 import org.quack.QUACKServer.global.security.provider.AppleLoginAuthenticationProvider;
+import org.quack.QUACKServer.global.security.provider.KakaoLoginAuthenticationProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +53,7 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private static final Pattern REGX = Pattern.compile("^[가-힣a-zA-Z0-9]+(?: [가-힣a-zA-Z0-9]+)*$");
     private final QuackAuthTokenManager quackAuthTokenManager;
+    private final KakaoLoginAuthenticationProvider kakaoLoginAuthenticationProvider;
 
     @Transactional
     public AuthResponse signup(SignupRequest request, String idToken) {
@@ -79,6 +79,39 @@ public class AuthService {
 
                 String accessToken = jwtProvider.generateToken(QuackUser.from(user));
                 String refreshToken = jwtProvider.generateRefreshToken(QuackUser.from(user));
+
+                QuackAuthTokenValue tokenValue = QuackAuthTokenValue.of(
+                        QuackUser.from(user), accessToken, refreshToken);
+
+                quackAuthTokenManager.insertToken(tokenValue);
+
+                return AuthResponse.of(accessToken, refreshToken);
+            }
+            case KAKAO -> {
+                SocialAuthDto socialAuthDto = kakaoLoginAuthenticationProvider.getSocialAuth(idToken);
+
+                // 1. 닉네임 중복 검증
+                validateNickName(request.nickname());
+
+                CustomerUser user = CustomerUser.createBySocial(request.providerType(),
+                        socialAuthDto.getProviderId(), socialAuthDto.getEmail(), request.nickname());
+
+                updateNicknameSequence(request.nickname());
+
+                customerUserRepository.save(user);
+
+                CustomerUserMetadata userMetadata = CustomerUserMetadata.create(user.getCustomerUserId(),
+                        request.privacyAgreed(), request.termsAgreed(), request.locationTermsAgreed());
+
+                customerUserMetadataRepository.save(userMetadata);
+
+                String accessToken = jwtProvider.generateToken(QuackUser.from(user));
+                String refreshToken = jwtProvider.generateRefreshToken(QuackUser.from(user));
+
+                QuackAuthTokenValue tokenValue = QuackAuthTokenValue.of(
+                        QuackUser.from(user), accessToken, refreshToken);
+
+                quackAuthTokenManager.insertToken(tokenValue);
 
                 return AuthResponse.of(accessToken, refreshToken);
             }
@@ -110,8 +143,7 @@ public class AuthService {
         String newAccessToken = jwtProvider.generateToken(sessionToken.quackUser());
         String newRefreshToken = jwtProvider.generateRefreshToken(sessionToken.quackUser());
 
-        QuackAuthTokenValue tokenValue = QuackAuthTokenBuilder
-                .build(QuackUser.builder().build(), newAccessToken, newRefreshToken, TokenStatus.ACTIVE);
+        QuackAuthTokenValue tokenValue = QuackAuthTokenValue.of(QuackUser.builder().build(), newAccessToken, newRefreshToken);
 
         quackAuthTokenManager.deleteTokenByKey(tokenValue.accessToken());
 

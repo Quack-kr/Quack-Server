@@ -5,6 +5,7 @@ import org.quack.QUACKServer.global.common.constant.QuackCode;
 import org.quack.QUACKServer.global.common.dto.BaseResponse;
 import org.quack.QUACKServer.global.common.dto.CommonExceptionResponse;
 import org.quack.QUACKServer.global.common.dto.CommonResponse;
+import org.quack.QUACKServer.global.error.exception.QuackGlobalException;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -48,6 +49,11 @@ public class GlobalResponseBodyHandler implements ResponseBodyAdvice<Object> {
             case CommonExceptionResponse commonExceptionResponse -> {
                 servletResponse.setStatus(commonExceptionResponse.exceptionCode().getHttpStatus().value());
                 return build(path, null, commonExceptionResponse.customMessaged(), commonExceptionResponse.exceptionCode().getCode());
+            }
+
+            case QuackGlobalException globalException -> {
+                servletResponse.setStatus(Integer.parseInt(globalException.getExceptionCode().getCode()));
+                return build(path, null, globalException.getExceptionCode().getDescription(), globalException.getExceptionCode().getCode());
             }
             default -> {
                 QuackCode.ExceptionCode success = QuackCode.ExceptionCode.SUCCESS;

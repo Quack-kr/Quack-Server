@@ -50,12 +50,12 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         try {
             BaseResponse<Object> baseResponse = BaseResponse.builder()
                     .code(String.valueOf(HttpStatus.CONFLICT.value()))
-                    .message(QuackCode.ExceptionCode.PARSING_ERROR.getDescription())
+                    .message(QuackCode.ExceptionCode.UN_AUTHENTICATION_ACCESS.getDescription())
                     .build();
 
             return objectMapper.writeValueAsString(baseResponse);
         } catch (JsonProcessingException ex) {
-            throw new QuackGlobalException(QuackCode.ExceptionCode.PARSING_ERROR);
+            throw new QuackGlobalException(QuackCode.ExceptionCode.UN_AUTHENTICATION_ACCESS);
         }
     }
 }

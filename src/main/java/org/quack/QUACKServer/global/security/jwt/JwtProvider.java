@@ -8,7 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
-import org.quack.QUACKServer.global.external.redis.QuackAuthTokenManager;
+import org.quack.QUACKServer.global.external.redis.repository.QuackAuthTokenManager;
 import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;

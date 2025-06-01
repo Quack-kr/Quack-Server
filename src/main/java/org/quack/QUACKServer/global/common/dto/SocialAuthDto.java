@@ -24,6 +24,5 @@ public class SocialAuthDto {
                 .providerId(claims.getSubject()) // Social_id
                 .email(claims.get("email", String.class))
                 .build();
-
     }
 }

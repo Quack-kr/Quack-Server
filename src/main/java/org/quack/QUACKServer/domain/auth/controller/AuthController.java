@@ -44,7 +44,7 @@ public class AuthController {
     }
 
     // TODO : 배포 과정에서 삭제.
-    @GetMapping("/apple/callback")
+    @GetMapping("/kakao/callback")
     public ResponseEntity<?> kakaoCallback(@RequestParam("code") String code) {
         // 1. 받은 code로 토큰 요청
         // 2. 토큰으로 사용자 정보 요청
@@ -54,7 +54,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public AuthResponse signup(
-            @Valid @NotBlank @RequestHeader("id-token") String idToken,
+            @Valid @NotBlank @RequestHeader("id_token") String idToken,
             @Valid @RequestBody SignupRequest request) {
          return authService.signup(request, idToken);
     }

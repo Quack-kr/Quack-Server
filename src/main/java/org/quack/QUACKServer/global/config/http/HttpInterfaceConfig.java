@@ -11,14 +11,10 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClient;
-
-import java.io.IOException;
 
 /**
  * @author : jung-kwanhee
@@ -51,43 +47,18 @@ public class HttpInterfaceConfig {
 
 
     private RestClient createRestClient(String baseUrl, String beanName) {
-        RestClient newRestClient = RestClient.builder()
+        RestClient restClient = RestClient.builder()
                 .baseUrl(baseUrl)
-                .defaultStatusHandler(HttpStatusCode::is4xxClientError, this::handleError)
-                .defaultStatusHandler(HttpStatusCode::is5xxServerError, this::handleError)
-                .requestInterceptors(interceptors -> interceptors.add(clientHttpRequestInterceptor()))
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
 
-        BeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(RestClient.class, () -> newRestClient)
-                .getRawBeanDefinition();
+        BeanDefinition beanDefinition = BeanDefinitionBuilder
+                .genericBeanDefinition(RestClient.class, () -> restClient).getBeanDefinition();
 
         beanFactory.registerBeanDefinition(beanName, beanDefinition);
-        return newRestClient;
+        return restClient;
     }
 
-    private void handleError(HttpRequest request, ClientHttpResponse response) {
-        try {
-            log.error("외부 API 통신 중 에러 발생");
-            log.error("응답 코드 = {}", response.getStatusCode());
-            log.error("에러 응답 바디 = {}", new String(response.getBody().readAllBytes()));
-        } catch (IOException e) {
-             log.error("응답 바디 읽는 중 에러 발생", e);
-        }
-    }
-
-    private ClientHttpRequestInterceptor clientHttpRequestInterceptor() {
-        return (request, body, execution) -> {
-            ObjectMapper objectMapper = snakeObjectMapper().getObjectMapper();
-
-            log.info("Request URI = [{}]  {}", request.getMethod(), request.getURI());
-            log.info("Request Headers = {}", request.getHeaders());
-            if (body.length > 0) {
-                log.info("Request Body = {}", objectMapper.writeValueAsString(objectMapper.readValue(body, Object.class)));
-            }
-
-            return execution.execute(request, body);
-        };
-    }
 
     private MappingJackson2HttpMessageConverter snakeObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();

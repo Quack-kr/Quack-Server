@@ -1,4 +1,4 @@
-package org.quack.QUACKServer.global.external.redis;
+package org.quack.QUACKServer.global.external.redis.repository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +6,6 @@ import org.quack.QUACKServer.domain.auth.domain.QuackAuthTokenValue;
 import org.quack.QUACKServer.global.common.constant.QuackCode;
 import org.quack.QUACKServer.global.error.exception.QuackGlobalException;
 import org.quack.QUACKServer.global.external.redis.dto.RedisAuthTokenValue;
-import org.quack.QUACKServer.global.external.redis.repository.AuthRedisRepository;
 import org.springframework.stereotype.Service;
 
 /**
