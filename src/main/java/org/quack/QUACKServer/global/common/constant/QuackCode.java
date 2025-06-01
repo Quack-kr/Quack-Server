@@ -37,8 +37,9 @@ public interface QuackCode {
         // Error 별 응답 코드 작성
         INVALID_REQUEST_INFO(BAD_REQUEST, "요청값이 잘못되었습니다."),
         MISMATCH_REFRESH_TOKEN(BAD_REQUEST, "리프레시 토큰의 유저 정보가 일치하지 않습니다"),
-        INVALID_PROVIDER_TYPE(BAD_REQUEST, "소셜 로그인 인증 타입이 존재하지 않습니다."),
+
         // 401
+        INVALID_PROVIDER_TYPE(BAD_REQUEST, "소셜 로그인 인증 타입이 존재하지 않습니다."),
         INVALID_REFRESH_TOKEN(UNAUTHORIZED, "인증되지 않은 접근입니다"),
         UN_AUTHENTICATION_ACCESS(UNAUTHORIZED, "인증되지 않은 접근입니다"),
         LOGIN_FAIL(UNAUTHORIZED, "로그인에 실패하였습니다"),
@@ -46,6 +47,7 @@ public interface QuackCode {
 
         // 500 ERROR
         SERVER_ERROR(INTERNAL_SERVER_ERROR, "서버 오류"),
+        PHOTO_UPLOAD_ERROR(INTERNAL_SERVER_ERROR, "이미지를 업로드하는데 오류가 발생하였습니다."),
 
         // 닉네임
         USER_NOT_FOUND(NOT_FOUND, "유저를 찾을 수 없습니다."),

@@ -19,6 +19,8 @@ public class QReviewKeyword extends EntityPathBase<ReviewKeyword> {
 
     public static final QReviewKeyword reviewKeyword = new QReviewKeyword("reviewKeyword");
 
+    public final NumberPath<Long> reviewId = createNumber("reviewId", Long.class);
+
     public final NumberPath<Long> reviewKeywordId = createNumber("reviewKeywordId", Long.class);
 
     public final EnumPath<org.quack.QUACKServer.domain.review.enums.ReviewEnum.ReviewTag> reviewTag = createEnum("reviewTag", org.quack.QUACKServer.domain.review.enums.ReviewEnum.ReviewTag.class);

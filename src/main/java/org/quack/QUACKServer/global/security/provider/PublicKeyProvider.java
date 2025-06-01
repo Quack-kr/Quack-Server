@@ -1,10 +1,10 @@
 package org.quack.QUACKServer.global.security.provider;
 
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.global.infra.social.apple.dto.ApplePublicKey;
-import org.quack.QUACKServer.global.infra.social.apple.dto.ApplePublicKeys;
-import org.quack.QUACKServer.global.infra.social.kakao.dto.KakaoPublicKey;
-import org.quack.QUACKServer.global.infra.social.kakao.dto.KakaoPublicKeys;
+import org.quack.QUACKServer.global.external.social.apple.dto.ApplePublicKey;
+import org.quack.QUACKServer.global.external.social.apple.dto.ApplePublicKeys;
+import org.quack.QUACKServer.global.external.social.kakao.dto.KakaoPublicKey;
+import org.quack.QUACKServer.global.external.social.kakao.dto.KakaoPublicKeys;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;

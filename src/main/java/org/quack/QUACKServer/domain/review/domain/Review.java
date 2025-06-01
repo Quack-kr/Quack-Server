@@ -1,21 +1,13 @@
 package org.quack.QUACKServer.domain.review.domain;
 
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "review")
@@ -38,8 +30,11 @@ public class Review{
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(name = "content")
+    @Column(name = "review_content")
     private String reviewContent;
+
+    @Column(name = "review_disabled", columnDefinition = "bit(1) default 0")
+    private Boolean disabled;
 
 //    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = false)
 //    private List<ReviewImage> reviewImages = new ArrayList<>();
@@ -48,6 +43,7 @@ public class Review{
         this.userId = userId;
         this.restaurantId = restaurantId;
         this.reviewContent = reviewContent;
+        this.disabled = false;
     }
 
     public static Review createReview(Long userId, Long restaurantId, String reviewContent) {

@@ -21,6 +21,8 @@ public class QReview extends EntityPathBase<Review> {
 
     public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
 
+    public final BooleanPath disabled = createBoolean("disabled");
+
     public final NumberPath<Long> restaurantId = createNumber("restaurantId", Long.class);
 
     public final StringPath reviewContent = createString("reviewContent");

@@ -14,7 +14,7 @@ import org.quack.QUACKServer.domain.auth.enums.SignUpStatus;
 import org.quack.QUACKServer.domain.auth.enums.TokenStatus;
 import org.quack.QUACKServer.domain.user.domain.CustomerUser;
 import org.quack.QUACKServer.domain.user.domain.CustomerUserMetadata;
-import org.quack.QUACKServer.domain.user.domain.NicknameSequence;
+import org.quack.QUACKServer.domain.user.domain.CustomerUserNicknameSequence;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserMetadataRepository;
 import org.quack.QUACKServer.domain.user.repository.CustomerUserRepository;
 import org.quack.QUACKServer.domain.user.repository.NicknameSequenceRepository;
@@ -22,9 +22,9 @@ import org.quack.QUACKServer.global.common.constant.QuackCode;
 import org.quack.QUACKServer.global.common.dto.CommonResponse;
 import org.quack.QUACKServer.global.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.global.error.exception.QuackGlobalException;
-import org.quack.QUACKServer.global.infra.redis.QuackAuthTokenManager;
-import org.quack.QUACKServer.global.infra.redis.RedisKeyManager;
-import org.quack.QUACKServer.global.infra.redis.repository.RedisDocument;
+import org.quack.QUACKServer.global.external.redis.QuackAuthTokenManager;
+import org.quack.QUACKServer.global.external.redis.RedisKeyManager;
+import org.quack.QUACKServer.global.external.redis.repository.RedisDocument;
 import org.quack.QUACKServer.global.security.jwt.JwtProvider;
 import org.quack.QUACKServer.global.security.provider.AppleLoginAuthenticationProvider;
 import org.springframework.http.HttpStatus;
@@ -178,13 +178,13 @@ public class AuthService {
         AuthEnum.NicknameMenuPrefix nicknameMenuPrefix = AuthEnum.NicknameMenuPrefix.getByNickname(nickname);
 
         if(nicknameColorPrefix != null && nicknameMenuPrefix != null) {
-            Optional<NicknameSequence> nicknameSequence = nicknameSequenceRepository.findByColorPrefixAndMenuPrefix(nicknameColorPrefix, nicknameMenuPrefix);
+            Optional<CustomerUserNicknameSequence> nicknameSequence = nicknameSequenceRepository.findByColorPrefixAndMenuPrefix(nicknameColorPrefix, nicknameMenuPrefix);
 
             if(nicknameSequence.isPresent()) {
                 nicknameSequence.get().increase();
             } else {
                 nicknameSequenceRepository.save(
-                        NicknameSequence.createBuilder()
+                        CustomerUserNicknameSequence.createBuilder()
                                 .colorPrefix(nicknameColorPrefix)
                                 .menuPrefix(nicknameMenuPrefix)
                                 .build());

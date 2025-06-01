@@ -34,7 +34,7 @@ public class MenuEvalSummary {
     @Column(name = "total_count", nullable = false)
     private Long totalCount;
 
-    @Column(name = "rank")
+    @Column(name = "menu_eval_summary_rank")
     private Integer menuEvalSummaryRank;
 
 }

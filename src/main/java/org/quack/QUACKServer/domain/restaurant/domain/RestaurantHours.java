@@ -36,6 +36,9 @@ public class RestaurantHours {
     @Column(name = "last_order_time")
     private LocalTime lastOrderTime;
 
+    @Column(name = "close_time")
+    private LocalTime closeTime;
+
     @Column(name = "is_closed")
     private Boolean isClosed;
 

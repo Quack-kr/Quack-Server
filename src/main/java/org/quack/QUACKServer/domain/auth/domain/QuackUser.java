@@ -2,8 +2,8 @@ package org.quack.QUACKServer.domain.auth.domain;
 
 import lombok.*;
 import org.quack.QUACKServer.domain.user.domain.CustomerUser;
-import org.quack.QUACKServer.global.infra.redis.RedisKeyManager;
-import org.quack.QUACKServer.global.infra.redis.repository.RedisDocument;
+import org.quack.QUACKServer.global.external.redis.RedisKeyManager;
+import org.quack.QUACKServer.global.external.redis.repository.RedisDocument;
 import org.quack.QUACKServer.global.security.enums.ProviderType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

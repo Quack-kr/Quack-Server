@@ -45,7 +45,7 @@ public class GlobalResponseBodyHandler implements ResponseBodyAdvice<Object> {
                 return build(path, commonResponse.data(), commonResponse.message(),
                         commonResponse.code());
             }
-            case null, default -> {
+            default -> {
                 QuackCode.DefaultCode success = QuackCode.DefaultCode.SUCCESS;
                 servletResponse.setStatus(success.getHttpStatus().value());
                 return build(path, body, success.getDescription(), success.name());

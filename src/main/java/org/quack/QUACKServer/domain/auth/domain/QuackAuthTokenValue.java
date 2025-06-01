@@ -3,7 +3,7 @@ package org.quack.QUACKServer.domain.auth.domain;
 import lombok.AccessLevel;
 import lombok.Builder;
 import org.quack.QUACKServer.domain.auth.enums.TokenStatus;
-import org.quack.QUACKServer.global.infra.redis.dto.RedisAuthTokenValue;
+import org.quack.QUACKServer.global.external.redis.dto.RedisAuthTokenValue;
 
 import java.time.LocalDateTime;
 

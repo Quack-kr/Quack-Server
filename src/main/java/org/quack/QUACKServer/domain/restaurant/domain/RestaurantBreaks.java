@@ -16,7 +16,7 @@ import java.time.LocalTime;
  */
 
 @Entity
-@Table(name = "restaurant_hours")
+@Table(name = "restaurant_breaks")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RestaurantBreaks {

@@ -9,7 +9,8 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.domain.photos.dto.PhotosFileDto;
-import org.quack.QUACKServer.global.infra.s3.repository.S3Repository;
+import org.quack.QUACKServer.global.error.exception.QuackGlobalException;
+import org.quack.QUACKServer.global.external.s3.repository.S3Repository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -20,6 +21,8 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+
+import static org.quack.QUACKServer.global.common.constant.QuackCode.ExceptionCode.PHOTO_UPLOAD_ERROR;
 
 /**
  * @author : jung-kwanhee
@@ -39,16 +42,20 @@ public class PhotosS3Repository implements S3Repository<PhotosFileDto, String> {
     private final AmazonS3 s3Client;
 
     @Override
-    public String upload(PhotosFileDto photosFileDto) throws IOException {
+    public String upload(PhotosFileDto photosFileDto) {
 
-        ObjectMetadata metadata = new ObjectMetadata();
+        try{
+            ObjectMetadata metadata = new ObjectMetadata();
 
-        metadata.setContentLength(photosFileDto.getPhotoFile().getInputStream().available());
+            metadata.setContentLength(photosFileDto.getPhotoFile().getInputStream().available());
 
-        s3Client.putObject(bucket, photosFileDto.getFileName(), photosFileDto.getPhotoFile().getInputStream(), metadata);
+            s3Client.putObject(bucket, photosFileDto.getFileName(), photosFileDto.getPhotoFile().getInputStream(), metadata);
 
-        return URLDecoder.decode(s3Client.getUrl(bucket, photosFileDto.getFileName()).toString(), StandardCharsets.UTF_8);
+            return URLDecoder.decode(s3Client.getUrl(bucket, photosFileDto.getFileName()).toString(), StandardCharsets.UTF_8);
 
+        }catch (IOException e){
+            throw new QuackGlobalException(PHOTO_UPLOAD_ERROR);
+        }
     }
 
     @Override

@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthTokenBuilder;
 import org.quack.QUACKServer.domain.auth.domain.QuackAuthTokenValue;
 import org.quack.QUACKServer.domain.auth.domain.QuackUser;
-import org.quack.QUACKServer.global.infra.redis.QuackAuthTokenManager;
+import org.quack.QUACKServer.global.external.redis.QuackAuthTokenManager;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationDetailsSource;

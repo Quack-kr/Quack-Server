@@ -1,12 +1,6 @@
 package org.quack.QUACKServer.domain.review.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +13,8 @@ import org.quack.QUACKServer.domain.review.enums.ReviewEnum;
 public class ReviewLike {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "review_like_id")
     private Long reviewLikeId;
 
     @Column(name = "review_id", nullable = false)

@@ -23,6 +23,9 @@ public class ReviewKeyword {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewKeywordId;
 
+    @Column(name = "review_id", nullable = false)
+    private Long reviewId;
+
     @Column(name = "review_tag", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private ReviewEnum.ReviewTag reviewTag;

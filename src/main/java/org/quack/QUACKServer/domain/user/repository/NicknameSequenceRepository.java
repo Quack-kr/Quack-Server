@@ -1,7 +1,7 @@
 package org.quack.QUACKServer.domain.user.repository;
 
 import org.quack.QUACKServer.domain.auth.enums.AuthEnum;
-import org.quack.QUACKServer.domain.user.domain.NicknameSequence;
+import org.quack.QUACKServer.domain.user.domain.CustomerUserNicknameSequence;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,11 +17,11 @@ import java.util.Optional;
  * @date : 25. 5. 31.
  */
 @Repository
-public interface NicknameSequenceRepository extends JpaRepository<NicknameSequence, Long> {
+public interface NicknameSequenceRepository extends JpaRepository<CustomerUserNicknameSequence, Long> {
 
     @Query("""
         SELECT COALESCE(MAX(n.sequence), 0) + 1
-        FROM NicknameSequence n
+        FROM CustomerUserNicknameSequence n
         WHERE n.colorPrefix = :colorPrefix AND n.menuPrefix = :menuPrefix
     """)
     Long findMaxSequenceByPrefix(
@@ -29,7 +29,7 @@ public interface NicknameSequenceRepository extends JpaRepository<NicknameSequen
             @Param("menuPrefix") AuthEnum.NicknameMenuPrefix menuPrefix
     );
 
-    Optional<NicknameSequence> findByColorPrefixAndMenuPrefix(
+    Optional<CustomerUserNicknameSequence> findByColorPrefixAndMenuPrefix(
             AuthEnum.NicknameColorPrefix colorPrefix,
             AuthEnum.NicknameMenuPrefix menuPrefix
     );

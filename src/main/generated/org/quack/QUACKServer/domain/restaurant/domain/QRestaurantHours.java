@@ -19,6 +19,8 @@ public class QRestaurantHours extends EntityPathBase<RestaurantHours> {
 
     public static final QRestaurantHours restaurantHours = new QRestaurantHours("restaurantHours");
 
+    public final TimePath<java.time.LocalTime> closeTime = createTime("closeTime", java.time.LocalTime.class);
+
     public final StringPath dayOfWeek = createString("dayOfWeek");
 
     public final BooleanPath isClosed = createBoolean("isClosed");

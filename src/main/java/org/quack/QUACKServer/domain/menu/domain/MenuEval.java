@@ -1,17 +1,10 @@
 package org.quack.QUACKServer.domain.menu.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.quack.QUACKServer.domain.menu.enums.MenuEnum;
-import org.quack.QUACKServer.domain.review.domain.Review;
 
 @Getter
 @Entity
@@ -21,8 +14,9 @@ import org.quack.QUACKServer.domain.review.domain.Review;
 public class MenuEval {
 
     @Id
-    @GeneratedValue
-    private Long evalId;
+    @Column(name = "menu_eval_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long menuEvalId;
 
     @Column(name = "review_id", nullable = false)
     private Long reviewId;

@@ -19,7 +19,7 @@ public class QMenuEval extends EntityPathBase<MenuEval> {
 
     public static final QMenuEval menuEval = new QMenuEval("menuEval");
 
-    public final NumberPath<Long> evalId = createNumber("evalId", Long.class);
+    public final NumberPath<Long> menuEvalId = createNumber("menuEvalId", Long.class);
 
     public final EnumPath<org.quack.QUACKServer.domain.menu.enums.MenuEnum.MenuEvalType> menuEvalType = createEnum("menuEvalType", org.quack.QUACKServer.domain.menu.enums.MenuEnum.MenuEvalType.class);
 
