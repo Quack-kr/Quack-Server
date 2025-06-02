@@ -130,4 +130,15 @@ public class MyPageRestaurantService {
         );
 
     }
+
+    public boolean checkSavedRestaurant(Long restaurantId) {
+        QuackUser quackUser = QuackAuthContext.getQuackUserDetails();
+
+        if(QuackAuthContext.isAnonymous()) {
+            return false;
+        }
+
+        return customerSavedRestaurantRepository.existsByCustomerUserIdAndRestaurantId(
+                quackUser.getCustomerUserId(), restaurantId);
+    }
 }

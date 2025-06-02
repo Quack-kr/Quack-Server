@@ -23,4 +23,6 @@ public interface CustomerSavedRestaurantRepository extends JpaRepository<Custome
     List<CustomerSavedRestaurant> findAllByCustomerUserId(Long customerUserId);
 
     Slice<CustomerSavedRestaurant> findAllByCustomerUserId(Long customerUserId, Pageable pageable);
+
+    boolean existsByCustomerUserIdAndRestaurantId(Long customerUserId, Long restaurantId);
 }
