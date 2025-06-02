@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.menu.domain.MenuEval;
+import org.quack.QUACKServer.domain.menu.dto.response.BestMenu;
 import org.quack.QUACKServer.domain.menu.dto.response.MenuEvalResponse;
 import org.quack.QUACKServer.domain.menu.repository.MenuEvalRepository;
 import org.quack.QUACKServer.domain.review.domain.Review;
@@ -33,5 +34,9 @@ public class MenuEvalService {
     @Transactional
     public boolean menuEvalDelete(Long reviewId) {
         return menuEvalRepository.deleteMenuEvalByReviewId(reviewId);
+    }
+
+    public List<BestMenu> getRestaurantBestMenu(Long restaurantId) {
+        return menuEvalRepository.findBestMenu(restaurantId);
     }
 }
