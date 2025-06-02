@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.restaurant.dto.request.SearchRestaurantsByKeywordRequest;
+import org.quack.QUACKServer.restaurant.dto.response.GetRestaurantDetailInfo;
 import org.quack.QUACKServer.restaurant.dto.response.SearchRestaurantsByKeywordResponse;
 import org.quack.QUACKServer.restaurant.service.RestaurantService;
 import org.quack.QUACKServer.restaurant.service.SearchRestaurantService;
@@ -42,5 +43,14 @@ public class RestaurantController {
     @PostMapping("/my-restaurant/update")
     public ResponseDto<?> updateCustomerUserRestaurant(@RequestBody @Valid @NotNull Long restaurantId) {
         return restaurantService.updateCustomerUserRestaurant(restaurantId);
+    }
+
+    /**
+     * 식당 상세 페이지
+     */
+
+    @GetMapping("/restaurant/{restaurantId}")
+    public GetRestaurantDetailInfo getRestaurantDetails(@PathVariable Long restaurantId) {
+        return restaurantService.getRestaurantDetailInfo(restaurantId);
     }
 }

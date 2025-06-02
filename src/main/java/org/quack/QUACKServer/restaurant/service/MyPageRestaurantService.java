@@ -130,4 +130,15 @@ public class MyPageRestaurantService {
         );
 
     }
+
+    public boolean checkSavedRestaurant(Long restaurantId) {
+        CustomerUserInfo customerUserInfo = PrincipalManager.getCustomerUserInfo();
+
+        if(PrincipalManager.isAnonymous()) {
+            return false;
+        }
+
+        return customerSavedRestaurantRepository.existsByCustomerUserIdAndRestaurantId(
+                customerUserInfo.getCustomerUserId(), restaurantId);
+    }
 }
