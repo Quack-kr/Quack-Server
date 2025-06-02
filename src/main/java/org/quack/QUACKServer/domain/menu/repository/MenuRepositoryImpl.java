@@ -5,11 +5,13 @@ import static org.quack.QUACKServer.domain.menu.domain.QMenuCategory.menuCategor
 import static org.quack.QUACKServer.domain.photos.domain.QPhotos.photos;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.menu.dto.response.GetReviewMenusResponse;
+import org.quack.QUACKServer.domain.menu.dto.response.MenuSimpleInfo;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -49,4 +51,21 @@ public class MenuRepositoryImpl implements MenuRepositoryCustom {
 
         return results;
     }
+
+
+    public List<MenuSimpleInfo> findMenuSimpleInfoByRestaurantId(Long restaurantId){
+        return queryFactory
+                .select(Projections.constructor(
+                        MenuSimpleInfo.class,
+                        photos.imageUrl,
+                        menu.menuName,
+                        menu.menuPrice
+                ))
+                .from(menu)
+                .leftJoin(photos).on(photos.targetId.eq(menu.menuId)
+                        .and(photos.photoType.eq("menu_board")))
+                .where(menu.restaurantId.eq(restaurantId))
+                .fetch();
+    }
+
 }

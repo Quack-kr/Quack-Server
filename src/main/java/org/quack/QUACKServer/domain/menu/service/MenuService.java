@@ -7,6 +7,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.domain.menu.domain.MenuCategory;
 import org.quack.QUACKServer.domain.menu.dto.response.GetReviewMenusResponse;
+import org.quack.QUACKServer.domain.menu.dto.response.MenuSimpleInfo;
 import org.quack.QUACKServer.domain.menu.repository.MenuCategoryRepository;
 import org.quack.QUACKServer.domain.menu.repository.MenuRepository;
 import org.springframework.stereotype.Service;
@@ -37,5 +38,9 @@ public class MenuService {
         }
 
         return results;
+    }
+
+    public List<MenuSimpleInfo> getMenuSimpleInfo(Long restaurantId) {
+        return menuRepository.findMenuSimpleInfoByRestaurantId(restaurantId);
     }
 }
