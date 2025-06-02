@@ -83,7 +83,7 @@ public class JwtUtil implements InitializingBean {
                 .getBody();
     }
 
-    public CustomerUserInfo getQuackUserByToken(String token){
+    public CustomerUserInfo getUserInfoByToken(String token){
 
         final Claims claims = getClaimsFromToken(token);
 

@@ -5,11 +5,15 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
 import org.quack.QUACKServer.auth.dto.request.SignupRequest;
 import org.quack.QUACKServer.auth.dto.response.AuthResponse;
 import org.quack.QUACKServer.auth.service.AuthService;
+import org.quack.QUACKServer.core.error.constant.ErrorCode;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
+import org.quack.QUACKServer.core.error.exception.CommonException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
@@ -66,8 +70,12 @@ public class AuthController {
     }
 
     @PostMapping("/withdraw")
-    public ResponseDto<?> withdraw() {
-        return authService.deleteCustomerUser();
+    public ResponseDto<?> withdraw(@AuthenticationPrincipal CustomerUserInfo customerUserInfo) {
+
+        if(customerUserInfo == null) {
+            throw new CommonException(ErrorCode.UNAUTHORIZED_USER);
+        }
+        return authService.deleteCustomerUser(customerUserInfo.getCustomerUserId());
     }
 
 

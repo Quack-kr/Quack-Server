@@ -2,23 +2,20 @@ package org.quack.QUACKServer.core.security.jwt;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.core.common.constant.ErrorCode;
+import org.quack.QUACKServer.core.error.constant.ErrorCode;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
-import org.quack.QUACKServer.core.error.exception.CommonException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+import java.nio.file.AccessDeniedException;
 
 /**
  * @author : jung-kwanhee
@@ -38,27 +35,34 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
-            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.getWriter().write(createResponseBody());
+            log.error("JWT 토큰 인증 중 Exception 발생, {}", e.getMessage());
+
+            switch (e) {
+                case SecurityException securityException -> buildResponse(response, ErrorCode.ACCESS_DENIED);
+                case AccessDeniedException accessDeniedException -> buildResponse(response, ErrorCode.ACCESS_DENIED);
+                case ExpiredJwtException expiredJwtException -> {
+                    if (request.getPathInfo().startsWith("/api/v1/auth/login")) {
+                        buildResponse(response, ErrorCode.INVALID_ID_TOKEN);
+                    } else {
+                        buildResponse(response, ErrorCode.EXPIRED_ACCESS_TOKEN);
+                    }
+                }
+                case IllegalArgumentException illegalArgumentException ->
+                        buildResponse(response, ErrorCode.INVALID_REQUEST);
+                default -> buildResponse(response, ErrorCode.UNAUTHORIZED_USER);
+            }
+
         }
     }
 
+    private void buildResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
+        response.setStatus(errorCode.getHttpStatus().value());
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(createResponseBody(errorCode));
+    }
 
-    private String createResponseBody() {
-
-        try {
-            ResponseDto<?> response = ResponseDto.builder()
-                    .httpStatus(HttpStatus.CONFLICT)
-                    .message(ErrorCode.SERVER_ERROR.getMessage())
-                    .isSuccess(false)
-                    .timestamp(LocalDateTime.now())
-                    .build();
-
-            return objectMapper.writeValueAsString(response);
-        } catch (JsonProcessingException ex) {
-            throw new CommonException(ErrorCode.UN_AUTHENTICATION_ACCESS);
-        }
+    private String createResponseBody(ErrorCode errorCode) throws JsonProcessingException {
+        ResponseDto<?> response = ResponseDto.fail(errorCode);
+        return objectMapper.writeValueAsString(response);
     }
 }

@@ -1,7 +1,7 @@
 package org.quack.QUACKServer.core.error.exception;
 
 import lombok.Getter;
-import org.quack.QUACKServer.core.common.constant.ErrorCode;
+import org.quack.QUACKServer.core.error.constant.ErrorCode;
 
 @Getter
 public class CommonException extends RuntimeException {

@@ -2,7 +2,6 @@ package org.quack.QUACKServer.restaurant.filter;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.quack.QUACKServer.auth.domain.PrincipalManager;
 import org.quack.QUACKServer.restaurant.dto.request.SearchRestaurantsByKeywordRequest;
 import org.quack.QUACKServer.restaurant.enums.RestaurantEnum;
 import org.quack.QUACKServer.core.common.dto.PageInfo;
@@ -28,7 +27,7 @@ public class RestaurantSearchFilter {
     private Long customerUserId;
     private boolean isOpen;
 
-    public static RestaurantSearchFilter from(SearchRestaurantsByKeywordRequest request) {
+    public static RestaurantSearchFilter of(SearchRestaurantsByKeywordRequest request, Long customerUserId) {
         return RestaurantSearchFilter.builder()
                 .longitude(request.userLocation().longitude())
                 .latitude(request.userLocation().latitude())
@@ -36,7 +35,7 @@ public class RestaurantSearchFilter {
                 .sortType(request.sort().sortType())
                 .isOpen(request.sort().isOpen())
                 .pageable(PageInfo.toPageable(request.pageInfo()))
-                .customerUserId(PrincipalManager.getCustomerUserId())
+                .customerUserId(customerUserId)
                 .build();
     }
 }

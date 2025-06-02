@@ -3,11 +3,9 @@ package org.quack.QUACKServer.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
-import org.quack.QUACKServer.auth.domain.PrincipalManager;
-import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.auth.enums.AuthEnum;
 import org.quack.QUACKServer.auth.service.AuthService;
+import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.photos.domain.Photos;
 import org.quack.QUACKServer.photos.enums.PhotoEnum;
 import org.quack.QUACKServer.photos.repository.PhotosRepository;
@@ -43,11 +41,9 @@ public class CustomerUserService {
     private final NicknameSequenceRepository nicknameSequenceRepository;
     private final AuthService authService;
 
-    public GetCustomerUserProfileResponse getCustomerUserProfile() {
+    public GetCustomerUserProfileResponse getCustomerUserProfile(Long customerUserId) {
 
-        CustomerUserInfo customerUserInfo = PrincipalManager.getCustomerUserInfo();
-
-        CustomerUser customerUser = customerUserRepository.findById(customerUserInfo.getCustomerUserId())
+        CustomerUser customerUser = customerUserRepository.findById(customerUserId)
                 .orElseThrow(() -> new IllegalStateException("유저 정보를 찾을 수 없습니다."));
 
         CustomerUserMetadata customerUserMetadata = customerUserMetadataRepository.findByCustomerUserId(customerUser.getCustomerUserId())
@@ -65,14 +61,12 @@ public class CustomerUserService {
     }
 
     @Transactional
-    public ResponseDto<?> updateCustomerUserProfile(UpdateProfileRequest request) {
+    public ResponseDto<?> updateCustomerUserProfile(UpdateProfileRequest request, Long customerUserId) {
 
-        CustomerUserInfo customerUserInfo = PrincipalManager.getCustomerUserInfo();
-
-        CustomerUser customerUser = customerUserRepository.findById(customerUserInfo.getCustomerUserId())
+        CustomerUser customerUser = customerUserRepository.findById(customerUserId)
                 .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
 
-        CustomerUserMetadata customerUserMetadata = customerUserMetadataRepository.findByCustomerUserId(customerUserInfo.getCustomerUserId())
+        CustomerUserMetadata customerUserMetadata = customerUserMetadataRepository.findByCustomerUserId(customerUserId)
                 .orElseThrow(() -> new IllegalArgumentException("유저 정보를 찾을 수 없습니다."));
 
         authService.validateNickName(request.nickname());

@@ -1,7 +1,6 @@
 package org.quack.QUACKServer.restaurant.service;
 
 import lombok.RequiredArgsConstructor;
-import org.quack.QUACKServer.auth.domain.PrincipalManager;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.photos.domain.Photos;
 import org.quack.QUACKServer.photos.dto.PhotosFileDto;
@@ -52,8 +51,7 @@ public class RestaurantService {
     }
 
     @Transactional
-    public ResponseDto<?> updateCustomerUserRestaurant(Long restaurantId) {
-        Long customerUserId = PrincipalManager.getCustomerUserId();
+    public ResponseDto<?> updateCustomerUserRestaurant(Long restaurantId, Long customerUserId) {
 
         Optional<CustomerSavedRestaurant> customerSavedRestaurant = customerSavedRestaurantRepository
                 .findByCustomerUserIdAndRestaurantId(customerUserId,restaurantId);

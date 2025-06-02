@@ -1,6 +1,7 @@
 package org.quack.QUACKServer.auth.domain;
 
 import lombok.*;
+import org.quack.QUACKServer.auth.enums.Role;
 import org.quack.QUACKServer.user.domain.CustomerUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -40,7 +41,7 @@ public class CustomerUserInfo implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("USER"));
+        return List.of(new SimpleGrantedAuthority(Role.USER.name()));
     }
 
     public static CustomerUserInfo from (CustomerUser user) {

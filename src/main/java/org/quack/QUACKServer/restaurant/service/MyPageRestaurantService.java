@@ -2,8 +2,7 @@ package org.quack.QUACKServer.restaurant.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.auth.domain.PrincipalManager;
-import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
+import org.quack.QUACKServer.core.common.dto.PageInfo;
 import org.quack.QUACKServer.restaurant.domain.CustomerSavedRestaurant;
 import org.quack.QUACKServer.restaurant.dto.request.SearchSavedRestaurantsRequest;
 import org.quack.QUACKServer.restaurant.dto.response.GetSavedRestaurantCountResponse;
@@ -17,7 +16,6 @@ import org.quack.QUACKServer.restaurant.repository.RestaurantRepositoryImpl;
 import org.quack.QUACKServer.restaurant.vo.RestaurantSimpleByDistanceVo;
 import org.quack.QUACKServer.user.domain.CustomerUserMetadata;
 import org.quack.QUACKServer.user.repository.CustomerUserMetadataRepository;
-import org.quack.QUACKServer.core.common.dto.PageInfo;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -42,37 +40,27 @@ public class MyPageRestaurantService {
     private final SubtractRestaurantService subtractRestaurantService;
     private final CustomerUserMetadataRepository customerUserMetadataRepository;
 
-    public GetSavedRestaurantCountResponse getSavedRestaurantCount() {
+    public GetSavedRestaurantCountResponse getSavedRestaurantCount(Long customerUserId) {
 
-        if(PrincipalManager.isAnonymous()) {
-            throw new IllegalStateException("비로그인 시 불가 합니다.");
-        }
-
-        long count = customerSavedRestaurantRepository.countByCustomerUserId(PrincipalManager.getCustomerUserId());
+        long count = customerSavedRestaurantRepository.countByCustomerUserId(customerUserId);
 
         return GetSavedRestaurantCountResponse.from(count);
     }
 
 
-    public SearchSavedRestaurantsResponse searchSavedRestaurants(SearchSavedRestaurantsRequest request) {
-
-        CustomerUserInfo customerUserInfo = PrincipalManager.getCustomerUserInfo();
-
-        if(PrincipalManager.isAnonymous()) {
-            throw new IllegalStateException("비 로그인 시에는 접근이 불가 합니다.");
-        }
+    public SearchSavedRestaurantsResponse searchSavedRestaurants(SearchSavedRestaurantsRequest request, Long customerUserId) {
 
         Pageable pageable = PageInfo.toPageable(request.pageInfo());
 
         Slice<CustomerSavedRestaurant> customerSavedRestaurants = customerSavedRestaurantRepository
-                .findAllByCustomerUserId(customerUserInfo.getCustomerUserId(), pageable);
+                .findAllByCustomerUserId(customerUserId, pageable);
 
         List<Long> restaurantIds = customerSavedRestaurants.getContent().stream()
                 .map(CustomerSavedRestaurant::getRestaurantId)
                 .toList();
 
         RestaurantFindDistanceFilter filter = RestaurantFindDistanceFilter.build(
-                restaurantIds, request.longitude(), request.latitude(), customerUserInfo.getCustomerUserId(), request.isOpen()
+                restaurantIds, request.longitude(), request.latitude(), customerUserId, request.isOpen()
         );
 
         List<RestaurantSimpleByDistanceVo> restaurantSimpleByDistanceVos = restaurantRepositoryImpl
@@ -92,10 +80,9 @@ public class MyPageRestaurantService {
     }
 
     // TODO : 전략 패턴으로 수정 가능
-    public SearchSavedRestaurantsInMapResponse searchSavedRestaurantsInMap(SearchSavedRestaurantsRequest request) {
-        CustomerUserInfo customerUserInfo = PrincipalManager.getCustomerUserInfo();
+    public SearchSavedRestaurantsInMapResponse searchSavedRestaurantsInMap(SearchSavedRestaurantsRequest request, Long customerUserId) {
 
-        CustomerUserMetadata metadata = customerUserMetadataRepository.findById(customerUserInfo.getCustomerUserId())
+        CustomerUserMetadata metadata = customerUserMetadataRepository.findById(customerUserId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 읽을 수 없습니다."));
 
         if(!metadata.getLocationTermsAgreed()) {
@@ -105,14 +92,14 @@ public class MyPageRestaurantService {
         Pageable pageable = PageInfo.toPageable(request.pageInfo());
 
         Slice<CustomerSavedRestaurant> customerSavedRestaurants = customerSavedRestaurantRepository
-                .findAllByCustomerUserId(customerUserInfo.getCustomerUserId(), pageable);
+                .findAllByCustomerUserId(customerUserId, pageable);
 
         List<Long> restaurantIds = customerSavedRestaurants.getContent().stream()
                 .map(CustomerSavedRestaurant::getRestaurantId)
                 .toList();
 
         RestaurantFindDistanceFilter filter = RestaurantFindDistanceFilter.build(
-                restaurantIds, request.longitude(), request.latitude(), customerUserInfo.getCustomerUserId(), request.isOpen()
+                restaurantIds, request.longitude(), request.latitude(), customerUserId, request.isOpen()
         );
 
         List<RestaurantSimpleByDistanceVo> restaurantSimpleByDistanceVos = restaurantRepositoryImpl

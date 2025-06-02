@@ -3,9 +3,7 @@ package org.quack.QUACKServer.review.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.auth.domain.PrincipalManager;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
-import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
 import org.quack.QUACKServer.review.dto.response.GetReviewMyCountResponse;
 import org.quack.QUACKServer.review.enums.ReviewEnum;
 import org.quack.QUACKServer.review.repository.ReviewLikeRepository;
@@ -28,15 +26,9 @@ public class MyPageReviewService {
 
     private final ReviewRepository reviewRepository;
 
-    public GetReviewMyCountResponse getMyReviewCounts() {
+    public GetReviewMyCountResponse getMyReviewCounts(Long customerUserId) {
 
-        if(PrincipalManager.isAnonymous()) {
-            throw new IllegalStateException("비로그인 시 조회 할 수 없습니다.");
-        }
-
-        CustomerUserInfo customerUserInfo = PrincipalManager.getCustomerUserInfo();
-
-        long count = reviewRepository.countByUserId(customerUserInfo.getCustomerUserId());
+        long count = reviewRepository.countByUserId(customerUserId);
 
         return GetReviewMyCountResponse.from(count);
 
@@ -51,9 +43,7 @@ public class MyPageReviewService {
 
     }
 
-    public ResponseDto<?> searchDecibel() {
-        Long customerUserId = PrincipalManager.getCustomerUserId();
-
+    public ResponseDto<?> searchDecibel(Long customerUserId) {
         Long reviewLike = reviewLikeRepository.countReviewLikeByCustomerUserIdAndLikeType(customerUserId, ReviewEnum.ReviewLikeType.LIKE);
         Long reviewDisLike = reviewLikeRepository.countReviewLikeByCustomerUserIdAndLikeType(customerUserId, ReviewEnum.ReviewLikeType.DISLIKE);
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import org.quack.QUACKServer.core.error.constant.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -52,6 +53,14 @@ public record ResponseDto<T>(
                 .isSuccess(false)
                 .message(e.customMessaged())
                 .data(null)
+                .build();
+    }
+
+    public static ResponseDto<?> fail(final ErrorCode e) {
+        return ResponseDto.builder()
+                .httpStatus(e.getHttpStatus())
+                .isSuccess(false)
+                .message(e.getMessage())
                 .build();
     }
 }

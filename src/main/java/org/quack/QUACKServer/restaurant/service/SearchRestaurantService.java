@@ -2,7 +2,6 @@ package org.quack.QUACKServer.restaurant.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.auth.domain.PrincipalManager;
 import org.quack.QUACKServer.restaurant.dto.request.SearchRestaurantsByKeywordRequest;
 import org.quack.QUACKServer.restaurant.dto.response.SearchRestaurantsByKeywordItem;
 import org.quack.QUACKServer.restaurant.dto.response.SearchRestaurantsByKeywordResponse;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 
 /**
@@ -40,10 +38,10 @@ public class SearchRestaurantService {
     private final RestaurantRepositoryImpl restaurantRepositoryImpl;
     private final SubtractRestaurantService subtractRestaurantService;
 
-    public SearchRestaurantsByKeywordResponse searchRestaurantByName(SearchRestaurantsByKeywordRequest request) {
+    public SearchRestaurantsByKeywordResponse searchRestaurantByName(SearchRestaurantsByKeywordRequest request, Long customerUserId) {
 
-        if(RestaurantEnum.RestaurantSortType.DISTANCE.equals(request.sort().sortType()) && !PrincipalManager.isAnonymous()) {
-            CustomerUserMetadata metadata = customerUserMetadataRepository.findById(Objects.requireNonNull(PrincipalManager.getCustomerUserId()))
+        if(RestaurantEnum.RestaurantSortType.DISTANCE.equals(request.sort().sortType()) && customerUserId != null) {
+            CustomerUserMetadata metadata = customerUserMetadataRepository.findById(customerUserId)
                     .orElseThrow(() -> new RuntimeException("서버 에러 발생"));
 
             if(!metadata.getLocationTermsAgreed()) {
@@ -56,7 +54,7 @@ public class SearchRestaurantService {
             }
         }
 
-        RestaurantSearchFilter filter = RestaurantSearchFilter.from(request);
+        RestaurantSearchFilter filter = RestaurantSearchFilter.of(request, customerUserId);
 
         List<SearchRestaurantsByKeywordItem> items = new ArrayList<>();
 

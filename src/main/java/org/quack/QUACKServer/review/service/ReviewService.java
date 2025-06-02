@@ -90,7 +90,7 @@ public class ReviewService {
                 reviewId,
                 request.reviewPhotos()
         );
-        reviewPhotoService.upload(reviewPhotoUploadRequest);
+        reviewPhotoService.upload(reviewPhotoUploadRequest, user.getCustomerUserId());
 
         return "Success";
     }
@@ -147,7 +147,7 @@ public class ReviewService {
 
         SliceImpl<ReviewWithRestaurantResponse> allMyReview = new SliceImpl<>(content, pageable, hasNext);
 
-        GetCustomerUserProfileResponse customerUserProfile = customerUserService.getCustomerUserProfile();
+        GetCustomerUserProfileResponse customerUserProfile = customerUserService.getCustomerUserProfile(user.getCustomerUserId());
 
         return MyReviewResponse.of(allMyReview, customerUserProfile.nickname(),
                 customerUserProfile.profilePhotosId());

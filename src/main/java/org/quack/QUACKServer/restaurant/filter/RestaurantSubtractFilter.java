@@ -2,7 +2,6 @@ package org.quack.QUACKServer.restaurant.filter;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.quack.QUACKServer.auth.domain.PrincipalManager;
 import org.quack.QUACKServer.restaurant.dto.request.SearchSubtractRestaurantLocationsRequest;
 import org.quack.QUACKServer.restaurant.dto.request.SearchSubtractRestaurantsRequest;
 import org.quack.QUACKServer.restaurant.enums.RestaurantEnum;
@@ -42,25 +41,25 @@ public class RestaurantSubtractFilter {
     // 정렬 필터링
     private Pageable pageable;
 
-    public static RestaurantSubtractFilter from(SearchSubtractRestaurantsRequest request) {
+    public static RestaurantSubtractFilter of(SearchSubtractRestaurantsRequest request, Long customerUserId) {
 
         return RestaurantSubtractFilter.builder()
                 .longitude(request.userLocationItem() != null ? request.userLocationItem().longitude() : null)
                 .latitude(request.userLocationItem() != null ? request.userLocationItem().latitude() : null)
                 .sortType(request.sort().sortType())
                 .isOpen(request.sort().isOpen())
-                .customerUserId(PrincipalManager.getCustomerUserId() == null ? PrincipalManager.getCustomerUserId() : 0L)
+                .customerUserId(customerUserId)
                 .build();
 
     }
 
-    public static RestaurantSubtractFilter from(SearchSubtractRestaurantLocationsRequest request) {
+    public static RestaurantSubtractFilter of(SearchSubtractRestaurantLocationsRequest request, Long customerUserId) {
         return RestaurantSubtractFilter.builder()
                 .longitude(request.userLocationItem() != null ? request.userLocationItem().longitude() : null)
                 .latitude(request.userLocationItem() != null ? request.userLocationItem().latitude() : null)
                 .sortType(RestaurantEnum.RestaurantSortType.DISTANCE)
                 .isSaved(true)
-                .customerUserId(PrincipalManager.getCustomerUserId())
+                .customerUserId(customerUserId)
                 .build();
     }
 }
