@@ -16,6 +16,7 @@ import org.quack.QUACKServer.domain.restaurant.service.RestaurantService;
 import org.quack.QUACKServer.domain.review.domain.Review;
 import org.quack.QUACKServer.domain.review.dto.request.CreateReviewRequest;
 import org.quack.QUACKServer.domain.review.dto.response.ReviewInitResponse;
+import org.quack.QUACKServer.domain.review.dto.response.ReviewSimpleInfo;
 import org.quack.QUACKServer.domain.review.enums.ReviewEnum.ReviewKeywordType;
 import org.quack.QUACKServer.domain.review.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
@@ -103,6 +104,14 @@ public class ReviewService {
         reviewPhotoService.delete(reviewId);
 
         return "Success";
+    }
+
+    public Long getRestaurantReviewTotalCount(Long restaurantId) {
+        return reviewRepository.countByRestaurantId(restaurantId);
+    }
+
+    public List<ReviewSimpleInfo> getRestaurantRecentReview(Long restaurantId) {
+        return reviewRepository.findByRestaurantRecentReview(restaurantId);
     }
 
 
