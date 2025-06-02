@@ -45,4 +45,12 @@ out/
 
 
 ## application.yml ##
-*.yml
+# NOTE: docker-ghcr.yml 때문에 와일드카드 X
+
+
+## Apple Pem Key ##
+*.p12
+*.p8
+
+# TODO: application.yml 디렉토리 경로 추가
+

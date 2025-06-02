@@ -17,3 +17,60 @@
 <br />
 
 ## 🗂 Folder Architecture
+<pre>
+org.quack.QUACKServer
+├── auth
+│   ├── service
+│   ├── domain
+│   └── validation
+├── user
+│   ├── controller
+│   ├── service
+│   ├── domain
+│   └── repository
+├── inquiry
+│   ├── controller
+│   ├── service
+│   ├── domain
+│   └── repository
+├── restaurant
+│   ├── controller
+│   ├── service
+│   ├── domain
+│   └── repository
+├── review
+│   ├── controller
+│   ├── service
+│   ├── domain
+│   └── repository
+├── core
+│   ├── common
+│   │   ├── constant
+│   │   ├── converter
+│   │   ├── dto
+│   │   ├── enums
+│   │   ├── interceptor
+│   │   ├── log
+│   │   ├── util
+│   │   └── validation
+│   ├── config
+│   │   ├── filter
+│   │   ├── http
+│   │   ├── security
+│   │   ├── storage
+│   │   │   ├── db
+│   │   │   └── redis
+│   │   └── dto
+│   ├── error
+│   ├── enums
+│   └── jwt
+
+├── external
+│   ├── db
+│   ├── redis
+│   └── social
+└── QuackServerApplication
+
+</pre>
+
+
