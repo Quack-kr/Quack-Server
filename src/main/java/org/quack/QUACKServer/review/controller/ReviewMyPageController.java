@@ -1,10 +1,12 @@
 package org.quack.QUACKServer.review.controller;
 
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
+import org.quack.QUACKServer.review.dto.response.GetMyReviewResponse;
 import org.quack.QUACKServer.review.dto.response.GetReviewMyCountResponse;
 import org.quack.QUACKServer.review.service.MyPageReviewService;
 import org.springframework.web.bind.annotation.*;
@@ -50,5 +52,16 @@ public class ReviewMyPageController {
     @PostMapping("/my-page/decibel")
     public ResponseDto<?> deleteMyPageReview() {
         return myPageReviewService.searchDecibel();
+    }
+
+    /**
+     *
+     * 마이페이지 - 작성한 모든 리뷰 조회
+     */
+    @GetMapping("/my-reviews")
+    public GetMyReviewResponse getMyReviews(@RequestParam(defaultValue = "0") int pageNum,
+                                            @RequestParam(defaultValue = "10") int sizeNum){
+
+        return myPageReviewService.getMyReviews(pageNum, sizeNum);
     }
 }

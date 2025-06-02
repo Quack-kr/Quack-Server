@@ -3,8 +3,8 @@ package org.quack.QUACKServer.review.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
+import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.review.dto.request.CreateReviewRequest;
-import org.quack.QUACKServer.review.dto.response.MyReviewResponse;
 import org.quack.QUACKServer.review.dto.response.ReviewInitResponse;
 import org.quack.QUACKServer.review.enums.ReviewType;
 import org.quack.QUACKServer.review.service.ReviewService;
@@ -26,25 +26,16 @@ public class ReviewController {
     }
 
     @PostMapping("/{restaurantId}/create")
-    public String createReview(@PathVariable Long restaurantId,
-                               @RequestBody CreateReviewRequest request) {
-        CustomerUserInfo loginUser = getAuthenticatedUser();
+    public ResponseDto<?> createReview(@PathVariable Long restaurantId,
+                                    @RequestBody CreateReviewRequest request) {
 
-        return reviewService.createReview(loginUser, restaurantId, request);
+        return reviewService.createReview(restaurantId, request);
     }
 
     @PostMapping("/{reviewId}/delete")
-    public String deleteReview(@PathVariable Long reviewId) {
-        CustomerUserInfo loginUser = getAuthenticatedUser();
+    public ResponseDto<?> deleteReview(@PathVariable Long reviewId) {
 
-        return reviewService.deleteReview(loginUser, reviewId);
+        return reviewService.deleteReview(reviewId);
     }
 
-    @GetMapping("/my-reviews")
-    public MyReviewResponse getMyReviews(@RequestParam(defaultValue = "0") int pageNum,
-                                         @RequestParam(defaultValue = "10") int sizeNum){
-        CustomerUserInfo loginUser = getAuthenticatedUser();
-
-        return reviewService.getMyReviews(loginUser, pageNum, sizeNum);
-    }
 }
