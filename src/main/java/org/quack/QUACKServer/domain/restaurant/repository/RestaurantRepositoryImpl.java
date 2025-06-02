@@ -1,6 +1,9 @@
 package org.quack.QUACKServer.domain.restaurant.repository;
 
+import static org.quack.QUACKServer.domain.restaurant.domain.QRestaurantBreaks.restaurantBreaks;
+
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -9,6 +12,11 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -18,6 +26,8 @@ import org.quack.QUACKServer.domain.menu.domain.QMenu;
 import org.quack.QUACKServer.domain.menu.domain.QMenuEval;
 import org.quack.QUACKServer.domain.menu.enums.MenuEnum;
 import org.quack.QUACKServer.domain.restaurant.domain.*;
+import org.quack.QUACKServer.domain.restaurant.dto.response.DayOperatingInfo;
+import org.quack.QUACKServer.domain.restaurant.dto.response.RestaurantInfo;
 import org.quack.QUACKServer.domain.restaurant.enums.RestaurantEnum;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantFindDistanceFilter;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSearchFilter;
@@ -339,6 +349,89 @@ public class RestaurantRepositoryImpl implements RestaurantRepositorySupport {
                 .fetch();
     }
 
+    @Override
+    public RestaurantInfo findRestaurantInfoByRestaurantId(Long restaurantId) {
+        Tuple tuple = queryFactory
+                .select(restaurant, restaurantOwnerMetadata)
+                .from(restaurant)
+                .leftJoin(restaurantOwnerMetadata).on(restaurantOwnerMetadata.restaurantId.eq(restaurantId))
+                .where(restaurant.restaurantId.eq(restaurantId))
+                .fetchOne();
+
+        List<String> restaurantAreaList = new ArrayList<>();
+        List<RestaurantArea> restaurantAreas = tuple.get(restaurant.restaurantAreas);
+
+        for (RestaurantArea restaurantArea : restaurantAreas) {
+            restaurantAreaList.add(restaurantArea.getRestaurantAreaName());
+        }
+
+        List<String> restaurantCategoryList = new ArrayList<>();
+        List<RestaurantCategory> restaurantCategories = tuple.get(restaurant.restaurantCategories);
+
+        for (RestaurantCategory category : restaurantCategories) {
+            restaurantCategoryList.add(category.getRestaurantCategoryName().getDescription());
+        }
+
+        return RestaurantInfo.of(
+                tuple.get(restaurant.restaurantName),
+                restaurantCategoryList,
+                restaurantAreaList,
+                tuple.get(restaurant.detailAddress),
+                tuple.get(restaurant.location),
+                tuple.get(restaurantOwnerMetadata.simpleDescription),
+                tuple.get(restaurantOwnerMetadata.detailDescription),
+                tuple.get(restaurantOwnerMetadata.effortMessage)
+        );
+    }
+
+    public Map<String, DayOperatingInfo> findOperationInfo(Long restaurantId) {
+        List<String> dayOfWeek = List.of("월", "화", "수", "목", "금", "토", "일");
+
+        List<RestaurantHours> hoursList = queryFactory
+                .selectFrom(restaurantHours)
+                .where(restaurantHours.restaurantId.eq(restaurantId))
+                .fetch();
+
+
+        List<RestaurantBreaks> breaksList = queryFactory
+                .selectFrom(restaurantBreaks)
+                .where(restaurantBreaks.restaurantId.eq(restaurantId))
+                .fetch();
+
+
+        Map<String, RestaurantHours> hoursMap = hoursList.stream()
+                .collect(Collectors.toMap(
+                        RestaurantHours::getDayOfWeek,
+                        Function.identity()
+                ));
+
+
+        Map<String, RestaurantBreaks> breaksMap = breaksList.stream()
+                .collect(Collectors.toMap(
+                        RestaurantBreaks::getDayOfWeek,
+                        Function.identity()
+                ));
+
+
+        Map<String, DayOperatingInfo> result = new LinkedHashMap<>();
+
+        for (String day : dayOfWeek) {
+            RestaurantHours hourInfo = hoursMap.get(day);
+            RestaurantBreaks breakInfo = breaksMap.get(day);
+
+            result.put(day, DayOperatingInfo.of(
+                    hourInfo != null ? hourInfo.getOpenTime() : null,
+                    hourInfo != null ? hourInfo.getCloseTime() : null,
+                    hourInfo != null ? hourInfo.getLastOrderTime() : null,
+                    breakInfo != null ? breakInfo.getBreakStart() : null,
+                    breakInfo != null ? breakInfo.getBreakEnd() : null,
+                    breakInfo != null ? breakInfo.getLastOrderTime() : null,
+                    hourInfo != null ? hourInfo.getIsClosed() : null
+            ));
+        }
+
+        return result;
+    }
 
     protected BooleanBuilder builderConditionSubtractFilter(RestaurantSubtractFilter filter) {
         BooleanBuilder builder = new BooleanBuilder();

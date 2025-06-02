@@ -1,6 +1,9 @@
 package org.quack.QUACKServer.domain.restaurant.repository;
 
 
+import java.util.Map;
+import org.quack.QUACKServer.domain.restaurant.dto.response.DayOperatingInfo;
+import org.quack.QUACKServer.domain.restaurant.dto.response.RestaurantInfo;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantFindDistanceFilter;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSearchFilter;
 import org.quack.QUACKServer.domain.restaurant.filter.RestaurantSubtractFilter;
@@ -32,4 +35,8 @@ public interface RestaurantRepositorySupport {
     Slice<RestaurantSearchBySavedVo> findByRestaurantNameOrderBySaved(RestaurantSearchFilter filter);
 
     List<RestaurantSimpleByDistanceVo> findDistanceByRestaurants(RestaurantFindDistanceFilter filter);
+
+    RestaurantInfo findRestaurantInfoByRestaurantId(Long restaurantId);
+
+    Map<String, DayOperatingInfo> findOperationInfo(Long restaurantId);
 }
