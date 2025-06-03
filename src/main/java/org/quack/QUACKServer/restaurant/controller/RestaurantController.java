@@ -8,6 +8,7 @@ import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.core.error.exception.CommonException;
 import org.quack.QUACKServer.restaurant.dto.request.SearchRestaurantsByKeywordRequest;
+import org.quack.QUACKServer.restaurant.dto.response.GetRestaurantDetailInfo;
 import org.quack.QUACKServer.restaurant.dto.response.SearchRestaurantsByKeywordResponse;
 import org.quack.QUACKServer.restaurant.service.RestaurantService;
 import org.quack.QUACKServer.restaurant.service.SearchRestaurantService;
@@ -60,5 +61,16 @@ public class RestaurantController {
             throw new CommonException(UNAUTHORIZED_USER);
         }
         return restaurantService.updateCustomerUserRestaurant(restaurantId, customerUserInfo.getCustomerUserId());
+    }
+
+    /**
+     * 식당 상세 페이지
+     */
+
+    @GetMapping("/restaurant/{restaurantId}")
+    public GetRestaurantDetailInfo getRestaurantDetails(
+            @AuthenticationPrincipal CustomerUserInfo customerUserInfo,
+            @PathVariable Long restaurantId) {
+        return restaurantService.getRestaurantDetailInfo(customerUserInfo, restaurantId);
     }
 }

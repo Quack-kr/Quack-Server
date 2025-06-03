@@ -3,7 +3,6 @@ package org.quack.QUACKServer.core.external.s3.repository;
 /**
  * @author : jung-kwanhee
  * @description :
- * @packageName : org.quack.QUACKServer.global.infra.s3
  * @fileName : S3Repository
  * @date : 25. 5. 24.
  */
