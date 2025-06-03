@@ -2,6 +2,7 @@ package org.quack.QUACKServer.restaurant.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
 import org.quack.QUACKServer.core.common.dto.PageInfo;
 import org.quack.QUACKServer.restaurant.domain.CustomerSavedRestaurant;
 import org.quack.QUACKServer.restaurant.dto.request.SearchSavedRestaurantsRequest;
@@ -116,5 +117,14 @@ public class MyPageRestaurantService {
                         .toList()
         );
 
+    }
+
+    public boolean checkSavedRestaurant(CustomerUserInfo customerUserInfo, Long restaurantId) {
+         if(customerUserInfo == null){
+             return false;
+         }
+
+        return customerSavedRestaurantRepository.existsByCustomerUserIdAndRestaurantId(
+                customerUserInfo.getCustomerUserId(), restaurantId);
     }
 }

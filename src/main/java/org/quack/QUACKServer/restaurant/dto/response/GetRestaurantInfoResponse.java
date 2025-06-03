@@ -10,10 +10,10 @@ public record GetRestaurantInfoResponse(
         String restaurantName,
         String restaurantDetailAddress,
         List<String> restaurantCategory,
-        Resource restaurantImage
+        String restaurantImage
 ) {
     public static GetRestaurantInfoResponse of(String restaurantName, String restaurantDetailAddress,
-                                                 List<String> restaurantCategory, Resource restaurantImage) {
+                                                 List<String> restaurantCategory, String restaurantImage) {
         return GetRestaurantInfoResponse.builder()
                 .restaurantName(restaurantName)
                 .restaurantDetailAddress(restaurantDetailAddress)

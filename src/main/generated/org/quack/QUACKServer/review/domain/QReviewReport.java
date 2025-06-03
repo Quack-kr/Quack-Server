@@ -10,14 +10,14 @@ import com.querydsl.core.types.Path;
 
 
 /**
- * QReviewReportHistory is a Querydsl query type for ReviewReport
+ * QReviewReport is a Querydsl query type for ReviewReport
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QReviewReportHistory extends EntityPathBase<ReviewReport> {
+public class QReviewReport extends EntityPathBase<ReviewReport> {
 
-    private static final long serialVersionUID = -1268468997L;
+    private static final long serialVersionUID = -41745575L;
 
-    public static final QReviewReportHistory reviewReportHistory = new QReviewReportHistory("reviewReportHistory");
+    public static final QReviewReport reviewReport = new QReviewReport("reviewReport");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -27,15 +27,15 @@ public class QReviewReportHistory extends EntityPathBase<ReviewReport> {
 
     public final NumberPath<Long> reviewId = createNumber("reviewId", Long.class);
 
-    public QReviewReportHistory(String variable) {
+    public QReviewReport(String variable) {
         super(ReviewReport.class, forVariable(variable));
     }
 
-    public QReviewReportHistory(Path<? extends ReviewReport> path) {
+    public QReviewReport(Path<? extends ReviewReport> path) {
         super(path.getType(), path.getMetadata());
     }
 
-    public QReviewReportHistory(PathMetadata metadata) {
+    public QReviewReport(PathMetadata metadata) {
         super(ReviewReport.class, metadata);
     }
 

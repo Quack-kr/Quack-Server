@@ -1,9 +1,11 @@
 package org.quack.QUACKServer.menu.repository;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.quack.QUACKServer.menu.dto.response.GetReviewMenusResponse;
+import org.quack.QUACKServer.menu.dto.response.MenuSimpleInfo;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -49,5 +51,20 @@ public class MenuRepositoryImpl implements MenuRepositoryCustom {
         }
 
         return results;
+    }
+
+    public List<MenuSimpleInfo> findMenuSimpleInfoByRestaurantId(Long restaurantId){
+        return queryFactory
+                .select(Projections.constructor(
+                        MenuSimpleInfo.class,
+                        photos.imageUrl,
+                        menu.menuName,
+                        menu.menuPrice
+                ))
+                .from(menu)
+                .leftJoin(photos).on(photos.targetId.eq(menu.menuId)
+                        .and(photos.photoType.eq("menu_board")))
+                .where(menu.restaurantId.eq(restaurantId))
+                .fetch();
     }
 }

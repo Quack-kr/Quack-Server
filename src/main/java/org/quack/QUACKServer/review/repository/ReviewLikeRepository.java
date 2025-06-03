@@ -18,4 +18,6 @@ public interface ReviewLikeRepository extends JpaRepository<ReviewLike, Long> {
     @Query("SELECT COUNT(rl) FROM ReviewLike rl WHERE rl.userId = :customerUserId AND rl.likeType = :reviewLikeType")
     Long countReviewLikeByCustomerUserIdAndLikeType(@Param("customerUserId") Long customerUserId,
                                                     @Param("reviewLikeType") ReviewEnum.ReviewLikeType reviewLikeType);
+
+    boolean deleteReviewLikeByReviewId(Long reviewId);
 }
