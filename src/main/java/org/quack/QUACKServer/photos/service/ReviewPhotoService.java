@@ -55,4 +55,17 @@ public class ReviewPhotoService implements PhotoService<Object, ReviewPhotoUploa
 
         return ResponseDto.successCreate(null);
     }
+
+    public ResponseDto<?> delete(Long reviewId) {
+        List<Photos> reviewPhotoList = photosRepository.findAllByTargetIdAndPhotoType(reviewId,
+                PhotoType.REVIEW.name());
+
+        if (!reviewPhotoList.isEmpty()) {
+            for (Photos photos : reviewPhotoList) {
+                photosS3Repository.delete(PhotosFileDto.builder().keyName(photos.getImageUrl()).build());
+            }
+        }
+
+        return ResponseDto.success(null);
+    }
 }
