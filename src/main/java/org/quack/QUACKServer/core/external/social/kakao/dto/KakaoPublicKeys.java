@@ -5,7 +5,6 @@ import java.util.List;
 /**
  * @author : jung-kwanhee
  * @description :
- * @packageName : org.quack.QUACKServer.global.infra.social.kakao.dto
  * @fileName : KakaoPublicKeys
  * @date : 25. 5. 31.
  */

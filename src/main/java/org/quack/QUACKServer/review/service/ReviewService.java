@@ -3,6 +3,8 @@ package org.quack.QUACKServer.review.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
+import org.quack.QUACKServer.core.error.constant.ErrorCode;
+import org.quack.QUACKServer.core.error.exception.CommonException;
 import org.quack.QUACKServer.menu.dto.response.GetReviewMenusResponse;
 import org.quack.QUACKServer.menu.dto.response.MenuEvalResponse;
 import org.quack.QUACKServer.menu.service.MenuEvalService;
@@ -13,11 +15,15 @@ import org.quack.QUACKServer.photos.enums.PhotoEnum.PhotoType;
 import org.quack.QUACKServer.photos.repository.PhotosRepository;
 import org.quack.QUACKServer.photos.service.ReviewPhotoService;
 import org.quack.QUACKServer.restaurant.dto.response.GetRestaurantInfoResponse;
+import org.quack.QUACKServer.restaurant.repository.RestaurantRepository;
 import org.quack.QUACKServer.restaurant.service.RestaurantService;
 import org.quack.QUACKServer.review.domain.Review;
+import org.quack.QUACKServer.review.domain.ReviewReport;
+import org.quack.QUACKServer.review.dto.request.CreateReportRequest;
 import org.quack.QUACKServer.review.dto.request.CreateReviewRequest;
 import org.quack.QUACKServer.review.dto.response.*;
 import org.quack.QUACKServer.review.enums.ReviewEnum;
+import org.quack.QUACKServer.review.repository.ReviewReportRepository;
 import org.quack.QUACKServer.review.repository.ReviewRepository;
 import org.quack.QUACKServer.user.dto.response.GetCustomerUserProfileResponse;
 import org.quack.QUACKServer.user.service.CustomerUserService;
@@ -30,11 +36,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+
+import static org.quack.QUACKServer.core.error.constant.ErrorCode.DUPLICATE_REVIEW_REPORT;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ReviewService {
+    private final RestaurantRepository restaurantRepository;
 
     private final ReviewRepository reviewRepository;
     private final ReviewKeywordService reviewKeywordService;
@@ -44,11 +54,12 @@ public class ReviewService {
     private final ReviewPhotoService reviewPhotoService;
     private final PhotosRepository photosRepository;
     private final CustomerUserService customerUserService;
+    private final ReviewReportRepository reviewReportRepository;
 
     public ReviewInitResponse getInitData(Long restaurantId, String reviewType) {
 
         boolean validationExistence = restaurantService.validateExistence(restaurantId);
-        if(!validationExistence) throw new IllegalArgumentException("식당 정보 없음.");
+        if (!validationExistence) throw new IllegalArgumentException("식당 정보 없음.");
 
         GetRestaurantInfoResponse restaurantInfo = restaurantService.getRestaurantBasicInfo(restaurantId);
 
@@ -66,7 +77,7 @@ public class ReviewService {
         checkLoginUser(user);
 
         boolean validationExistence = restaurantService.validateExistence(restaurantId);
-        if(!validationExistence) throw new IllegalArgumentException("식당 정보 없음.");
+        if (!validationExistence) throw new IllegalArgumentException("식당 정보 없음.");
 
         Review review = Review.createReview(user.getCustomerUserId(), restaurantId, request.content());
 
@@ -96,7 +107,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public String deleteReview(CustomerUserInfo user, Long reviewId){
+    public String deleteReview(CustomerUserInfo user, Long reviewId) {
         checkLoginUser(user);
 
         validateDeletableReview(user.getCustomerUserId(), reviewId);
@@ -153,6 +164,26 @@ public class ReviewService {
                 customerUserProfile.profilePhotosId());
     }
 
+    @Transactional
+    public String reportReview(CreateReportRequest request, Long customerUserId) {
+
+        Review review = reviewRepository.findById(request.reviewId())
+                .orElseThrow(() -> new CommonException(ErrorCode.REVIEW_NOT_FOUND));
+
+        Optional<ReviewReport> reviewReport = reviewReportRepository
+                .findByReviewIdAndRestaurantIdAndCustomerUserId(review.getReviewId(), review.getRestaurantId(), customerUserId);
+
+        if (reviewReport.isPresent()) {
+            throw new CommonException(DUPLICATE_REVIEW_REPORT);
+        }
+
+        ReviewReport newReviewReport = ReviewReport.create(review, request.reportContent(), customerUserId);
+
+        reviewReportRepository.save(newReviewReport);
+
+        return "성공";
+    }
+
 
     private void checkLoginUser(CustomerUserInfo user) {
         if (user == null) {
@@ -160,7 +191,7 @@ public class ReviewService {
         }
     }
 
-    private void validateDeletableReview(Long userId, Long reviewId){
+    private void validateDeletableReview(Long userId, Long reviewId) {
         Review findReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("리뷰가 존재하지 않습니다."));
 
