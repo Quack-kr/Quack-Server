@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 /**
  * @author : jung-kwanhee
  * @description :
- * @packageName : org.quack.QUACKServer.global.config.infra
  * @fileName : JpaConfig
  * @date : 25. 4. 13.
  */

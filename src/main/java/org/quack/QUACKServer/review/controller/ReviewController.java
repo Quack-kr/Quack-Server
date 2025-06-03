@@ -6,6 +6,7 @@ import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.core.error.constant.ErrorCode;
 import org.quack.QUACKServer.core.error.exception.CommonException;
+import org.quack.QUACKServer.review.dto.request.CreateReportRequest;
 import org.quack.QUACKServer.review.dto.request.CreateReviewRequest;
 import org.quack.QUACKServer.review.dto.response.ReviewInitResponse;
 import org.quack.QUACKServer.review.enums.ReviewType;
@@ -48,4 +49,14 @@ public class ReviewController {
         return reviewService.deleteReview(loginUser, reviewId);
     }
 
+    @PostMapping("/report")
+    public ResponseDto<?> reportReview(
+            @AuthenticationPrincipal CustomerUserInfo loginUser,
+            @RequestBody CreateReportRequest request) {
+        if(loginUser == null) {
+            throw new CommonException(ErrorCode.UNAUTHORIZED_USER);
+        }
+
+        return ResponseDto.success(reviewService.reportReview(request, loginUser.getCustomerUserId()));
+    }
 }
