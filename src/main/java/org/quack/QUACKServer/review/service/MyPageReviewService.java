@@ -1,23 +1,16 @@
 package org.quack.QUACKServer.review.service;
 
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.auth.domain.PrincipalManager;
-import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
+import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.menu.dto.response.MenuEvalResponse;
 import org.quack.QUACKServer.menu.service.MenuEvalService;
 import org.quack.QUACKServer.photos.domain.Photos;
 import org.quack.QUACKServer.photos.enums.PhotoEnum.PhotoType;
 import org.quack.QUACKServer.photos.repository.PhotosRepository;
-import org.quack.QUACKServer.review.dto.response.GetMyReviewResponse;
-import org.quack.QUACKServer.review.dto.response.GetReviewMyCountResponse;
-import org.quack.QUACKServer.review.dto.response.ReviewImageResponse;
-import org.quack.QUACKServer.review.dto.response.ReviewInfoResponse;
-import org.quack.QUACKServer.review.dto.response.ReviewWithRestaurantResponse;
+import org.quack.QUACKServer.review.dto.response.*;
 import org.quack.QUACKServer.review.enums.ReviewEnum;
 import org.quack.QUACKServer.review.repository.ReviewLikeRepository;
 import org.quack.QUACKServer.review.repository.ReviewRepository;
@@ -27,6 +20,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author : jung-kwanhee
@@ -46,15 +42,9 @@ public class MyPageReviewService {
     private final MenuEvalService menuEvalService;
     private final ReviewRepository reviewRepository;
 
-    public GetReviewMyCountResponse getMyReviewCounts() {
+    public GetReviewMyCountResponse getMyReviewCounts(Long customerUserId) {
 
-        if(PrincipalManager.isAnonymous()) {
-            throw new IllegalStateException("비로그인 시 조회 할 수 없습니다.");
-        }
-
-        CustomerUserInfo customerUserInfo = PrincipalManager.getCustomerUserInfo();
-
-        long count = reviewRepository.countByUserId(customerUserInfo.getCustomerUserId());
+        long count = reviewRepository.countByUserId(customerUserId);
 
         return GetReviewMyCountResponse.from(count);
 
@@ -69,9 +59,7 @@ public class MyPageReviewService {
 
     }
 
-    public ResponseDto<?> searchDecibel() {
-        Long customerUserId = PrincipalManager.getCustomerUserId();
-
+    public ResponseDto<?> searchDecibel(Long customerUserId) {
         Long reviewLike = reviewLikeRepository.countReviewLikeByCustomerUserIdAndLikeType(customerUserId, ReviewEnum.ReviewLikeType.LIKE);
         Long reviewDisLike = reviewLikeRepository.countReviewLikeByCustomerUserIdAndLikeType(customerUserId, ReviewEnum.ReviewLikeType.DISLIKE);
 
@@ -80,13 +68,7 @@ public class MyPageReviewService {
         return ResponseDto.successCreate(decibel);
     }
 
-    public GetMyReviewResponse getMyReviews(int pageNum, int sizeNum) {
-
-        if(PrincipalManager.isAnonymous()) {
-            throw new IllegalStateException("비로그인 시 조회 할 수 없습니다.");
-        }
-
-        CustomerUserInfo customerUserInfo = PrincipalManager.getCustomerUserInfo();
+    public GetMyReviewResponse getMyReviews(CustomerUserInfo customerUserInfo, int pageNum, int sizeNum) {
 
         Pageable pageable = PageRequest.of(pageNum, sizeNum);
 
@@ -124,18 +106,17 @@ public class MyPageReviewService {
         boolean hasNext = false;
         if (content.size() > pageable.getPageSize()) {
             hasNext = true;
-            content.remove(content.size() - 1);
+            content.removeLast();
         }
 
         SliceImpl<ReviewWithRestaurantResponse> allMyReview = new SliceImpl<>(content, pageable, hasNext);
 
-        GetCustomerUserProfileResponse customerUserProfile = customerUserService.getCustomerUserProfile();
+        GetCustomerUserProfileResponse customerUserProfile = customerUserService.getCustomerUserProfile(customerUserInfo.getCustomerUserId());
+
         Object userProfile = customerUserService.getCustomerUserProfilePhoto(
                 customerUserProfile.profilePhotosId()).data();
 
-        GetMyReviewResponse reviews = GetMyReviewResponse.of(allMyReview, customerUserProfile.nickname(),
+        return GetMyReviewResponse.of(allMyReview, customerUserProfile.nickname(),
                 String.valueOf(userProfile));
-
-        return reviews;
     }
 }

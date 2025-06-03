@@ -39,7 +39,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // 토큰이 잘 들어 왔는지 검증
         if (!StringUtils.isEmpty(token) && jwtUtil.isValidToken(token)) {
-            CustomerUserInfo customerUserInfo = jwtUtil.getQuackUserByToken(token);
+            CustomerUserInfo customerUserInfo = jwtUtil.getUserInfoByToken(token);
 
             UsernamePasswordAuthenticationToken beforeAuthenticationToken =
                     new UsernamePasswordAuthenticationToken(customerUserInfo, null, customerUserInfo.getAuthorities());

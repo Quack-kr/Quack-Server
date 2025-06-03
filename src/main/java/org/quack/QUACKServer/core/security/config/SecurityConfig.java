@@ -2,7 +2,6 @@ package org.quack.QUACKServer.core.security.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.core.security.filter.RequestParamCamelizingFilter;
 import org.quack.QUACKServer.core.security.filter.SocialAuthLoginFilter;
 import org.quack.QUACKServer.core.security.jwt.JwtExceptionFilter;
 import org.quack.QUACKServer.core.security.jwt.JwtTokenFilter;
@@ -38,7 +37,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    @Qualifier("handlerMappingIntrospector") HandlerMappingIntrospector introspector,
-                                                   @Qualifier("requestParamCamelizingFilter") RequestParamCamelizingFilter requestParamCamelizingFilter,
                                                    SocialAuthLoginFilter socialAuthLoginFilter,
                                                    JwtTokenFilter jwtTokenFilter,
                                                    JwtExceptionFilter jwtExceptionFilter) throws Exception {
@@ -57,7 +55,6 @@ public class SecurityConfig {
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(socialAuthLoginFilter, LogoutFilter.class)
-                .addFilterAfter(requestParamCamelizingFilter, socialAuthLoginFilter.getClass())
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtTokenFilter.class)
                 .logout(logout -> logout

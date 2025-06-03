@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
-import org.quack.QUACKServer.core.common.constant.ErrorCode;
+import org.quack.QUACKServer.core.error.constant.ErrorCode;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.core.error.exception.CommonException;
 import org.quack.QUACKServer.core.security.enums.ProviderType;
@@ -63,7 +63,7 @@ public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilte
             String idToken = request.getHeader("id_token");
 
             if (clientType == null || idToken == null) {
-                throw new AuthenticationException("Invalid client_type or id_token") {};
+                throw new CommonException(ErrorCode.INVALID_ID_TOKEN);
             }
 
             LoginAuthenticationProvider provider = providerFactory.get(clientType);
@@ -73,7 +73,7 @@ public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilte
             return provider.authenticate(quackAuthenticationDto);
 
         } catch (AuthenticationException e) {
-            throw new CommonException(ErrorCode.UN_AUTHENTICATION_ACCESS);
+            throw new CommonException(ErrorCode.UNAUTHORIZED_USER);
         }
     }
 

@@ -1,37 +1,27 @@
 package org.quack.QUACKServer.review.service;
 
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
-import org.quack.QUACKServer.auth.domain.PrincipalManager;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.menu.dto.response.GetReviewMenusResponse;
-import org.quack.QUACKServer.menu.dto.response.MenuEvalResponse;
 import org.quack.QUACKServer.menu.service.MenuEvalService;
 import org.quack.QUACKServer.menu.service.MenuService;
-import org.quack.QUACKServer.photos.domain.Photos;
 import org.quack.QUACKServer.photos.dto.ReviewPhotoUploadRequest;
-import org.quack.QUACKServer.photos.enums.PhotoEnum.PhotoType;
-import org.quack.QUACKServer.photos.repository.PhotosRepository;
 import org.quack.QUACKServer.photos.service.ReviewPhotoService;
 import org.quack.QUACKServer.restaurant.dto.response.GetRestaurantInfoResponse;
-import org.quack.QUACKServer.restaurant.service.RestaurantService;
+import org.quack.QUACKServer.restaurant.service.RestaurantManager;
 import org.quack.QUACKServer.review.domain.Review;
 import org.quack.QUACKServer.review.dto.request.CreateReviewRequest;
-import org.quack.QUACKServer.review.dto.response.*;
+import org.quack.QUACKServer.review.dto.response.ReviewInitResponse;
+import org.quack.QUACKServer.review.dto.response.ReviewSimpleInfo;
 import org.quack.QUACKServer.review.enums.ReviewEnum;
 import org.quack.QUACKServer.review.repository.ReviewRepository;
-import org.quack.QUACKServer.user.dto.response.GetCustomerUserProfileResponse;
-import org.quack.QUACKServer.user.service.CustomerUserService;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -43,13 +33,13 @@ public class ReviewService {
     private final ReviewKeywordService reviewKeywordService;
     private final MenuEvalService menuEvalService;
     private final MenuService menuService;
-    private final RestaurantService restaurantService;
     private final ReviewPhotoService reviewPhotoService;
     private final ReviewLikeService reviewLikeService;
+    private final RestaurantManager restaurantManager;
 
     public ReviewInitResponse getInitData(Long restaurantId, String reviewType) {
 
-        GetRestaurantInfoResponse restaurantInfo = restaurantService.getRestaurantBasicInfo(restaurantId);
+        GetRestaurantInfoResponse restaurantInfo = restaurantManager.getRestaurantBasicInfo(restaurantId);
 
         if (reviewType.equals("FULL")) {
             Map<String, List<GetReviewMenusResponse>> menus = menuService.getMenusForReview(restaurantId);
@@ -61,15 +51,9 @@ public class ReviewService {
     }
 
     @Transactional
-    public ResponseDto<?> createReview(Long restaurantId, CreateReviewRequest request) {
+    public ResponseDto<?> createReview(CustomerUserInfo customerUserInfo, Long restaurantId, CreateReviewRequest request) {
 
-        if(PrincipalManager.isAnonymous()) {
-            throw new IllegalStateException("비로그인 시 리뷰 작성을 할 수 없습니다.");
-        }
-
-        CustomerUserInfo customerUserInfo = PrincipalManager.getCustomerUserInfo();
-
-        boolean validationExistence = restaurantService.validateExistence(restaurantId);
+        boolean validationExistence = restaurantManager.validateExistence(restaurantId);
         if(!validationExistence) throw new IllegalArgumentException("식당 정보 없음.");
 
         Review review = Review.createReview(customerUserInfo.getCustomerUserId(), restaurantId, request.content());
@@ -94,19 +78,17 @@ public class ReviewService {
                 reviewId,
                 request.reviewPhotos()
         );
-        reviewPhotoService.upload(reviewPhotoUploadRequest);
+        reviewPhotoService.upload(reviewPhotoUploadRequest, customerUserInfo.getCustomerUserId());
 
         return ResponseDto.success(null);
     }
 
     @Transactional
-    public ResponseDto<?> deleteReview(Long reviewId){
+    public ResponseDto<?> deleteReview(CustomerUserInfo customerUserInfo, Long reviewId){
 
-        if(PrincipalManager.isAnonymous()) {
+        if(customerUserInfo == null) {
             throw new IllegalStateException("비로그인 시 리뷰 작성을 할 수 없습니다.");
         }
-
-        CustomerUserInfo customerUserInfo = PrincipalManager.getCustomerUserInfo();
 
         validateDeletableReview(customerUserInfo.getCustomerUserId(), reviewId);
 

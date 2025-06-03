@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.core.common.constant.ErrorCode;
+import org.quack.QUACKServer.core.error.constant.ErrorCode;
 import org.quack.QUACKServer.core.error.exception.CommonException;
 import org.quack.QUACKServer.auth.domain.JwtTokenDto;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,11 +34,11 @@ public class AuthRedisRepository implements RedisRepository<String, JwtTokenDto>
     @Value("${spring.datasource.data.redis.default-ttl}")
     long defaultTtl;
 
-    @Resource(name = "authTokenRedisTemplate")
+    @Resource(name = "redisTemplate")
     private ValueOperations<String, String> valueOperations;
 
     public AuthRedisRepository(
-            ObjectMapper objectMapper, @Qualifier("authTokenRedisTemplate") RedisTemplate<String, String> authTokenRedisTemplate) {
+            ObjectMapper objectMapper, @Qualifier("redisTemplate") RedisTemplate<String, String> authTokenRedisTemplate) {
         this.objectMapper = objectMapper;
         this.authTokenRedisTemplate = authTokenRedisTemplate;
     }

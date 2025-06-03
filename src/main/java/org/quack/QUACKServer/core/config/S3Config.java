@@ -1,4 +1,4 @@
-package org.quack.QUACKServer.core.config.app;
+package org.quack.QUACKServer.core.config;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;

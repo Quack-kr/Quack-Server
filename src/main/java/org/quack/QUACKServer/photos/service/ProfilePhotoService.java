@@ -2,8 +2,7 @@ package org.quack.QUACKServer.photos.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.auth.domain.PrincipalManager;
-import org.quack.QUACKServer.core.common.constant.ErrorCode;
+import org.quack.QUACKServer.core.error.constant.ErrorCode;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.core.error.exception.CommonException;
 import org.quack.QUACKServer.photos.domain.Photos;
@@ -34,7 +33,7 @@ public class ProfilePhotoService implements PhotoService<Object, ProfileUploadRe
     private final PhotosRepository photosRepository;
 
     @Override
-    public ResponseDto<?> upload(ProfileUploadRequest profileUploadRequest) {
+    public ResponseDto<?> upload(ProfileUploadRequest profileUploadRequest, Long customerUserId) {
 
         try {
             MultipartFile file = profileUploadRequest.photoFile();
@@ -49,7 +48,7 @@ public class ProfilePhotoService implements PhotoService<Object, ProfileUploadRe
 
             Photos photos = Photos.builder()
                     .imageUrl(fullPath)
-                    .targetId(PrincipalManager.getCustomerUserId())
+                    .targetId(customerUserId)
                     .sortOrder(1)
                     .photoType(PhotoEnum.PhotoType.DEFAULT_PROFILE.name())
                     .build();

@@ -1,4 +1,4 @@
-package org.quack.QUACKServer.core.config.stoarge.db;
+package org.quack.QUACKServer.core.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

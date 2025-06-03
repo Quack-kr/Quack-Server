@@ -22,7 +22,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import static org.quack.QUACKServer.core.common.constant.ErrorCode.PHOTO_UPLOAD_ERROR;
+import static org.quack.QUACKServer.core.error.constant.ErrorCode.PHOTO_UPLOAD_ERROR;
 
 
 /**

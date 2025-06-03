@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "review_report")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReviewReportHistory {
+public class ReviewReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

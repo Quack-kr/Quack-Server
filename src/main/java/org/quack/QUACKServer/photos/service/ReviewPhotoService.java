@@ -25,7 +25,7 @@ public class ReviewPhotoService implements PhotoService<Object, ReviewPhotoUploa
     private final PhotosRepository photosRepository;
 
     @Override
-    public ResponseDto<?> upload(ReviewPhotoUploadRequest reviewPhotoUploadRequest) {
+    public ResponseDto<?> upload(ReviewPhotoUploadRequest reviewPhotoUploadRequest, Long customerUserId) {
 
         try{
             List<MultipartFile> multipartFiles = reviewPhotoUploadRequest.reviewPhotos();

@@ -2,7 +2,7 @@ package org.quack.QUACKServer.restaurant.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.quack.QUACKServer.auth.domain.PrincipalManager;
+import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
 import org.quack.QUACKServer.restaurant.domain.Restaurant;
 import org.quack.QUACKServer.restaurant.domain.RestaurantCategory;
 import org.quack.QUACKServer.restaurant.domain.RestaurantMetadata;
@@ -49,10 +49,10 @@ public class SubtractRestaurantService {
     private final RestaurantOwnerMetadataRepository restaurantOwnerMetadataRepository;
 
     @Transactional(readOnly = true)
-    public SearchSubtractRestaurantsResponse searchSubtractRestaurants(SearchSubtractRestaurantsRequest request) {
+    public SearchSubtractRestaurantsResponse searchSubtractRestaurants(SearchSubtractRestaurantsRequest request, CustomerUserInfo userInfo) {
 
-        if(RestaurantEnum.RestaurantSortType.DISTANCE.equals(request.sort().sortType()) && !PrincipalManager.isAnonymous()) {
-            CustomerUserMetadata metadata = customerUserMetadataRepository.findById(Objects.requireNonNull(PrincipalManager.getCustomerUserId()))
+        if(RestaurantEnum.RestaurantSortType.DISTANCE.equals(request.sort().sortType()) && userInfo != null) {
+            CustomerUserMetadata metadata = customerUserMetadataRepository.findById(Objects.requireNonNull(userInfo.getCustomerUserId()))
                     .orElseThrow(() -> new RuntimeException("서버 에러 발생"));
 
             if(!metadata.getLocationTermsAgreed()) {
@@ -65,9 +65,7 @@ public class SubtractRestaurantService {
             }
         }
 
-
-
-        RestaurantSubtractFilter filter = RestaurantSubtractFilter.from(request);
+        RestaurantSubtractFilter filter = RestaurantSubtractFilter.of(request, userInfo == null ? null : userInfo.getCustomerUserId());
 
         // 1. 필터링 처리
         if (request.filter() != null) {
@@ -139,14 +137,14 @@ public class SubtractRestaurantService {
         return SearchSubtractRestaurantsResponse.from(subtractRestaurantItems);
     }
 
-    public SearchSubtractRestaurantLocationsResponse searchSubtractRestaurantLocations(SearchSubtractRestaurantLocationsRequest request) {
+    public SearchSubtractRestaurantLocationsResponse searchSubtractRestaurantLocations(SearchSubtractRestaurantLocationsRequest request, Long customerUserId) {
 
 
         if (request.userLocationItem() == null || request.userLocationItem().longitude() == null || request.userLocationItem().latitude() == null) {
             throw new IllegalArgumentException("사용자 위치를 읽을 수 없습니다.");
         }
 
-        RestaurantSubtractFilter filter = RestaurantSubtractFilter.from(request);
+        RestaurantSubtractFilter filter = RestaurantSubtractFilter.of(request, customerUserId);
 
         List<RestaurantSubtractByDistanceVo> restaurants = restaurantRepositoryImpl.findAllBySubtractFilterOrderByDistance(filter);
 

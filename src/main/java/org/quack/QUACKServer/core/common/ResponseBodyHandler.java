@@ -1,4 +1,4 @@
-package org.quack.QUACKServer.core.error.handler;
+package org.quack.QUACKServer.core.common;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;

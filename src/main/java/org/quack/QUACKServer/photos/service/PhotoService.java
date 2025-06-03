@@ -9,5 +9,5 @@ package org.quack.QUACKServer.photos.service;
  */
 public interface PhotoService<T, K> {
 
-    T upload(K k);
+    T upload(K k, Long customerUserId);
 }

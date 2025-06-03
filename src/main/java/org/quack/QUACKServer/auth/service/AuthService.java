@@ -4,12 +4,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.quack.QUACKServer.auth.domain.PrincipalManager;
 import org.quack.QUACKServer.auth.dto.request.SignupRequest;
 import org.quack.QUACKServer.auth.dto.response.AuthResponse;
 import org.quack.QUACKServer.auth.enums.AuthEnum;
 import org.quack.QUACKServer.auth.enums.SignUpStatus;
-import org.quack.QUACKServer.core.common.constant.ErrorCode;
+import org.quack.QUACKServer.core.error.constant.ErrorCode;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.core.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.core.error.exception.CommonException;
@@ -31,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import static org.quack.QUACKServer.core.common.constant.ErrorCode.*;
+import static org.quack.QUACKServer.core.error.constant.ErrorCode.*;
 
 /**
  * @author : jung-kwanhee
@@ -162,13 +161,9 @@ public class AuthService {
     }
 
     @Transactional
-    public ResponseDto<?> deleteCustomerUser() {
+    public ResponseDto<?> deleteCustomerUser(Long customerUserId) {
 
-        if(PrincipalManager.getCustomerUserId() == null) {
-           throw new CommonException(INVALID_REFRESH_TOKEN);
-        }
-
-        CustomerUser customerUser = customerUserRepository.findById(PrincipalManager.getCustomerUserId())
+        CustomerUser customerUser = customerUserRepository.findById(customerUserId)
                 .orElseThrow(() -> new CommonException(ErrorCode.USER_NOT_FOUND));
 
         customerUserRepository.delete(customerUser);

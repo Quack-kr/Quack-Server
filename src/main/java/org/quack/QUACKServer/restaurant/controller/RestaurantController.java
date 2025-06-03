@@ -4,13 +4,18 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
+import org.quack.QUACKServer.core.error.exception.CommonException;
 import org.quack.QUACKServer.restaurant.dto.request.SearchRestaurantsByKeywordRequest;
 import org.quack.QUACKServer.restaurant.dto.response.GetRestaurantDetailInfo;
 import org.quack.QUACKServer.restaurant.dto.response.SearchRestaurantsByKeywordResponse;
 import org.quack.QUACKServer.restaurant.service.RestaurantService;
 import org.quack.QUACKServer.restaurant.service.SearchRestaurantService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import static org.quack.QUACKServer.core.error.constant.ErrorCode.UNAUTHORIZED_USER;
 
 /**
  * @author : jung-kwanhee
@@ -32,8 +37,15 @@ public class RestaurantController {
      * 검색 기능
      */
     @GetMapping("/restaurant/search/restaurants")
-    public SearchRestaurantsByKeywordResponse searchSubtractRestaurants(@RequestBody(required = false) @Valid SearchRestaurantsByKeywordRequest request) {
-        return searchRestaurantService.searchRestaurantByName(request);
+    public SearchRestaurantsByKeywordResponse searchSubtractRestaurants(
+            @AuthenticationPrincipal CustomerUserInfo customerUserInfo,
+            @RequestBody(required = false) @Valid SearchRestaurantsByKeywordRequest request) {
+
+        if(customerUserInfo == null) {
+            throw new CommonException(UNAUTHORIZED_USER);
+        }
+
+        return searchRestaurantService.searchRestaurantByName(request,customerUserInfo.getCustomerUserId());
     }
 
 
@@ -41,8 +53,14 @@ public class RestaurantController {
      * 식당 저장
      */
     @PostMapping("/my-restaurant/update")
-    public ResponseDto<?> updateCustomerUserRestaurant(@RequestBody @Valid @NotNull Long restaurantId) {
-        return restaurantService.updateCustomerUserRestaurant(restaurantId);
+    public ResponseDto<?> updateCustomerUserRestaurant(
+            @AuthenticationPrincipal CustomerUserInfo customerUserInfo,
+            @RequestBody @Valid @NotNull Long restaurantId) {
+
+        if(customerUserInfo == null) {
+            throw new CommonException(UNAUTHORIZED_USER);
+        }
+        return restaurantService.updateCustomerUserRestaurant(restaurantId, customerUserInfo.getCustomerUserId());
     }
 
     /**
@@ -50,7 +68,9 @@ public class RestaurantController {
      */
 
     @GetMapping("/restaurant/{restaurantId}")
-    public GetRestaurantDetailInfo getRestaurantDetails(@PathVariable Long restaurantId) {
-        return restaurantService.getRestaurantDetailInfo(restaurantId);
+    public GetRestaurantDetailInfo getRestaurantDetails(
+            @AuthenticationPrincipal CustomerUserInfo customerUserInfo,
+            @PathVariable Long restaurantId) {
+        return restaurantService.getRestaurantDetailInfo(customerUserInfo, restaurantId);
     }
 }

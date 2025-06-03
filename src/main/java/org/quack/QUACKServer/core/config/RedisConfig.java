@@ -1,4 +1,4 @@
-package org.quack.QUACKServer.core.config.stoarge.redis;
+package org.quack.QUACKServer.core.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -48,15 +48,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> quackRedisTemplate() {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(lettuceConnectionFactory());
-        redisTemplate.setDefaultSerializer(new StringRedisSerializer());
-        return redisTemplate;
-    }
-
-    @Bean
-    public RedisTemplate<String, String> authTokenRedisTemplate() {
+    public RedisTemplate<String, String> redisTemplate() {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(lettuceConnectionFactory());
         redisTemplate.setDefaultSerializer(new StringRedisSerializer());

@@ -5,10 +5,14 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
+import org.quack.QUACKServer.core.error.constant.ErrorCode;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.review.dto.response.GetMyReviewResponse;
+import org.quack.QUACKServer.core.error.exception.CommonException;
 import org.quack.QUACKServer.review.dto.response.GetReviewMyCountResponse;
 import org.quack.QUACKServer.review.service.MyPageReviewService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -30,8 +34,14 @@ public class ReviewMyPageController {
      * 마이페이지 - 저장된 리뷰수 조회
      */
     @GetMapping("/my-page/review-count")
-    public GetReviewMyCountResponse selectMyPageReviewCount() {
-        return myPageReviewService.getMyReviewCounts();
+    public GetReviewMyCountResponse selectMyPageReviewCount(
+            @AuthenticationPrincipal CustomerUserInfo customerUserInfo) {
+
+        if(customerUserInfo == null) {
+            throw new CommonException(ErrorCode.UNAUTHORIZED_USER);
+        }
+
+        return myPageReviewService.getMyReviewCounts(customerUserInfo.getCustomerUserId());
     }
 
 
@@ -50,8 +60,12 @@ public class ReviewMyPageController {
      * 마이페이지 - 핵공감 데시벨 조회
      */
     @PostMapping("/my-page/decibel")
-    public ResponseDto<?> deleteMyPageReview() {
-        return myPageReviewService.searchDecibel();
+    public ResponseDto<?> deleteMyPageReview(@AuthenticationPrincipal CustomerUserInfo customerUserInfo) {
+        if(customerUserInfo == null) {
+            throw new CommonException(ErrorCode.UNAUTHORIZED_USER);
+        }
+
+        return myPageReviewService.searchDecibel(customerUserInfo.getCustomerUserId());
     }
 
     /**
@@ -59,9 +73,13 @@ public class ReviewMyPageController {
      * 마이페이지 - 작성한 모든 리뷰 조회
      */
     @GetMapping("/my-reviews")
-    public GetMyReviewResponse getMyReviews(@RequestParam(defaultValue = "0") int pageNum,
-                                            @RequestParam(defaultValue = "10") int sizeNum){
-
-        return myPageReviewService.getMyReviews(pageNum, sizeNum);
+    public GetMyReviewResponse getMyReviews(
+            @AuthenticationPrincipal CustomerUserInfo customerUserInfo,
+            @RequestParam(defaultValue = "0") int pageNum,
+            @RequestParam(defaultValue = "10") int sizeNum){
+        if(customerUserInfo == null) {
+            throw new CommonException(ErrorCode.UNAUTHORIZED_USER);
+        }
+        return myPageReviewService.getMyReviews(customerUserInfo, pageNum, sizeNum);
     }
 }
