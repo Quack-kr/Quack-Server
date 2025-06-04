@@ -44,10 +44,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authenticationManager(quackAuthenticationManager)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(new MvcRequestMatcher(introspector, "/public/**")).hasAuthority("ANONYMOUS")
-                        .requestMatchers(new MvcRequestMatcher(introspector, "/auth/**")).permitAll()
-                        .requestMatchers(new MvcRequestMatcher(introspector, "/api/v1/auth/**")).permitAll()
-                        .requestMatchers(new MvcRequestMatcher(introspector, "/common/health-check")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/v1/public/**")).hasAuthority("ANONYMOUS")
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/v1/auth/**")).permitAll()
+                        .requestMatchers(new MvcRequestMatcher(introspector, "/v1/common/health-check")).permitAll()
                                 .anyRequest().authenticated())
                 .anonymous(anon -> anon
                         .principal("guest-user")
@@ -58,7 +57,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtTokenFilter.class)
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/api/v1/auth/logout")
+                        .logoutSuccessUrl("/v1/auth/logout")
                         .logoutSuccessHandler(
                                 (request, response, auth) -> SecurityContextHolder.clearContext()))
                 .build();
