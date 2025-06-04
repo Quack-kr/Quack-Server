@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
+import org.quack.QUACKServer.core.error.constant.ErrorCode;
+import org.quack.QUACKServer.core.error.exception.CommonException;
 import org.quack.QUACKServer.menu.dto.response.GetReviewMenusResponse;
 import org.quack.QUACKServer.menu.service.MenuEvalService;
 import org.quack.QUACKServer.menu.service.MenuService;
@@ -12,10 +14,13 @@ import org.quack.QUACKServer.photos.service.ReviewPhotoService;
 import org.quack.QUACKServer.restaurant.dto.response.GetRestaurantInfoResponse;
 import org.quack.QUACKServer.restaurant.service.RestaurantManager;
 import org.quack.QUACKServer.review.domain.Review;
+import org.quack.QUACKServer.review.domain.ReviewReport;
+import org.quack.QUACKServer.review.dto.request.CreateReportRequest;
 import org.quack.QUACKServer.review.dto.request.CreateReviewRequest;
 import org.quack.QUACKServer.review.dto.response.ReviewInitResponse;
 import org.quack.QUACKServer.review.dto.response.ReviewSimpleInfo;
 import org.quack.QUACKServer.review.enums.ReviewEnum;
+import org.quack.QUACKServer.review.repository.ReviewReportRepository;
 import org.quack.QUACKServer.review.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+
+import static org.quack.QUACKServer.core.error.constant.ErrorCode.DUPLICATE_REVIEW_REPORT;
 
 @Service
 @Slf4j
@@ -36,6 +44,7 @@ public class ReviewService {
     private final ReviewPhotoService reviewPhotoService;
     private final ReviewLikeService reviewLikeService;
     private final RestaurantManager restaurantManager;
+    private final ReviewReportRepository reviewReportRepository;
 
     public ReviewInitResponse getInitData(Long restaurantId, String reviewType) {
 
@@ -109,8 +118,28 @@ public class ReviewService {
         return reviewRepository.findByRestaurantRecentReview(restaurantId);
     }
 
+    @Transactional
+    public String reportReview(CreateReportRequest request, Long customerUserId) {
 
-    private void validateDeletableReview(Long userId, Long reviewId){
+        Review review = reviewRepository.findById(request.reviewId())
+                .orElseThrow(() -> new CommonException(ErrorCode.REVIEW_NOT_FOUND));
+
+        Optional<ReviewReport> reviewReport = reviewReportRepository
+                .findByReviewIdAndRestaurantIdAndCustomerUserId(review.getReviewId(), review.getRestaurantId(), customerUserId);
+
+        if (reviewReport.isPresent()) {
+            throw new CommonException(DUPLICATE_REVIEW_REPORT);
+        }
+
+        ReviewReport newReviewReport = ReviewReport.create(review, request.reportContent(), customerUserId);
+
+        reviewReportRepository.save(newReviewReport);
+
+        return "성공";
+    }
+
+
+    private void validateDeletableReview(Long userId, Long reviewId) {
         Review findReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("리뷰가 존재하지 않습니다."));
 

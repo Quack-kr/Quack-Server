@@ -19,11 +19,15 @@ public class QReviewReport extends EntityPathBase<ReviewReport> {
 
     public static final QReviewReport reviewReport = new QReviewReport("reviewReport");
 
+    public final NumberPath<Long> customerUserId = createNumber("customerUserId", Long.class);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final BooleanPath isReported = createBoolean("isReported");
 
     public final NumberPath<Long> restaurantId = createNumber("restaurantId", Long.class);
+
+    public final StringPath reviewContent = createString("reviewContent");
 
     public final NumberPath<Long> reviewId = createNumber("reviewId", Long.class);
 

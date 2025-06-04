@@ -22,6 +22,9 @@ public enum ErrorCode {
     PARSING_ERROR(INTERNAL_SERVER_ERROR, "응답값 변환 시 오류 발생하였습니다."),
 
     USER_NOT_FOUND(NOT_FOUND, "유저를 찾을 수 없습니다."),
+    REVIEW_NOT_FOUND(NOT_FOUND, "리뷰 정보를 찾을 수 없습니다."),
+    RESTAURANT_NOT_FOUND(NOT_FOUND, "식당 정보를 찾을 수 없습니다."),
+
     CURRENT_USE_NICKNAME(FORBIDDEN, "현재 설정된 닉네임입니다."),
     DUPLICATE_NICKNAME(FORBIDDEN, "이미 사용중인 닉네임입니다."),
     INVALID_NULL_NICKNAME(BAD_REQUEST, "닉네임은 null일 수 없습니다."),
@@ -30,6 +33,7 @@ public enum ErrorCode {
     INVALID_LONG_LENGTH_NICKNAME(BAD_REQUEST, "닉네임은 15자 미만 입력해야 합니다."),
     INVALID_PATTERN_NICKNAME(BAD_REQUEST, "닉네임은 영어, 한글, 숫자로만 사용할 수 있습니다."),
 
+    DUPLICATE_REVIEW_REPORT(CONFLICT, "이미 해당 리뷰는 신고 처리되었습니다."),
     ;
 
     final HttpStatus httpStatus;

@@ -3,11 +3,11 @@ package org.quack.QUACKServer.core.external.redis.repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quack.QUACKServer.auth.domain.JwtTokenDto;
 import org.quack.QUACKServer.core.error.constant.ErrorCode;
 import org.quack.QUACKServer.core.error.exception.CommonException;
-import org.quack.QUACKServer.auth.domain.JwtTokenDto;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -20,16 +20,16 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author : jung-kwanhee
  * @description :
- * @packageName : org.quack.QUACKServer.global.infra.redis.repository
  * @fileName : AuthRedisRepository
  * @date : 25. 6. 1.
  */
 @Repository
 @Slf4j
-public class AuthRedisRepository implements RedisRepository<String, JwtTokenDto> {
+@RequiredArgsConstructor
+public class AuthRedisRepository {
 
     private final ObjectMapper objectMapper;
-    private final RedisTemplate<String, String> authTokenRedisTemplate;
+    private final RedisTemplate<String, String> authRedisTemplate;
 
     @Value("${spring.datasource.data.redis.default-ttl}")
     long defaultTtl;
@@ -37,13 +37,6 @@ public class AuthRedisRepository implements RedisRepository<String, JwtTokenDto>
     @Resource(name = "redisTemplate")
     private ValueOperations<String, String> valueOperations;
 
-    public AuthRedisRepository(
-            ObjectMapper objectMapper, @Qualifier("redisTemplate") RedisTemplate<String, String> authTokenRedisTemplate) {
-        this.objectMapper = objectMapper;
-        this.authTokenRedisTemplate = authTokenRedisTemplate;
-    }
-
-    @Override
     public Optional<JwtTokenDto> get(String s) {
         String value = valueOperations.get(s);
 
@@ -59,7 +52,6 @@ public class AuthRedisRepository implements RedisRepository<String, JwtTokenDto>
         }
     }
 
-    @Override
     public void insert(String s, JwtTokenDto redisTokenDto) {
         try {
             valueOperations.set(s, objectMapper.writeValueAsString(redisTokenDto), defaultTtl, TimeUnit.SECONDS);
@@ -69,9 +61,8 @@ public class AuthRedisRepository implements RedisRepository<String, JwtTokenDto>
 
     }
 
-    @Override
     public void delete(String s) {
-        authTokenRedisTemplate.delete(s);
+        authRedisTemplate.delete(s);
     }
 
 }
