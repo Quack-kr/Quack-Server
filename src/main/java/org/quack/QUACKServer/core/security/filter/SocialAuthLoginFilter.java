@@ -47,7 +47,7 @@ public class SocialAuthLoginFilter extends AbstractAuthenticationProcessingFilte
     private final CustomerUserService customerUserService;
 
     public SocialAuthLoginFilter(AuthenticationManager authenticationManager, LoginAuthenticationProviderFactory providerFactory, ObjectMapper objectMapper, JwtUtil jwtUtil, CustomerUserService customerUserService) {
-        super(new AntPathRequestMatcher("/api/v1/auth/login", "POST"));
+        super(new AntPathRequestMatcher("/v1/auth/login", "POST"));
         this.providerFactory = providerFactory;
         this.objectMapper = objectMapper;
         setAuthenticationManager(authenticationManager);
