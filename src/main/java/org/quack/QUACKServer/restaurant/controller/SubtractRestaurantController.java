@@ -31,7 +31,7 @@ import static org.quack.QUACKServer.core.error.constant.ErrorCode.UNAUTHORIZED_U
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/subtract")
+@RequestMapping("")
 public class SubtractRestaurantController {
 
     private final SubtractRestaurantService baseSubtractRestaurantService;
@@ -39,7 +39,7 @@ public class SubtractRestaurantController {
     /**
      * 빼기 - 식당 조회 (필터, 정렬)
      */
-    @GetMapping("/restaurants")
+    @GetMapping("/subtract/restaurants")
     public SearchSubtractRestaurantsResponse searchSubtractRestaurants(
             @AuthenticationPrincipal CustomerUserInfo userInfo,
             @Valid SearchSubtractRestaurantsRequest request) {
@@ -49,7 +49,7 @@ public class SubtractRestaurantController {
     /**
      * 빼기 - 식당 조회 (필터, 정렬) - (둘러보기 권한)
      */
-    @GetMapping("/public/restaurants")
+    @GetMapping("/public/subtract/restaurants")
     public SearchSubtractRestaurantsResponse searchSubtractRestaurantsByNoAuth(
             @Valid SearchSubtractRestaurantsRequest request) {
         return baseSubtractRestaurantService.searchSubtractRestaurants(request, null);
@@ -58,7 +58,7 @@ public class SubtractRestaurantController {
     /**
      * 빼기(지도) - 식당 조회
      */
-    @GetMapping("/restaurants-locations")
+    @GetMapping("/subtract/restaurants-locations")
     public SearchSubtractRestaurantLocationsResponse searchSubtractRestaurantLocations(
             @AuthenticationPrincipal CustomerUserInfo customerUserInfo,
             @Valid SearchSubtractRestaurantLocationsRequest request) {
@@ -71,7 +71,7 @@ public class SubtractRestaurantController {
     /**
      * 빼기(지도) - 식당 단일 조회
      */
-    @GetMapping("/restaurant/{restaurantId}")
+    @GetMapping("/subtract/restaurant/{restaurantId}")
     public GetSubtractRestaurantResponse getSubtractRestaurant(@NotNull @PathVariable Long restaurantId) {
         return baseSubtractRestaurantService.getSubtractRestaurant(restaurantId);
     }
