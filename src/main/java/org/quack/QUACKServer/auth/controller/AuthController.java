@@ -2,7 +2,6 @@ package org.quack.QUACKServer.auth.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
@@ -19,6 +18,8 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+
+import static org.quack.QUACKServer.core.error.constant.ErrorCode.INVALID_ID_TOKEN;
 
 /**
  * @author : jung-kwanhee
@@ -58,9 +59,12 @@ public class AuthController {
 
     @PostMapping("/signup")
     public AuthResponse signup(
-            @Valid @NotBlank @RequestHeader("id_token") String idToken,
+            @RequestHeader("id_token") String idToken,
             @Valid @RequestBody SignupRequest request) {
-         return authService.signup(request, idToken);
+        if (idToken == null || idToken.trim().isEmpty()) {
+            throw new CommonException(INVALID_ID_TOKEN);
+        }
+        return authService.signup(request, idToken);
     }
 
     @PostMapping("/validate-nickname")
