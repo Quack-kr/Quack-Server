@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quack.QUACKServer.auth.domain.CustomerUserInfo;
+import org.quack.QUACKServer.auth.dto.request.NicknameRequest;
 import org.quack.QUACKServer.auth.dto.request.SignupRequest;
 import org.quack.QUACKServer.auth.dto.response.AuthResponse;
 import org.quack.QUACKServer.auth.service.AuthService;
@@ -70,8 +71,8 @@ public class AuthController {
 
     @PostMapping("/validate-nickname")
     public ResponseDto<?> validateUserNickname(
-            @Valid @RequestBody String nickname) {
-        authService.validateNickName(nickname);
+            @Valid @RequestBody NicknameRequest nicknameRequest) {
+        authService.validateNickName(nicknameRequest.getNickname());
 
         return ResponseDto.builder()
                 .httpStatus(HttpStatus.OK)
