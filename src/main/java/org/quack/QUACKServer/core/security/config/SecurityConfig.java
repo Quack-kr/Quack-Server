@@ -33,6 +33,8 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 public class SecurityConfig {
 
     private final AuthenticationManager quackAuthenticationManager;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -43,11 +45,16 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authenticationManager(quackAuthenticationManager)
+                .exceptionHandling(ex -> ex
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(new MvcRequestMatcher(introspector, "/v1/public/**")).hasAuthority("ANONYMOUS")
                         .requestMatchers(new MvcRequestMatcher(introspector, "/v1/auth/**")).permitAll()
                         .requestMatchers(new MvcRequestMatcher(introspector, "/v1/common/health-check")).permitAll()
-                                .anyRequest().authenticated())
+                        .anyRequest().authenticated()
+                )
                 .anonymous(anon -> anon
                         .principal("guest-user")
                         .authorities("ANONYMOUS")
@@ -58,8 +65,8 @@ public class SecurityConfig {
                 .addFilterBefore(jwtExceptionFilter, JwtTokenFilter.class)
                 .logout(logout -> logout
                         .logoutSuccessUrl("/v1/auth/logout")
-                        .logoutSuccessHandler(
-                                (request, response, auth) -> SecurityContextHolder.clearContext()))
+                        .logoutSuccessHandler((request, response, auth) -> SecurityContextHolder.clearContext())
+                )
                 .build();
     }
 
@@ -67,6 +74,4 @@ public class SecurityConfig {
     public HandlerMappingIntrospector handlerMappingIntrospector() {
         return new HandlerMappingIntrospector();
     }
-
-
 }
