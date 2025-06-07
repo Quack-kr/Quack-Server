@@ -13,6 +13,7 @@ import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.core.common.dto.SocialAuthDto;
 import org.quack.QUACKServer.core.error.exception.CommonException;
 import org.quack.QUACKServer.core.external.redis.repository.AuthRedisRepository;
+import org.quack.QUACKServer.core.security.enums.ProviderType;
 import org.quack.QUACKServer.core.security.jwt.JwtUtil;
 import org.quack.QUACKServer.core.security.provider.AppleLoginAuthenticationProvider;
 import org.quack.QUACKServer.core.security.provider.KakaoLoginAuthenticationProvider;
@@ -55,62 +56,46 @@ public class AuthService {
 
     @Transactional
     public AuthResponse signup(SignupRequest request, String idToken) {
+        SocialAuthDto socialAuthDto = switch (request.providerType()) {
+            case APPLE -> appleLoginAuthenticationProvider.getSocialAuth(idToken);
+            case KAKAO -> kakaoLoginAuthenticationProvider.getSocialAuth(idToken);
+            default -> throw new CommonException(ErrorCode.INVALID_PROVIDER_TYPE);
+        };
 
-        switch (request.providerType()) {
-            case APPLE -> {
-                SocialAuthDto socialAuthDto = appleLoginAuthenticationProvider.getSocialAuth(idToken);
-
-                // 1. 닉네임 중복 검증
-                validateNickName(request.nickname());
-
-                CustomerUser user = CustomerUser.createBySocial(request.providerType(),
-                        socialAuthDto.getProviderId(), socialAuthDto.getEmail(), request.nickname());
-
-                updateNicknameSequence(request.nickname());
-
-                customerUserRepository.save(user);
-
-                CustomerUserMetadata userMetadata = CustomerUserMetadata.create(user.getCustomerUserId(),
-                        request.privacyAgreed(), request.termsAgreed(), request.locationTermsAgreed());
-
-                customerUserMetadataRepository.save(userMetadata);
-
-                JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getEmail(), user.getCustomerUserId());
-
-                authRedisRepository.insert(jwtTokenDto.getRedisKey(), jwtTokenDto);
-
-                return AuthResponse.from(jwtTokenDto);
-            }
-            case KAKAO -> {
-                SocialAuthDto socialAuthDto = kakaoLoginAuthenticationProvider.getSocialAuth(idToken);
-
-                // 1. 닉네임 중복 검증
-                validateNickName(request.nickname());
-
-                CustomerUser user = CustomerUser.createBySocial(request.providerType(),
-                        socialAuthDto.getProviderId(), socialAuthDto.getEmail(), request.nickname());
-
-                updateNicknameSequence(request.nickname());
-
-                customerUserRepository.save(user);
-
-                CustomerUserMetadata userMetadata = CustomerUserMetadata.create(user.getCustomerUserId(),
-                        request.privacyAgreed(), request.termsAgreed(), request.locationTermsAgreed());
-
-                customerUserMetadataRepository.save(userMetadata);
-
-                JwtTokenDto jwtTokenDto = jwtUtil.generateToken(user.getEmail(), user.getCustomerUserId());
-
-                authRedisRepository.insert(jwtTokenDto.getRedisKey(), jwtTokenDto);
-
-
-                return AuthResponse.from(jwtTokenDto);
-            }
-            default -> {
-                throw new CommonException(ErrorCode.INVALID_PROVIDER_TYPE);
-            }
-        }
+        return processSignup(request, socialAuthDto);
     }
+
+    private AuthResponse processSignup(SignupRequest request, SocialAuthDto socialAuthDto) {
+        // 1. 닉네임 중복 검증
+        validateNickName(request.nickname());
+        validateProviderAndId(request.providerType(), socialAuthDto.getProviderId());
+
+        // 2. 사용자 생성 및 저장
+        CustomerUser user = CustomerUser.createBySocial(
+                request.providerType(),
+                socialAuthDto.getProviderId(),
+                socialAuthDto.getEmail(),
+                request.nickname()
+        );
+        updateNicknameSequence(request.nickname());
+        customerUserRepository.save(user);
+
+        // 3. 사용자 메타데이터 저장
+        CustomerUserMetadata metadata = CustomerUserMetadata.create(
+                user.getCustomerUserId(),
+                request.privacyAgreed(),
+                request.termsAgreed(),
+                request.locationTermsAgreed()
+        );
+        customerUserMetadataRepository.save(metadata);
+
+        // 4. JWT 토큰 발급 및 Redis 저장
+        JwtTokenDto jwtToken = jwtUtil.generateToken(user.getEmail(), user.getCustomerUserId());
+        authRedisRepository.insert(jwtToken.getRedisKey(), jwtToken);
+
+        return AuthResponse.from(jwtToken);
+    }
+
 
     public AuthResponse refreshToken(HttpServletRequest request) {
         String refreshToken = getRefreshToken(request);
@@ -221,5 +206,9 @@ public class AuthService {
                 .build();
     }
 
-
+    public void validateProviderAndId(ProviderType providerType, String providerId) {
+        if (customerUserRepository.existsByProviderAndProviderId(providerType, providerId)) {
+            throw new CommonException(DUPLICATE_USER);
+        }
+    }
 }
