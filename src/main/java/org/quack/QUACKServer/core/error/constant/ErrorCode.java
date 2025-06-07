@@ -27,6 +27,7 @@ public enum ErrorCode {
 
     CURRENT_USE_NICKNAME(FORBIDDEN, "현재 설정된 닉네임입니다."),
     DUPLICATE_NICKNAME(FORBIDDEN, "이미 사용중인 닉네임입니다."),
+    DUPLICATE_USER(BAD_REQUEST, "이미 가입된 계정입니다."),
     INVALID_NULL_NICKNAME(BAD_REQUEST, "닉네임은 null일 수 없습니다."),
     INVALID_BLANK_NICKNAME(BAD_REQUEST, "닉네임은 blank일 수 없습니다."),
     INVALID_SHORT_LENGTH_NICKNAME(BAD_REQUEST, "닉네임은 3자 이상 입력해야 합니다."),
@@ -43,6 +44,4 @@ public enum ErrorCode {
         this.httpStatus = httpStatus;
         this.message = message;
     }
-
-
 }
