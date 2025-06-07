@@ -177,15 +177,14 @@ public class AuthService {
         }
     }
 
-    public ResponseDto<?> validateNickName(String nickname) {
-
+    public void validateNickName(String nickname) {
         if (nickname == null) {
             throw new CommonException(INVALID_NULL_NICKNAME);
         }
         if (nickname.isBlank()) {
             throw new CommonException(INVALID_BLANK_NICKNAME);
         }
-        if (nickname.length() <= 2) {
+        if (nickname.length() < 3) {
             throw new CommonException(INVALID_SHORT_LENGTH_NICKNAME);
         }
         if (nickname.length() > 15) {
@@ -195,15 +194,9 @@ public class AuthService {
             throw new CommonException(INVALID_PATTERN_NICKNAME);
         }
 
-        if(customerUserRepository.existsByNickname(nickname)) {
+        if (customerUserRepository.existsByNickname(nickname)) {
             throw new CommonException(DUPLICATE_NICKNAME);
         }
-
-        return ResponseDto.builder()
-                .httpStatus(HttpStatus.OK)
-                .message("꽥에서 사용하실 이름이에요")
-                .isSuccess(true)
-                .build();
     }
 
     public void validateProviderAndId(ProviderType providerType, String providerId) {

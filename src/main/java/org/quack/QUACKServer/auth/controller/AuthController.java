@@ -11,6 +11,7 @@ import org.quack.QUACKServer.auth.service.AuthService;
 import org.quack.QUACKServer.core.error.constant.ErrorCode;
 import org.quack.QUACKServer.core.common.dto.ResponseDto;
 import org.quack.QUACKServer.core.error.exception.CommonException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -70,7 +71,13 @@ public class AuthController {
     @PostMapping("/validate-nickname")
     public ResponseDto<?> validateUserNickname(
             @Valid @RequestBody String nickname) {
-        return authService.validateNickName(nickname);
+        authService.validateNickName(nickname);
+
+        return ResponseDto.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("꽥에서 사용하실 이름이에요")
+                .isSuccess(true)
+                .build();
     }
 
     @PostMapping("/withdraw")
